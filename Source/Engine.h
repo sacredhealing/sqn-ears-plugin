@@ -304,9 +304,9 @@ public:
             listen (L, R, n);
             double pk = 0; for (int i = 0; i < n; ++i) pk = std::max (pk, (double) std::max (std::abs (L[i]), std::abs (R[i])));
             silent = pk < 1e-3 ? silent + n : 0;
-            const bool lock = (nsamp >= sr * 30 && silent >= sr * 2) || (! p.listen && lastListen && ! p.fix);
-            if (nsamp >= sr * 8 && (nsamp - planAt >= sr * 4 || lock) && silent == 0) { lastAmount = p.amount; if (snapshot()) computeFix (style, p.amount, p.limiter); planAt = nsamp; }
-            if (lock) { learning = false; if (snapshot()) computeFix (style, p.amount, p.limiter); }
+            const bool lock = (totN >= sr * 30 && silent >= sr * 2) || (! p.listen && lastListen && ! p.fix);
+            if (totN >= sr * 8 && (totN - planAt >= sr * 4 || lock) && silent == 0) { lastAmount = p.amount; if (snapshot()) computeFix (style, p.amount, p.limiter); planAt = totN; }
+            if (lock && totN >= sr * 8) { learning = false; if (snapshot()) computeFix (style, p.amount, p.limiter); }
         }
         else if (an.have && lastStyle >= 0 && (style != lastStyle || std::abs (p.amount - lastAmount) > 0.5f || limI != lastLim))
         { lastAmount = p.amount; computeFix (style, p.amount, p.limiter); }
@@ -444,7 +444,7 @@ public:
         const double cr = learning ? sLR / std::sqrt (std::max (sLL * sRR, 1e-30)) : an.corr;
         const double Io = (target == 1 && mout.blocks > 10) ? mout.integrated() : -70;
         ro.lufsIn = (float) I; ro.tpIn = (float) tpd; ro.corr = (float) cr;
-        ro.gain = target == 1 ? fx.gain + fx.trim : 0.0f; ro.secs = (float) (nsamp / sr);
+        ro.gain = target == 1 ? fx.gain + fx.trim : 0.0f; ro.secs = (float) (totN / sr);
         ro.lufsOut = (float) Io; ro.peakOut = target == 1 ? (float) dB20 (std::max (opk, 1e-9)) : -70.0f;
         ro.turnDown = Io > -70 ? (float) std::max (0.0, Io + 14) : 0.0f;
         ro.harsh = (float) -dB20 (hmax); ro.glue = (float) -dB20 (gmax); ro.lim = (float) -dB20 (lmax);
@@ -524,7 +524,7 @@ private:
 
     bool snapshot()
     {
-        if (nsamp < sr * 5) return false;
+        if (totN < sr * 5) return false;   // never plan from silence
         for (int b = 0; b < 9; ++b) an.mb[b] = (float) dB10 (bandE[b] / std::max (totE, 1e-20));
         for (int b = 0; b < 6; ++b) an.mm[b] = (float) dB10 (mudE[b]);
         an.mhb = (float) (hbE / std::max (totE, 1e-20)); an.mhba = (float) (hbE / std::max (totN, 1.0));
