@@ -1,0 +1,41 @@
+name: Build Mac installer
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  mac:
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+      - name: Get JUCE 8
+        run: git clone --depth 1 --branch 8.0.4 https://github.com/juce-framework/JUCE.git JUCE
+      - name: Build AU + VST3 (Apple Silicon + Intel)
+        run: |
+          cmake -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_OSX_ARCHITECTURES="arm64;x86_64" -DCMAKE_OSX_DEPLOYMENT_TARGET=11.0
+          cmake --build build --config Release -j 4
+      - name: Sign (ad-hoc) and validate the Audio Unit
+        run: |
+          A="build/SqnEars_artefacts/Release"
+          codesign --force --deep -s - "$A/AU/SQN Ears.component"
+          codesign --force --deep -s - "$A/VST3/SQN Ears.vst3"
+          mkdir -p ~/Library/Audio/Plug-Ins/Components
+          cp -R "$A/AU/SQN Ears.component" ~/Library/Audio/Plug-Ins/Components/
+          killall -9 AudioComponentRegistrar || true
+          sleep 3
+          auval -v aufx SqEr SqnM
+      - name: Make installer
+        run: |
+          A="build/SqnEars_artefacts/Release"
+          mkdir -p pkg/au pkg/vst3
+          cp -R "$A/AU/SQN Ears.component" pkg/au/
+          cp -R "$A/VST3/SQN Ears.vst3" pkg/vst3/
+          pkgbuild --root pkg/au --identifier com.siddhaquantumnexus.sqnears.au --version 2.0.0 --install-location "/Library/Audio/Plug-Ins/Components" au.pkg
+          pkgbuild --root pkg/vst3 --identifier com.siddhaquantumnexus.sqnears.vst3 --version 2.0.0 --install-location "/Library/Audio/Plug-Ins/VST3" vst3.pkg
+          productbuild --package au.pkg --package vst3.pkg "SQN_Ears_Installer.pkg"
+          ls -la SQN_Ears_Installer.pkg
+      - uses: actions/upload-artifact@v4
+        with:
+          name: SQN_Ears_Installer
+          path: SQN_Ears_Installer.pkg

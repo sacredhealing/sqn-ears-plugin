@@ -1,0 +1,257 @@
+<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SQN Ears</title>
+<style>
+:root{--gold:#D4AF37;--gold2:#F6DE8D;--cyan:#22D3EE;--red:#F2545B;--green:#4ADE80;--muted:rgba(255,255,255,.6);--faint:rgba(255,255,255,.34);color-scheme:dark}
+*{box-sizing:border-box;-webkit-user-select:none;user-select:none}
+html,body{margin:0;height:100%;background:#030303;overflow:hidden;font-family:"Plus Jakarta Sans",Inter,-apple-system,"SF Pro Display","Helvetica Neue",sans-serif;color:#F4F1E8;cursor:default}
+.plug{position:absolute;inset:0;background:radial-gradient(70% 60% at 50% -10%,rgba(212,175,55,.2),transparent 60%),radial-gradient(50% 50% at 95% 110%,rgba(34,211,238,.12),transparent 70%),linear-gradient(180deg,#0b0a07,#030303 55%)}
+.plug::before{content:"";position:absolute;inset:0;background:linear-gradient(115deg,rgba(255,255,255,.06),transparent 28%,transparent 70%,rgba(255,255,255,.03));pointer-events:none;z-index:5}
+#stars{position:absolute;inset:0;width:100%;height:100%}
+.ui{position:absolute;inset:0;padding:2.6vh 2.6vw;display:grid;grid-template-columns:25% 1fr 27%;grid-template-rows:auto 1fr auto;gap:1.8vh 1.8vw;z-index:2}
+.lbl{font-weight:800;font-size:8px;letter-spacing:.5em;text-transform:uppercase;color:var(--gold)}
+.lbl.d{color:var(--faint)}
+.top{grid-column:1/-1;display:flex;justify-content:space-between;align-items:center;gap:12px}
+.brand b{display:block;font-weight:900;letter-spacing:-.05em;font-size:30px;line-height:1;margin-top:6px}
+.brand b em{font-style:normal;background:linear-gradient(180deg,#FFF1BE,#D4AF37 55%,#8C6A12);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 0 12px rgba(212,175,55,.45))}
+.pills{display:flex;gap:10px}
+.pill{border:1px solid rgba(212,175,55,.45);border-radius:999px;padding:9px 15px;font-weight:800;font-size:8px;letter-spacing:.35em;text-transform:uppercase;color:var(--gold2);display:flex;align-items:center;gap:9px;background:rgba(212,175,55,.06);box-shadow:inset 0 1px 0 rgba(255,255,255,.08)}
+.pill i{width:8px;height:8px;border-radius:50%;background:var(--faint)}
+.pill.live i{background:var(--gold);box-shadow:0 0 14px var(--gold);animation:blink 1.6s ease-in-out infinite}
+.pill.listen i{background:var(--cyan);box-shadow:0 0 14px var(--cyan);animation:blink .8s ease-in-out infinite}
+.pill.btn{cursor:pointer}.pill.btn.off{opacity:.45;border-color:rgba(255,255,255,.15);color:var(--muted)}
+@keyframes blink{50%{opacity:.35}}
+.card{position:relative;border-radius:26px;padding:14px 16px;background:linear-gradient(160deg,rgba(255,255,255,.07),rgba(255,255,255,.015) 40%,rgba(255,255,255,.01));border:1px solid rgba(255,255,255,.07);box-shadow:inset 0 1px 0 rgba(255,255,255,.12),inset 0 -12px 24px rgba(0,0,0,.35),0 18px 40px rgba(0,0,0,.55);backdrop-filter:blur(40px);-webkit-backdrop-filter:blur(40px)}
+.col{display:flex;flex-direction:column;gap:1.6vh;min-width:0;min-height:0}
+.col .card{flex:1;display:flex;flex-direction:column;justify-content:center}
+.v{font-family:"SF Mono",Menlo,monospace;font-size:22px;letter-spacing:-.03em;margin-top:6px}
+.v small{font-family:inherit;font-size:11px;color:var(--muted)}
+.s{font-size:11px;color:var(--muted);line-height:1.5}
+.meter{height:6px;border-radius:6px;background:rgba(255,255,255,.06);margin-top:8px;position:relative;overflow:hidden;box-shadow:inset 0 1px 2px rgba(0,0,0,.6)}
+.meter i{position:absolute;inset:0 auto 0 0;border-radius:6px;transition:width .12s linear}
+.center{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:0}
+.orbwrap{position:relative;height:min(100%,46vw);max-height:calc(100% - 64px);aspect-ratio:1}
+.aura{position:absolute;inset:-10%;border-radius:50%;background:radial-gradient(circle,rgba(34,211,238,.2),rgba(212,175,55,.12) 45%,transparent 68%);animation:breathe 4s ease-in-out infinite;filter:blur(6px)}
+@keyframes breathe{50%{transform:scale(1.06);opacity:.75}}
+#spec{position:absolute;inset:0;width:100%;height:100%}
+.orb{position:absolute;inset:18%;border-radius:50%;background:radial-gradient(circle at 35% 28%,rgba(255,248,220,.55),rgba(212,175,55,.35) 18%,rgba(70,50,10,.9) 52%,#0a0703 78%);box-shadow:inset -18px -26px 50px rgba(0,0,0,.85),inset 10px 14px 30px rgba(255,230,160,.25),0 0 60px rgba(212,175,55,.35),0 30px 60px rgba(0,0,0,.8)}
+.orb::after{content:"";position:absolute;left:22%;top:12%;width:34%;height:20%;border-radius:50%;background:radial-gradient(ellipse,rgba(255,255,255,.5),transparent 70%);filter:blur(2px)}
+.yantra{position:absolute;inset:25%;animation:spin 60s linear infinite;opacity:.45}
+@keyframes spin{to{transform:rotate(360deg)}}
+.readout{position:absolute;inset:0;display:grid;place-content:center;text-align:center;pointer-events:none}
+.readout b{font-weight:900;font-size:clamp(26px,4.6vw,48px);letter-spacing:-.05em;line-height:1;text-shadow:0 4px 18px rgba(0,0,0,.9),0 0 30px rgba(246,222,141,.35)}
+.readout span{font-weight:800;font-size:8px;letter-spacing:.38em;color:var(--gold2);margin-top:8px;text-shadow:0 2px 6px #000}
+.btns{display:flex;gap:12px;margin-top:10px}
+.b{position:relative;border-radius:999px;padding:12px 26px;font-weight:800;font-size:10px;letter-spacing:.4em;text-transform:uppercase;color:var(--gold2);background:linear-gradient(180deg,rgba(255,255,255,.08),rgba(255,255,255,.01));border:1px solid rgba(212,175,55,.5);box-shadow:inset 0 1px 0 rgba(255,255,255,.18),0 10px 24px rgba(0,0,0,.6);cursor:pointer;overflow:hidden;transition:transform .08s}
+.b:active{transform:scale(.96)}
+.b.cy{color:var(--cyan);border-color:rgba(34,211,238,.55)}
+.b.cy.on{color:#03161a;background:linear-gradient(180deg,#b8f5fc,#22D3EE 50%,#0e7490);box-shadow:inset 0 1px 0 rgba(255,255,255,.7),0 0 36px rgba(34,211,238,.6)}
+.b.on.gd{color:#1a1205;border-color:#F6DE8D;background:linear-gradient(180deg,#FFF0B8,#D4AF37 45%,#9C7414);box-shadow:inset 0 1px 0 rgba(255,255,255,.7),inset 0 -3px 6px rgba(0,0,0,.3),0 0 40px rgba(212,175,55,.6),0 12px 26px rgba(0,0,0,.7)}
+.b.on::after{content:"";position:absolute;top:0;bottom:0;width:40%;left:-60%;background:linear-gradient(100deg,transparent,rgba(255,255,255,.6),transparent);animation:shine 3s ease-in-out infinite}
+.b.dis{opacity:.35;pointer-events:none}
+@keyframes shine{60%,100%{left:130%}}
+.chips{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-top:8px}
+.chip{border:1px solid rgba(255,255,255,.08);border-radius:999px;padding:5px 8px;font-size:10px;color:var(--muted);background:rgba(255,255,255,.02);text-align:center;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;transition:all .15s}
+.chip:hover{color:#fff;border-color:rgba(212,175,55,.4)}
+.chip.on{border-color:var(--gold);color:var(--gold2);background:rgba(212,175,55,.12);box-shadow:0 0 16px rgba(212,175,55,.3),inset 0 1px 0 rgba(255,255,255,.15)}
+.knobs{display:grid;grid-template-columns:1fr 1fr;gap:8px 4px}
+.k{text-align:center}
+.kn{position:relative;width:62px;height:62px;margin:auto;cursor:ns-resize;touch-action:none}
+.kn .ring{position:absolute;inset:0;border-radius:50%;background:conic-gradient(from 225deg,var(--c) 0 var(--p),rgba(255,255,255,.07) var(--p) 75%,transparent 75%);-webkit-mask:radial-gradient(circle,transparent 60%,#000 61%);mask:radial-gradient(circle,transparent 60%,#000 61%);filter:drop-shadow(0 0 5px var(--c))}
+.kn .cap{position:absolute;inset:16%;border-radius:50%;background:conic-gradient(from 20deg,#2a2418,#6b5420,#1b160c,#5a4719,#2a2418,#8c6c22,#2a2418);box-shadow:inset 0 2px 2px rgba(255,240,190,.35),inset 0 -4px 8px rgba(0,0,0,.7),0 8px 16px rgba(0,0,0,.8)}
+.kn .cap::before{content:"";position:absolute;inset:14%;border-radius:50%;background:radial-gradient(circle at 40% 30%,#3a3222,#0d0b07 70%)}
+.kn .tick{position:absolute;left:50%;top:18%;width:3px;height:14%;margin-left:-1.5px;border-radius:2px;background:var(--gold2);box-shadow:0 0 8px var(--gold2);transform-origin:50% 230%;transform:rotate(var(--a))}
+.kn b{position:absolute;inset:0;display:grid;place-items:center;font-weight:900;font-size:12px;z-index:2;pointer-events:none}
+.k .t{font-weight:800;font-size:7px;letter-spacing:.3em;text-transform:uppercase;color:var(--faint);margin-top:5px}
+.bottom{grid-column:1/-1;display:grid;grid-template-columns:1fr 27%;gap:1.8vw}
+#curve{width:100%;height:58px;display:block}
+.moves{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:11px;color:var(--muted)}.moves b{color:#F4F1E8;font-family:"SF Mono",Menlo,monospace;font-weight:500}
+.dyn{display:grid;grid-template-columns:auto 1fr auto;gap:5px 8px;align-items:center;font-size:10px;color:var(--muted);margin-top:6px}
+.dyn .meter{margin:0}
+.dyn em{font-style:normal;font-family:"SF Mono",Menlo,monospace;color:#F4F1E8;min-width:38px;text-align:right}
+@media (prefers-reduced-motion:reduce){*{animation:none!important}}
+</style></head><body>
+<div class="plug">
+<canvas id="stars"></canvas>
+<div class="ui">
+ <div class="top">
+  <div class="brand"><div class="lbl">Siddha Quantum Nexus · Master Intelligence</div><b>SQN <em>Ears</em></b></div>
+  <div class="pills"><div class="pill btn" id="limBtn" title="Peak limiter: lets the loud sounds reach their target safely"><i></i>Loud</div><div class="pill" id="status"><i></i><span>Press Listen</span></div></div>
+ </div>
+ <div class="col">
+  <div class="card"><div class="lbl d">Loudness</div><div class="v" id="lu">— <small>LUFS</small></div><div class="s" id="luS">target — · heard —</div><div class="meter"><i id="luM" style="width:0;background:linear-gradient(90deg,#8C6A12,#F6DE8D);box-shadow:0 0 12px #D4AF37"></i></div></div>
+  <div class="card"><div class="lbl d">Peak</div><div class="v" id="tp">— <small>dB</small></div><div class="s" id="tpS">safe ceiling -1.5 dB</div><div class="meter"><i id="tpM" style="width:0;background:linear-gradient(90deg,#1f8a4c,#7cf2a9);box-shadow:0 0 12px #4ADE80"></i></div></div>
+  <div class="card"><div class="lbl d">Stereo field</div><div class="v" id="wd">—</div><div class="s" id="wdS">bass kept mono</div><div class="meter"><i id="wdM" style="width:0;background:linear-gradient(90deg,#0e7490,#7deaf7);box-shadow:0 0 12px #22D3EE"></i></div></div>
+ </div>
+ <div class="center">
+  <div class="orbwrap">
+   <div class="aura"></div><canvas id="spec"></canvas><div class="orb"></div>
+   <svg class="yantra" viewBox="0 0 100 100"><g fill="none" stroke="#FFE9A8" stroke-width=".6"><path d="M50 10 L88 74 L12 74 Z"/><path d="M50 90 L12 26 L88 26 Z"/><circle cx="50" cy="50" r="38" stroke-opacity=".5"/><circle cx="50" cy="50" r="44" stroke-dasharray="1 3"/></g></svg>
+   <div class="readout"><b id="big">—</b><span id="bigS">PLAY · PRESS LISTEN</span></div>
+  </div>
+  <div class="btns"><span class="b cy" id="listenBtn">Listen</span><span class="b gd" id="fixBtn">Fix</span><span class="b" id="abBtn" title="Hold to hear your original mix">Hold A/B</span></div>
+ </div>
+ <div class="col">
+  <div class="card" style="flex:1.3"><div class="lbl">Sound</div><div class="chips" id="chips"></div></div>
+  <div class="card"><div class="knobs" id="knobs"></div></div>
+ </div>
+ <div class="bottom">
+  <div class="card"><div class="lbl d">Tone · what Ears changed</div><canvas id="curve"></canvas><div class="moves" id="moves"><span>Press Listen, play the song, then Fix</span></div></div>
+  <div class="card"><div class="lbl d">Working now</div>
+   <div class="dyn"><span>Harsh</span><div class="meter"><i id="dH" style="width:0;background:#22D3EE;box-shadow:0 0 10px #22D3EE"></i></div><em id="dHv">0.0</em>
+   <span>Glue</span><div class="meter"><i id="dG" style="width:0;background:#D4AF37;box-shadow:0 0 10px #D4AF37"></i></div><em id="dGv">0.0</em>
+   <span>Limit</span><div class="meter"><i id="dL" style="width:0;background:#F2545B;box-shadow:0 0 10px #F2545B"></i></div><em id="dLv">0.0</em></div>
+   <div class="s" id="stream" style="margin-top:6px">Spotify / YouTube: —</div></div>
+ </div>
+</div></div>
+<script>
+// demo backend when opened outside the plugin (design preview)
+if (!window.__JUCE__) {
+  const L = {}, demo = { listen:false, fix:true, limiter:true };
+  window.__SQN_DEMO__ = true;
+  window.__JUCE__ = { initialisationData:{ __juce__sliders:["amount","console","harsh","glue"], __juce__toggles:["listen","fix","limiter"], __juce__comboBoxes:["sound"], __juce__functions:[] },
+    backend:{ addEventListener(id,fn){ (L[id]=L[id]||[]).push(fn); return [id,fn]; }, removeEventListener(){},
+      emitEvent(id,ev){ const fire=(e)=>setTimeout(()=>(L[id]||[]).forEach(f=>f(e)));
+        const vals={amount:100,console:60,harsh:50,glue:50};
+        if(ev.eventType==="requestInitialUpdate"){
+          if(id.startsWith("__juce__slider")){const n=id.slice(14);fire({eventType:"propertiesChanged",start:0,end:100,skew:1,name:n,label:"%",numSteps:1001,interval:0.1,parameterIndex:0});fire({eventType:"valueChanged",value:vals[n]});}
+          if(id.startsWith("__juce__toggle")){const n=id.slice(14);fire({eventType:"valueChanged",value:demo[n]});}
+          if(id.startsWith("__juce__comboBox")){fire({eventType:"propertiesChanged",name:"Sound",parameterIndex:0,choices:["Sovereign","Zion Roots","Kingston 1973","Island '77","Dub Chamber","West Coast Gold","G-Funk '96","Golden Era '94","808 Modern","Crystal Pop '82","Mantra Temple"]});fire({eventType:"valueChanged",value:2/10});}
+        } else if(ev.eventType==="valueChanged"){fire({eventType:"valueChanged",value:ev.value});}
+      } } };
+  let t=0; setInterval(()=>{t+=.033;const spec=[];for(let k=0;k<32;k++)spec.push(-38+14*Math.sin(k*.45+t*2.1)*Math.cos(k*.13-t)-k*.5+6*Math.random());
+    (L.meters||[]).forEach(f=>f({state:2,style:2,cal:true,lufsIn:-15.4,tpIn:-0.6,corr:.93,gain:2.4,secs:212,lufsOut:-13.1+.15*Math.sin(t),peakOut:-1.6,turnDown:0,
+      harsh:Math.max(0,2.2*Math.sin(t*1.3)),glue:1.4+.6*Math.sin(t*2.2),lim:Math.max(0,1.5*Math.sin(t*.9)),ls:1.2,lm:.6,pr:-.8,hs:-1.6,mudf:315,mudg:-1,width:1.5,latencyMs:1.5,spec}));},33);
+}
+</script>
+<script type="module">
+import * as Juce from "./juce/index.js";
+const $ = (id) => document.getElementById(id);
+const NAMES = ["Sovereign","Zion Roots","Kingston 1973","Island '77","Dub Chamber","West Coast Gold","G-Funk '96","Golden Era '94","808 Modern","Crystal Pop '82","Mantra Temple"];
+const TARGET = [-11,-13,-13,-12,-12,-10,-10,-10,-9,-11.5,-16];
+const listen = Juce.getToggleState("listen"), fix = Juce.getToggleState("fix"), lim = Juce.getToggleState("limiter");
+const sound = Juce.getComboBoxState("sound");
+let M = { state:0, spec:[] }, abHeld = false;
+
+// buttons
+function paintButtons(){
+  $("listenBtn").classList.toggle("on", listen.getValue());
+  $("fixBtn").classList.toggle("on", fix.getValue());
+  $("limBtn").classList.toggle("off", !lim.getValue());
+}
+$("listenBtn").onclick = () => listen.setValue(!listen.getValue());
+$("fixBtn").onclick = () => fix.setValue(!fix.getValue());
+$("limBtn").onclick = () => lim.setValue(!lim.getValue());
+const abDown = () => { if (fix.getValue()) { abHeld = true; fix.setValue(false); } };
+const abUp = () => { if (abHeld) { abHeld = false; fix.setValue(true); } };
+$("abBtn").addEventListener("pointerdown", abDown);
+["pointerup","pointerleave","pointercancel"].forEach(e => $("abBtn").addEventListener(e, abUp));
+[listen, fix, lim].forEach(s => s.valueChangedEvent.addListener(paintButtons));
+
+// sounds
+const chips = $("chips");
+NAMES.forEach((n, i) => { const c = document.createElement("div"); c.className = "chip"; c.textContent = n; c.onclick = () => sound.setChoiceIndex(i); chips.appendChild(c); });
+function paintChips(){ const i = sound.getChoiceIndex(); [...chips.children].forEach((c, k) => c.classList.toggle("on", k === i)); }
+sound.valueChangedEvent.addListener(paintChips); sound.propertiesChangedEvent.addListener(paintChips);
+
+// knobs
+const KN = [["amount","Amount","#D4AF37",100],["console","Console 1973","#E0913A",0],["harsh","Harsh tamer","#22D3EE",50],["glue","Glue","#F6DE8D",50]];
+KN.forEach(([id, label, col, def]) => {
+  const st = Juce.getSliderState(id);
+  const k = document.createElement("div"); k.className = "k";
+  k.innerHTML = `<div class="kn" style="--c:${col}"><div class="ring"></div><div class="cap"></div><div class="tick"></div><b></b></div><div class="t">${label}</div>`;
+  $("knobs").appendChild(k);
+  const kn = k.querySelector(".kn"), val = k.querySelector("b");
+  const paint = () => { const n = st.getNormalisedValue(); kn.style.setProperty("--p", (n * 75) + "%"); kn.style.setProperty("--a", (-135 + 270 * n) + "deg"); val.textContent = Math.round(st.getScaledValue()); };
+  st.valueChangedEvent.addListener(paint); st.propertiesChangedEvent.addListener(paint);
+  let y0 = 0, n0 = 0;
+  kn.addEventListener("pointerdown", e => { kn.setPointerCapture(e.pointerId); y0 = e.clientY; n0 = st.getNormalisedValue(); st.sliderDragStarted(); });
+  kn.addEventListener("pointermove", e => { if (!kn.hasPointerCapture(e.pointerId)) return; const n = Math.min(1, Math.max(0, n0 + (y0 - e.clientY) / (e.shiftKey ? 600 : 180))); st.setNormalisedValue(n); paint(); });
+  kn.addEventListener("pointerup", e => { kn.releasePointerCapture(e.pointerId); st.sliderDragEnded(); });
+  kn.addEventListener("dblclick", () => { st.sliderDragStarted(); st.setNormalisedValue(def / 100); st.sliderDragEnded(); paint(); });
+  kn.addEventListener("wheel", e => { e.preventDefault(); st.setNormalisedValue(Math.min(1, Math.max(0, st.getNormalisedValue() - Math.sign(e.deltaY) * .02))); paint(); }, { passive:false });
+});
+
+// meters from the plugin
+const f1 = (v) => (v > -69 ? v.toFixed(1) : "—");
+const sg = (v) => (v >= 0 ? "+" : "") + v.toFixed(1);
+window.__JUCE__.backend.addEventListener("meters", (d) => {
+  M = d;
+  const fixed = d.state === 2, tgt = TARGET[d.style] ?? -13;
+  const shown = fixed && d.lufsOut > -69 ? d.lufsOut : d.lufsIn;
+  $("lu").innerHTML = `${f1(shown)} <small>LUFS</small>`;
+  $("luS").textContent = `target ${tgt} · heard ${f1(d.lufsIn)}`;
+  $("luM").style.width = Math.max(0, Math.min(100, (shown + 24) / 18 * 100)) + "%";
+  const pk = fixed ? d.peakOut : d.tpIn;
+  $("tp").innerHTML = `${f1(pk)} <small>${fixed ? "dB out" : "dBTP in"}</small>`;
+  $("tp").style.color = pk > -1 ? "var(--red)" : "var(--green)";
+  $("tpS").textContent = fixed ? "peaks held under -1.5 dB" : (pk > -1 ? "too hot: Fix will hold it" : "safe for every platform");
+  $("tpM").style.width = Math.max(0, Math.min(100, (pk + 12) / 12 * 100)) + "%";
+  $("wd").textContent = d.corr ? d.corr.toFixed(2) : "—";
+  $("wdS").textContent = fixed ? `width ${sg(d.width)} dB · bass mono` : "L/R similarity (1 = mono)";
+  $("wdM").style.width = Math.max(0, Math.min(100, (1 - Math.max(0, d.corr)) * 200 + 20)) + "%";
+  $("big").textContent = shown > -69 ? shown.toFixed(1) : "—";
+  const S = ["PLAY · PRESS LISTEN", `LISTENING · ${Math.floor(d.secs)} S`, d.cal ? "LUFS · ON TARGET" : "LUFS · TUNING ITSELF", "READY · PRESS FIX"];
+  $("bigS").textContent = S[d.state] ?? "";
+  const P = ["Press Listen", `Listening ${Math.floor(d.secs)}s`, `Fixed · ${NAMES[d.style]}`, "Ready · press Fix"];
+  $("status").querySelector("span").textContent = P[d.state] ?? "";
+  $("status").className = "pill" + (d.state === 2 ? " live" : d.state === 1 ? " listen" : "");
+  $("fixBtn").classList.toggle("dis", d.state === 0 || d.state === 1);
+  const bar = (id, v) => { $(id).style.width = Math.min(100, v / 6 * 100) + "%"; $(id + "v").textContent = v.toFixed(1); };
+  bar("dH", fixed ? d.harsh : 0); bar("dG", fixed ? d.glue : 0); bar("dL", fixed ? d.lim : 0);
+  $("stream").textContent = fixed && d.lufsOut > -69 ? (d.turnDown > 0.2 ? `Spotify / YouTube turn it down ${d.turnDown.toFixed(1)} dB` : "Spotify / YouTube: no turn-down") : `Latency ${d.latencyMs.toFixed(1)} ms · Fix off = undo`;
+  if (d.state >= 2) $("moves").innerHTML = `<span>Bass <b>${sg(d.ls)}</b></span><span>Low-mid <b>${sg(d.lm)}</b></span>${d.mudg < -0.05 ? `<span>Mud ${Math.round(d.mudf)} Hz <b>${sg(d.mudg)}</b></span>` : ""}<span>Presence <b>${sg(d.pr)}</b></span><span>Air <b>${sg(d.hs)}</b></span><span>Gain <b>${sg(d.gain)}</b></span>`;
+});
+
+// canvases
+function fit(c){ const r = c.getBoundingClientRect(), dp = devicePixelRatio || 1; c.width = r.width * dp; c.height = r.height * dp; const g = c.getContext("2d"); g.setTransform(dp,0,0,dp,0,0); return [g, r.width, r.height]; }
+let [sg2, SW, SH] = fit($("stars")), [pg, PW, PH] = fit($("spec")), [cg, CW, CH] = fit($("curve"));
+addEventListener("resize", () => { [sg2, SW, SH] = fit($("stars")); [pg, PW, PH] = fit($("spec")); [cg, CW, CH] = fit($("curve")); });
+const P = Array.from({ length: 110 }, () => ({ x: Math.random(), y: Math.random(), z: Math.random(), c: Math.random() < .25 }));
+// exact RBJ magnitude for the tone curve
+function mag(type, f0, Q, g, f, sr = 48000){
+  const A = 10 ** (g / 40), w = 2 * Math.PI * f0 / sr, cs = Math.cos(w), sn = Math.sin(w), al = sn / (2 * Q); let b0, b1, b2, a0, a1, a2;
+  if (type === "pk") { b0 = 1 + al * A; b1 = -2 * cs; b2 = 1 - al * A; a0 = 1 + al / A; a1 = -2 * cs; a2 = 1 - al / A; }
+  else { const s = 2 * Math.sqrt(A) * al, sgn = type === "ls" ? 1 : -1;
+    b0 = A * ((A + 1) - sgn * (A - 1) * cs + s); b1 = sgn * 2 * A * ((A - 1) - sgn * (A + 1) * cs); b2 = A * ((A + 1) - sgn * (A - 1) * cs - s);
+    a0 = (A + 1) + sgn * (A - 1) * cs + s; a1 = -sgn * 2 * ((A - 1) + sgn * (A + 1) * cs); a2 = (A + 1) + sgn * (A - 1) * cs - s; }
+  const W = 2 * Math.PI * f / sr, re = (c0, c1, c2) => [c0 + c1 * Math.cos(W) + c2 * Math.cos(2 * W), -(c1 * Math.sin(W) + c2 * Math.sin(2 * W))];
+  const [nr, ni] = re(b0, b1, b2), [dr, di] = re(a0, a1, a2);
+  return 10 * Math.log10((nr * nr + ni * ni) / (dr * dr + di * di));
+}
+let t = 0, specS = new Array(32).fill(-60);
+(function frame(){
+  t += .016;
+  sg2.clearRect(0, 0, SW, SH);
+  for (const p of P) { p.y -= .0004 * (.3 + p.z); if (p.y < 0) p.y = 1; const a = .12 + .45 * p.z * (.6 + .4 * Math.sin(t * 2 + p.x * 30)); sg2.fillStyle = p.c ? `rgba(34,211,238,${a})` : `rgba(246,222,141,${a})`; sg2.beginPath(); sg2.arc(p.x * SW, p.y * SH, .6 + 1.3 * p.z, 0, 7); sg2.fill(); }
+  // spectrum ring (live audio)
+  pg.clearRect(0, 0, PW, PH);
+  const cx = PW / 2, cy = PH / 2, r0 = PW * .36, N = 96, sp = M.spec || [];
+  for (let k = 0; k < 32; k++) { const v = sp[k] ?? -60; specS[k] += (v - specS[k]) * .35; }
+  for (let i = 0; i < N; i++) {
+    const a = i / N * Math.PI * 2 - Math.PI / 2, pos = (i < N / 2 ? i : N - i) / (N / 2) * 31, k0 = Math.floor(pos), fr = pos - k0;
+    const lvl = specS[k0] * (1 - fr) + (specS[Math.min(31, k0 + 1)] ?? -60) * fr;
+    const v = Math.max(.06, Math.min(1, (lvl + 60) / 50)), L = PW * .025 + v * PW * .1;
+    const g = pg.createLinearGradient(cx + Math.cos(a) * r0, cy + Math.sin(a) * r0, cx + Math.cos(a) * (r0 + L), cy + Math.sin(a) * (r0 + L));
+    g.addColorStop(0, "rgba(212,175,55,.95)"); g.addColorStop(1, "rgba(34,211,238,.9)");
+    pg.strokeStyle = g; pg.lineWidth = 2.2; pg.lineCap = "round"; pg.beginPath(); pg.moveTo(cx + Math.cos(a) * r0, cy + Math.sin(a) * r0); pg.lineTo(cx + Math.cos(a) * (r0 + L), cy + Math.sin(a) * (r0 + L)); pg.stroke();
+  }
+  // loudness arc: how close to target
+  const shown = M.state === 2 && M.lufsOut > -69 ? M.lufsOut : M.lufsIn, frac = shown > -69 ? Math.max(0, Math.min(1, (shown + 24) / 18)) : 0;
+  pg.strokeStyle = "rgba(246,222,141,.9)"; pg.lineWidth = 3; pg.shadowColor = "#D4AF37"; pg.shadowBlur = 18; pg.beginPath(); pg.arc(cx, cy, PW * .48, -Math.PI * .75, -Math.PI * .75 + Math.PI * 1.5 * frac); pg.stroke(); pg.shadowBlur = 0;
+  // tone curve
+  cg.clearRect(0, 0, CW, CH);
+  const fx = (x) => 20 * Math.pow(1000, x), on = M.state >= 2, y0 = CH / 2;
+  cg.strokeStyle = "rgba(255,255,255,.1)"; cg.lineWidth = 1; cg.beginPath(); cg.moveTo(0, y0); cg.lineTo(CW, y0); cg.stroke();
+  const gr = cg.createLinearGradient(0, 0, CW, 0); gr.addColorStop(0, "#F6DE8D"); gr.addColorStop(1, "#D4AF37");
+  cg.strokeStyle = gr; cg.lineWidth = 2.4; cg.shadowColor = "#D4AF37"; cg.shadowBlur = 12; cg.beginPath();
+  for (let x = 0; x <= 1.0001; x += .01) {
+    const f = fx(x); let db = 0;
+    if (on) { db = mag("ls", 110, .7071, M.ls, f) + mag("pk", 260, 1, M.lm, f) + mag("pk", 3500, .9, M.pr, f) + mag("hs", 9000, .7071, M.hs, f); if (M.mudg < 0) db += mag("pk", M.mudf, 4.3, M.mudg, f); }
+    cg.lineTo(x * CW, y0 - db * (CH / 2 - 4) / 4);
+  }
+  cg.stroke(); cg.shadowBlur = 0;
+  const sx = (t * .25 % 1) * CW; cg.fillStyle = "rgba(34,211,238,.25)"; cg.fillRect(sx, 0, 2, CH);
+  requestAnimationFrame(frame);
+})();
+paintButtons();
+</script></body></html>
