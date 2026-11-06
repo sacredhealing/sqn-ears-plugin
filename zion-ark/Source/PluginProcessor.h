@@ -38,6 +38,7 @@ public:
 
     juce::AudioProcessorValueTreeState state;
     za::Engine engine;
+    std::atomic<int> autoMask { 0 };   // which Dub Desk pads the auto-programmer is firing (for the UI)
 
 private:
     static juce::AudioProcessorValueTreeState::ParameterLayout layout();
@@ -48,7 +49,7 @@ private:
     juce::AudioBuffer<float> work;
     double sr = 44100; int maxBlock = 512;
     float loadedDecay = -1;
-    std::map<juce::String, std::atomic<float>*> raw;
+    std::map<std::string, std::atomic<float>*> raw;   // std::string keys: short ids stay in SSO, no allocation on the audio thread
     float r (const char* id) const { return raw.at (id)->load(); }
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ZionArkProcessor)
 };

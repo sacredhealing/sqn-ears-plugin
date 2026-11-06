@@ -35,7 +35,7 @@ void ZionArkEditor::timerCallback()
 {
     auto& r = proc.engine.ro;
     auto* o = new juce::DynamicObject();
-    o->setProperty ("in", r.inDb.load()); o->setProperty ("out", r.outDb.load()); o->setProperty ("bpm", r.bpm.load());
+    o->setProperty ("in", r.inDb.load()); o->setProperty ("out", r.outDb.load()); o->setProperty ("bpm", r.bpm.load()); o->setProperty ("am", proc.autoMask.load());
     juce::Array<juce::var> mg;
     for (auto& m : r.mg) mg.add (m.load());
     o->setProperty ("mg", mg);

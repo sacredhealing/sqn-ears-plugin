@@ -14,7 +14,14 @@ const juce::StringArray& ZionArkProcessor::toggleIds()
     static const juce::StringArray ids { "phOn","phSq","sync","aux","byp","cut","mono","thE","thS","warp","siren","kick" };
     return ids;
 }
-const juce::StringArray& ZionArkProcessor::choiceIds() { static const juce::StringArray ids { "mode","match" }; return ids; }
+static const char* PADK[6] = { "cut","thE","thS","warp","kick","siren" };
+static const char* AID[6] = { "a_cut","a_thE","a_thS","a_warp","a_kick","a_siren" };
+static const char* LID[6] = { "l_cut","l_thE","l_thS","l_warp","l_kick","l_siren" };
+const juce::StringArray& ZionArkProcessor::choiceIds()
+{
+    static const juce::StringArray ids = [] { juce::StringArray s { "mode","match" }; for (auto* k : PADK) { s.add (juce::String ("a_") + k); s.add (juce::String ("l_") + k); } return s; }();
+    return ids;
+}
 
 APVTS::ParameterLayout ZionArkProcessor::layout()
 {
@@ -37,6 +44,14 @@ APVTS::ParameterLayout ZionArkProcessor::layout()
         l.add (std::make_unique<juce::AudioParameterBool> (juce::ParameterID { id, 1 }, T.at (id).first, T.at (id).second));
     l.add (std::make_unique<juce::AudioParameterChoice> (juce::ParameterID { "mode", 1 }, "Echo heads", juce::StringArray { "Head 1","Head 2","Head 3","1+2","2+3","1+3","All" }, 0));
     l.add (std::make_unique<juce::AudioParameterChoice> (juce::ParameterID { "match", 1 }, "Reference match", juce::StringArray { "Off","Ark '77","Rebel '70","One '72","Now" }, 1));
+    // Dub Desk auto-programmer: fire each pad at the end of every N bars, for the last part of that bar
+    const char* padName[6] = { "Dry cut", "Throw echo", "Throw spring", "Warp", "Kick", "Siren" };
+    const int lenDef[6] = { 1, 0, 1, 2, 1, 2 };
+    for (int k = 0; k < 6; ++k)
+    {
+        l.add (std::make_unique<juce::AudioParameterChoice> (juce::ParameterID { juce::String ("a_") + PADK[k], 1 }, juce::String (padName[k]) + " auto", juce::StringArray { "Off","Every 1 bar","Every 2 bars","Every 4 bars","Every 8 bars" }, 0));
+        l.add (std::make_unique<juce::AudioParameterChoice> (juce::ParameterID { juce::String ("l_") + PADK[k], 1 }, juce::String (padName[k]) + " length", juce::StringArray { "Last 1/8","Last 1/4","Last 1/2","Last bar" }, lenDef[k]));
+    }
     return l;
 }
 
@@ -45,9 +60,8 @@ ZionArkProcessor::ZionArkProcessor()
                                        .withOutput ("Output", juce::AudioChannelSet::stereo(), true)),
       state (*this, nullptr, "ZIONARK", layout())
 {
-    for (auto& id : knobIds()) raw[id] = state.getRawParameterValue (id);
-    for (auto& id : toggleIds()) raw[id] = state.getRawParameterValue (id);
-    for (auto& id : choiceIds()) raw[id] = state.getRawParameterValue (id);
+    for (auto* ids : { &knobIds(), &toggleIds(), &choiceIds() })
+        for (auto& id : *ids) raw[id.toStdString()] = state.getRawParameterValue (id);
     startTimer (300);
 }
 
@@ -103,13 +117,45 @@ void ZionArkProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::Mid
     p.tDrive = r ("tDrive"); p.tWow = r ("tWow"); p.tMatch = r ("tMatch"); p.match = (int) r ("match"); p.mono = r ("mono") > .5f;
     p.aux = r ("aux") > .5f; p.byp = r ("byp") > .5f; p.cut = r ("cut") > .5f;
     p.thE = r ("thE") > .5f; p.thS = r ("thS") > .5f; p.warp = r ("warp") > .5f; p.siren = r ("siren") > .5f; p.kick = r ("kick") > .5f;
+    bool playing = false; double ppq = 0, barBeats = 4;
     if (auto* ph = getPlayHead())
         if (auto pos = ph->getPosition())
+        {
             if (auto bpm = pos->getBpm()) p.hostBpm = *bpm;
+            playing = pos->getIsPlaying();
+            if (auto q = pos->getPpqPosition()) ppq = *q; else playing = false;
+            if (auto ts = pos->getTimeSignature()) if (ts->numerator > 0 && ts->denominator > 0) barBeats = ts->numerator * 4.0 / ts->denominator;
+        }
+    const bool manual[6] = { p.cut, p.thE, p.thS, p.warp, p.kick, p.siren };
+    const double qnPerSample = (p.hostBpm > 20 ? p.hostBpm : 120.0) / 60.0 / sr;
 
     for (int start = 0; start < n; start += maxBlock)
     {
         const int len = juce::jmin (maxBlock, n - start);
+        // Dub Desk auto-programmer (follows the Mixbus timeline)
+        int mask = 0;
+        if (playing)
+        {
+            static const int EV[5] = { 0, 1, 2, 4, 8 };
+            static const double LEN[3] = { 0.5, 1.0, 2.0 };
+            const double q = ppq + start * qnPerSample;
+            const double barD = std::floor (q / barBeats);
+            const long long bar = (long long) barD;
+            const double pos = q - barD * barBeats;
+            for (int k = 0; k < 6; ++k)
+            {
+                const int ev = EV[juce::jlimit (0, 4, (int) r (AID[k]))];
+                if (ev == 0) continue;
+                const int li = juce::jlimit (0, 3, (int) r (LID[k]));
+                const double L = juce::jmin (barBeats, li == 3 ? barBeats : LEN[li]);
+                bool on = (((bar % ev) + ev) % ev == ev - 1) && pos >= barBeats - L - 1e-9;
+                if (k == 4) on = on && pos < barBeats - L + 0.25;   // kick = one hit at the start of its window
+                if (on) mask |= 1 << k;
+            }
+        }
+        autoMask = mask;
+        p.cut = manual[0] || (mask & 1); p.thE = manual[1] || (mask & 2); p.thS = manual[2] || (mask & 4);
+        p.warp = manual[3] || (mask & 8); p.kick = manual[4] || (mask & 16); p.siren = manual[5] || (mask & 32);
         float* L = work.getWritePointer (0); float* R = work.getWritePointer (1);
         juce::FloatVectorOperations::copy (L, buffer.getReadPointer (0, start), len);
         juce::FloatVectorOperations::copy (R, buffer.getReadPointer (inCh > 1 ? 1 : 0, start), len);
