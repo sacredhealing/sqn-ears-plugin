@@ -4,6 +4,9 @@ on:
     branches: [main]
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   mac:
     runs-on: macos-15-intel
@@ -39,3 +42,9 @@ jobs:
         with:
           name: SQN_Ears_Installer
           path: SQN_Ears_Installer.pkg
+      - name: Publish download link (Releases > latest)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release delete latest -y --cleanup-tag || true
+          gh release create latest SQN_Ears_Installer.pkg --title "SQN Ears - latest" --notes "Double-click SQN_Ears_Installer.pkg to install SQN Ears (AU + VST3), then restart Mixbus."

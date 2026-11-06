@@ -167,13 +167,23 @@ public:
     void process (float* L, float* R, int n, const Params& p)
     {
         const int style = clampv (p.sound, 0, 10), limI = p.limiter ? 1 : 0;
-        if (p.listen && ! lastListen) resetMeas();
-        if (! p.listen && lastListen) { lastAmount = p.amount; if (snapshot()) computeFix (style, p.amount, p.limiter); }
-        else if (an.have && ! p.listen && lastStyle >= 0 && (style != lastStyle || std::abs (p.amount - lastAmount) > 0.5f || limI != lastLim))
+        // LANDR-style: press Master (fix) and play. It learns while it plays, masters after ~8 s,
+        // refines every 4 s, and locks when playback stops (2 s of silence after 30 s heard).
+        // "Listen" = learn this song again from the start.
+        if ((p.fix && ! lastFixP && ! an.have) || (p.listen && ! lastListen)) { learning = true; resetMeas(); planAt = 0; silent = 0; }
+        if (! p.fix && ! p.listen) learning = false;
+        if (learning)
+        {
+            listen (L, R, n);
+            double pk = 0; for (int i = 0; i < n; ++i) pk = std::max (pk, (double) std::max (std::abs (L[i]), std::abs (R[i])));
+            silent = pk < 1e-3 ? silent + n : 0;
+            const bool lock = (nsamp >= sr * 30 && silent >= sr * 2) || (! p.listen && lastListen && ! p.fix);
+            if (nsamp >= sr * 8 && (nsamp - planAt >= sr * 4 || lock) && silent == 0) { lastAmount = p.amount; if (snapshot()) computeFix (style, p.amount, p.limiter); planAt = nsamp; }
+            if (lock) { learning = false; if (snapshot()) computeFix (style, p.amount, p.limiter); }
+        }
+        else if (an.have && lastStyle >= 0 && (style != lastStyle || std::abs (p.amount - lastAmount) > 0.5f || limI != lastLim))
         { lastAmount = p.amount; computeFix (style, p.amount, p.limiter); }
-        lastListen = p.listen; lastStyle = style; lastAmount = p.amount; lastLim = limI;
-
-        if (p.listen) listen (L, R, n);
+        lastListen = p.listen; lastFixP = p.fix; lastStyle = style; lastAmount = p.amount; lastLim = limI;
 
         // manual Vintage Console 1973 (works with or without Fix)
         const float vc = p.console / 100.0f;
@@ -287,7 +297,7 @@ public:
                 mout.feed (kout[0].run (L[i]), kout[1].run (R[i]));
                 opk = std::max (opk, (double) std::max (std::abs (L[i]), std::abs (R[i])));
             }
-            if (! fx.cal && mout.blocks >= 120)
+            if (! learning && ! fx.cal && mout.blocks >= 120)
             {
                 const double want = st.lufs + (1 - a) * (an.I - st.lufs);
                 const double t = clampv (want - mout.integrated(), -3.0, 3.0);
@@ -300,9 +310,9 @@ public:
         if (uiOpen.load (std::memory_order_relaxed)) spectrum (L, R, n);
 
         // readouts
-        const double I = p.listen ? min_.integrated() : an.I;
-        const double tpd = p.listen ? dB20 (tp) : an.tp;
-        const double cr = p.listen ? sLR / std::sqrt (std::max (sLL * sRR, 1e-30)) : an.corr;
+        const double I = learning ? min_.integrated() : an.I;
+        const double tpd = learning ? dB20 (tp) : an.tp;
+        const double cr = learning ? sLR / std::sqrt (std::max (sLL * sRR, 1e-30)) : an.corr;
         const double Io = (target == 1 && mout.blocks > 10) ? mout.integrated() : -70;
         ro.lufsIn = (float) I; ro.tpIn = (float) tpd; ro.corr = (float) cr;
         ro.gain = target == 1 ? fx.gain + fx.trim : 0.0f; ro.secs = (float) (nsamp / sr);
@@ -310,7 +320,8 @@ public:
         ro.turnDown = Io > -70 ? (float) std::max (0.0, Io + 14) : 0.0f;
         ro.harsh = (float) -dB20 (hmax); ro.glue = (float) -dB20 (gmax); ro.lim = (float) -dB20 (lmax);
         ro.ls = fx.ls; ro.lm = fx.lm; ro.pr = fx.pr; ro.hs = fx.hs; ro.mudf = fx.mudf; ro.mudg = fx.mudg; ro.width = fx.width;
-        ro.state = p.listen ? 1 : (target == 1 ? 2 : (fx.ready ? 3 : 0));
+        // 0 idle, 1 learning (not mastering yet), 2 mastered + locked, 3 ready (Master off), 4 mastering while still learning
+        ro.state = learning ? (target == 1 ? 4 : 1) : (target == 1 ? 2 : (fx.ready ? 3 : 0));
         ro.style = target == 1 ? fx.style : style; ro.cal = fx.cal;
     }
 
@@ -331,6 +342,7 @@ private:
     double hb = 0, hx = 0, hg = 1, hgt = 1, ge2 = 0, gc = 1, gtg = 1, gs = 1; unsigned tick = 0;
     std::vector<double> dqv, box; std::vector<long long> dqi; long long dh = 0, dt = 0, lt = 0; int cap = 70; double rel = 1, bsum = 0;
     std::vector<float> dDL, dDR, dWL, dWR; int dp = 0;
+    bool learning = false, lastFixP = false; double planAt = 0, silent = 0;
     double mixv = 0; bool lastListen = false; int lastStyle = -1, lastLim = -1, lastFix = 0; float lastAmount = 100, lastVc = -1; bool coeffDirty = true;
 
     double coef (double secs) const { return 1.0 - std::exp (-1.0 / (secs * sr)); }

@@ -41,7 +41,7 @@ html,body{margin:0;height:100%;background:#030303;overflow:hidden;font-family:"P
 .readout b{font-weight:900;font-size:clamp(26px,4.6vw,48px);letter-spacing:-.05em;line-height:1;text-shadow:0 4px 18px rgba(0,0,0,.9),0 0 30px rgba(246,222,141,.35)}
 .readout span{font-weight:800;font-size:8px;letter-spacing:.38em;color:var(--gold2);margin-top:8px;text-shadow:0 2px 6px #000}
 .btns{display:flex;gap:12px;margin-top:10px}
-.b{position:relative;border-radius:999px;padding:12px 26px;font-weight:800;font-size:10px;letter-spacing:.4em;text-transform:uppercase;color:var(--gold2);background:linear-gradient(180deg,rgba(255,255,255,.08),rgba(255,255,255,.01));border:1px solid rgba(212,175,55,.5);box-shadow:inset 0 1px 0 rgba(255,255,255,.18),0 10px 24px rgba(0,0,0,.6);cursor:pointer;overflow:hidden;transition:transform .08s}
+.b{position:relative;white-space:nowrap;border-radius:999px;padding:12px 22px;font-weight:800;font-size:10px;letter-spacing:.4em;text-transform:uppercase;color:var(--gold2);background:linear-gradient(180deg,rgba(255,255,255,.08),rgba(255,255,255,.01));border:1px solid rgba(212,175,55,.5);box-shadow:inset 0 1px 0 rgba(255,255,255,.18),0 10px 24px rgba(0,0,0,.6);cursor:pointer;overflow:hidden;transition:transform .08s}
 .b:active{transform:scale(.96)}
 .b.cy{color:var(--cyan);border-color:rgba(34,211,238,.55)}
 .b.cy.on{color:#03161a;background:linear-gradient(180deg,#b8f5fc,#22D3EE 50%,#0e7490);box-shadow:inset 0 1px 0 rgba(255,255,255,.7),0 0 36px rgba(34,211,238,.6)}
@@ -78,7 +78,7 @@ html,body{margin:0;height:100%;background:#030303;overflow:hidden;font-family:"P
 <div class="ui">
  <div class="top">
   <div class="brand"><div class="lbl">Siddha Quantum Nexus · Master Intelligence</div><b>SQN <em>Ears</em></b></div>
-  <div class="pills"><div class="pill btn" id="limBtn" title="Peak limiter: lets the loud sounds reach their target safely"><i></i>Loud</div><div class="pill" id="status"><i></i><span>Press Listen</span></div></div>
+  <div class="pills"><div class="pill btn" id="limBtn" title="Peak limiter: lets the loud sounds reach their target safely"><i></i>Loud</div><div class="pill" id="status"><i></i><span>Press Master</span></div></div>
  </div>
  <div class="col">
   <div class="card"><div class="lbl d">Loudness</div><div class="v" id="lu">— <small>LUFS</small></div><div class="s" id="luS">target — · heard —</div><div class="meter"><i id="luM" style="width:0;background:linear-gradient(90deg,#8C6A12,#F6DE8D);box-shadow:0 0 12px #D4AF37"></i></div></div>
@@ -89,16 +89,16 @@ html,body{margin:0;height:100%;background:#030303;overflow:hidden;font-family:"P
   <div class="orbwrap">
    <div class="aura"></div><canvas id="spec"></canvas><div class="orb"></div>
    <svg class="yantra" viewBox="0 0 100 100"><g fill="none" stroke="#FFE9A8" stroke-width=".6"><path d="M50 10 L88 74 L12 74 Z"/><path d="M50 90 L12 26 L88 26 Z"/><circle cx="50" cy="50" r="38" stroke-opacity=".5"/><circle cx="50" cy="50" r="44" stroke-dasharray="1 3"/></g></svg>
-   <div class="readout"><b id="big">—</b><span id="bigS">PLAY · PRESS LISTEN</span></div>
+   <div class="readout"><b id="big">—</b><span id="bigS">PRESS MASTER · PLAY</span></div>
   </div>
-  <div class="btns"><span class="b cy" id="listenBtn">Listen</span><span class="b gd" id="fixBtn">Fix</span><span class="b" id="abBtn" title="Hold to hear your original mix">Hold A/B</span></div>
+  <div class="btns"><span class="b cy" id="listenBtn" title="Learn this song again from the start">Re-learn</span><span class="b gd" id="fixBtn">Master</span><span class="b" id="abBtn" title="Hold to hear your original mix">Hold A/B</span></div>
  </div>
  <div class="col">
   <div class="card" style="flex:1.3"><div class="lbl">Sound</div><div class="chips" id="chips"></div></div>
   <div class="card"><div class="knobs" id="knobs"></div></div>
  </div>
  <div class="bottom">
-  <div class="card"><div class="lbl d">Tone · what Ears changed</div><canvas id="curve"></canvas><div class="moves" id="moves"><span>Press Listen, play the song, then Fix</span></div></div>
+  <div class="card"><div class="lbl d">Tone · what Ears changed</div><canvas id="curve"></canvas><div class="moves" id="moves"><span>Press Master and play the song: Ears learns and masters while it plays</span></div></div>
   <div class="card"><div class="lbl d">Working now</div>
    <div class="dyn"><span>Harsh</span><div class="meter"><i id="dH" style="width:0;background:#22D3EE;box-shadow:0 0 10px #22D3EE"></i></div><em id="dHv">0.0</em>
    <span>Glue</span><div class="meter"><i id="dG" style="width:0;background:#D4AF37;box-shadow:0 0 10px #D4AF37"></i></div><em id="dGv">0.0</em>
@@ -122,7 +122,7 @@ if (!window.__JUCE__) {
         } else if(ev.eventType==="valueChanged"){fire({eventType:"valueChanged",value:ev.value});}
       } } };
   let t=0; setInterval(()=>{t+=.033;const spec=[];for(let k=0;k<32;k++)spec.push(-38+14*Math.sin(k*.45+t*2.1)*Math.cos(k*.13-t)-k*.5+6*Math.random());
-    (L.meters||[]).forEach(f=>f({state:2,style:2,cal:true,lufsIn:-15.4,tpIn:-0.6,corr:.93,gain:2.4,secs:212,lufsOut:-13.1+.15*Math.sin(t),peakOut:-1.6,turnDown:0,
+    (L.meters||[]).forEach(f=>f({state:4,style:2,cal:false,lufsIn:-15.4,tpIn:-0.6,corr:.93,gain:2.4,secs:47,lufsOut:-13.1+.15*Math.sin(t),peakOut:-1.6,turnDown:0,
       harsh:Math.max(0,2.2*Math.sin(t*1.3)),glue:1.4+.6*Math.sin(t*2.2),lim:Math.max(0,1.5*Math.sin(t*.9)),ls:1.2,lm:.6,pr:-.8,hs:-1.6,mudf:315,mudg:-1,width:1.5,latencyMs:1.5,spec}));},33);
 }
 </script>
@@ -137,11 +137,10 @@ let M = { state:0, spec:[] }, abHeld = false;
 
 // buttons
 function paintButtons(){
-  $("listenBtn").classList.toggle("on", listen.getValue());
   $("fixBtn").classList.toggle("on", fix.getValue());
   $("limBtn").classList.toggle("off", !lim.getValue());
 }
-$("listenBtn").onclick = () => listen.setValue(!listen.getValue());
+$("listenBtn").onclick = () => { fix.setValue(true); listen.setValue(true); setTimeout(() => listen.setValue(false), 250); };
 $("fixBtn").onclick = () => fix.setValue(!fix.getValue());
 $("limBtn").onclick = () => lim.setValue(!lim.getValue());
 const abDown = () => { if (fix.getValue()) { abHeld = true; fix.setValue(false); } };
@@ -179,7 +178,7 @@ const f1 = (v) => (v > -69 ? v.toFixed(1) : "—");
 const sg = (v) => (v >= 0 ? "+" : "") + v.toFixed(1);
 window.__JUCE__.backend.addEventListener("meters", (d) => {
   M = d;
-  const fixed = d.state === 2, tgt = TARGET[d.style] ?? -13;
+  const fixed = d.state === 2 || d.state === 4, tgt = TARGET[d.style] ?? -13;
   const shown = fixed && d.lufsOut > -69 ? d.lufsOut : d.lufsIn;
   $("lu").innerHTML = `${f1(shown)} <small>LUFS</small>`;
   $("luS").textContent = `target ${tgt} · heard ${f1(d.lufsIn)}`;
@@ -193,12 +192,12 @@ window.__JUCE__.backend.addEventListener("meters", (d) => {
   $("wdS").textContent = fixed ? `width ${sg(d.width)} dB · bass mono` : "L/R similarity (1 = mono)";
   $("wdM").style.width = Math.max(0, Math.min(100, (1 - Math.max(0, d.corr)) * 200 + 20)) + "%";
   $("big").textContent = shown > -69 ? shown.toFixed(1) : "—";
-  const S = ["PLAY · PRESS LISTEN", `LISTENING · ${Math.floor(d.secs)} S`, d.cal ? "LUFS · ON TARGET" : "LUFS · TUNING ITSELF", "READY · PRESS FIX"];
+  const S = ["PRESS MASTER · PLAY", `LEARNING · ${Math.floor(d.secs)} S`, d.cal ? "LUFS · ON TARGET" : "LUFS · LOCKED · FINE-TUNING", "MASTER OFF · ORIGINAL", `MASTERING · LEARNING ${Math.floor(d.secs)} S`];
   $("bigS").textContent = S[d.state] ?? "";
-  const P = ["Press Listen", `Listening ${Math.floor(d.secs)}s`, `Fixed · ${NAMES[d.style]}`, "Ready · press Fix"];
+  const P = ["Press Master", `Learning ${Math.floor(d.secs)}s`, `Mastered · ${NAMES[d.style]}`, "Original (Master off)", `Mastering · ${NAMES[d.style]}`];
   $("status").querySelector("span").textContent = P[d.state] ?? "";
-  $("status").className = "pill" + (d.state === 2 ? " live" : d.state === 1 ? " listen" : "");
-  $("fixBtn").classList.toggle("dis", d.state === 0 || d.state === 1);
+  $("listenBtn").classList.toggle("on", d.state === 1 || d.state === 4);
+  $("status").className = "pill" + (d.state === 2 || d.state === 4 ? " live" : d.state === 1 ? " listen" : "");
   const bar = (id, v) => { $(id).style.width = Math.min(100, v / 6 * 100) + "%"; $(id + "v").textContent = v.toFixed(1); };
   bar("dH", fixed ? d.harsh : 0); bar("dG", fixed ? d.glue : 0); bar("dL", fixed ? d.lim : 0);
   $("stream").textContent = fixed && d.lufsOut > -69 ? (d.turnDown > 0.2 ? `Spotify / YouTube turn it down ${d.turnDown.toFixed(1)} dB` : "Spotify / YouTube: no turn-down") : `Latency ${d.latencyMs.toFixed(1)} ms · Fix off = undo`;
