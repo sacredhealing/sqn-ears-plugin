@@ -303,7 +303,6 @@ window.__JUCE__.backend.addEventListener("meters", (d) => {
   if (binC.getChoiceIndex() === 0 && d.key >= 0) why.push(`in tune with ${KEYS[d.key]} ${d.minor ? "minor" : "major"}`);
   if (locked) why.push(`pulsing with ${Math.round(d.bpm)} BPM`);
   const mmss = (x) => Math.floor(x / 60) + ":" + String(Math.floor(x % 60)).padStart(2, "0");
-  if (d.binOn) why.push(d.songEnd > 20 ? `fades out by ${mmss(d.songEnd - 5)} (5 s before the end)` : "play to the end once to learn the ending");
   $("binWhy").textContent = why.join(" · ");
   if (d.state >= 2) $("moves").innerHTML = `<span>Bass <b>${sg(d.ls)}</b></span><span>Low-mid <b>${sg(d.lm)}</b></span>${d.mudg < -0.05 ? `<span>Mud ${Math.round(d.mudf)} Hz <b>${sg(d.mudg)}</b></span>` : ""}<span>Presence <b>${sg(d.pr)}</b></span><span>Air <b>${sg(d.hs)}</b></span><span>Gain <b>${sg(d.gain)}</b></span>`;
 });
