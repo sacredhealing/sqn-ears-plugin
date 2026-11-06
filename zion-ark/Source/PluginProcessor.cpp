@@ -5,8 +5,8 @@ using APVTS = juce::AudioProcessorValueTreeState;
 
 const juce::StringArray& ZionArkProcessor::knobIds()
 {
-    static const juce::StringArray ids { "inG","mix","outG","bk","phRA","phRB","phDepth","phFb","phMix","eSend","time","eInt","eAge","eSpr","eRet",
-                                         "sSend","sDrive","sDecay","sTone","sRet","srPitch","srRate","srDepth","srWave","tDrive","tWow","tMatch" };
+    static const juce::StringArray ids { "inG","mix","outG","bk","phRA","phRB","phDepth","phFb","phMix","eSend","time","eInt","eAge","eSpr","eRet","eBass","eTreb",
+                                         "sSend","sDrive","sDecay","sTone","sRet","srPitch","srRate","srDepth","srWave","tDrive","tWow","tBounce","tMatch" };
     return ids;
 }
 const juce::StringArray& ZionArkProcessor::toggleIds()
@@ -23,23 +23,52 @@ const juce::StringArray& ZionArkProcessor::choiceIds()
     return ids;
 }
 
+// readable values in Mixbus automation lanes (same maps as the engine and the UI)
+static juce::String display (const juce::String& id, float p)
+{
+    using namespace za;
+    auto pct = [] (float v) { return juce::String (juce::roundToInt (v * 100)) + "%"; };
+    auto hz = [] (float v) { return v >= 1000 ? juce::String (v / 1000.0f, 1) + " kHz" : juce::String (juce::roundToInt (v)) + " Hz"; };
+    auto db = [] (float v) { return (v > 0 ? "+" : "") + juce::String (v, 1) + " dB"; };
+    if (id == "inG" || id == "outG") return db (lin (-12, 12, p));
+    if (id == "eBass" || id == "eTreb") return db (lin (-12, 12, p));
+    if (id == "bk") { const int i = juce::roundToInt (p * 10); return i ? hz (BK[i]) : juce::String ("OUT"); }
+    if (id == "phRA" || id == "phRB") return juce::String (ex (.03f, 8, p), 2) + " Hz";
+    if (id == "phFb") return pct (lin (0, .85f, p));
+    if (id == "eSend" || id == "sSend") return pct (lin (0, 1.2f, p));
+    if (id == "time") { static const char* N[7] = { "1/16","1/8T","1/8","1/8D","1/4","1/4D","1/2" }; return juce::String (N[juce::roundToInt (p * 6)]) + " (sync) / " + juce::String (juce::roundToInt (ex (.05f, .8f, p) * 1000)) + " ms (free)"; }
+    if (id == "eInt") return pct (lin (0, 1.15f, p));
+    if (id == "eRet") return pct (lin (0, 1.3f, p));
+    if (id == "sDrive") return juce::String (ex (.5f, 5, p), 1) + "x";
+    if (id == "sDecay") return juce::String (lin (.8f, 4.5f, p), 1) + " s";
+    if (id == "sTone") return hz (ex (1500, 9000, p));
+    if (id == "sRet") return pct (lin (0, 1.5f, p));
+    if (id == "srPitch") return hz (ex (120, 1800, p));
+    if (id == "srRate") return juce::String (ex (.2f, 14, p), 1) + " Hz";
+    if (id == "srWave") { static const char* W[4] = { "Sine","Triangle","Square","Saw" }; return W[juce::roundToInt (p * 3)]; }
+    if (id == "tDrive") return juce::String (lin (.6f, 5, p), 1) + "x";
+    if (id == "tBounce") return juce::String (p * 4, 1) + " bounces";
+    return pct (p);
+}
+
 APVTS::ParameterLayout ZionArkProcessor::layout()
 {
     // defaults = the "Ark '77 · Party Time" preset
     const std::map<juce::String, std::pair<juce::String, float>> K {
         { "inG", { "Input", .5f } }, { "mix", { "Mix", 1 } }, { "outG", { "Output", .5f } }, { "bk", { "Big Knob step", 0 } },
         { "phRA", { "Phase rate A", .3f } }, { "phRB", { "Phase rate B", .42f } }, { "phDepth", { "Phase depth", .75f } }, { "phFb", { "Phase feedback", .5f } }, { "phMix", { "Phase mix", .8f } },
-        { "eSend", { "Echo send", .15f } }, { "time", { "Echo time", .5f } }, { "eInt", { "Echo repeat", .45f } }, { "eAge", { "Tape age", .55f } }, { "eSpr", { "Echo to spring", .2f } }, { "eRet", { "Echo return", .7f } },
+        { "eSend", { "Echo send", .15f } }, { "time", { "Echo time", .5f } }, { "eInt", { "Echo repeat", .45f } }, { "eAge", { "Tape age", .55f } }, { "eSpr", { "Echo to spring", .2f } }, { "eRet", { "Echo return", .7f } }, { "eBass", { "Echo bass", .5f } }, { "eTreb", { "Echo treble", .5f } },
         { "sSend", { "Spring send", .25f } }, { "sDrive", { "Spring drive", .45f } }, { "sDecay", { "Spring decay", .45f } }, { "sTone", { "Spring tone", .55f } }, { "sRet", { "Spring return", .6f } },
         { "srPitch", { "Siren pitch", .5f } }, { "srRate", { "Siren rate", .45f } }, { "srDepth", { "Siren depth", .5f } }, { "srWave", { "Siren shape", 2.0f / 3.0f } },
-        { "tDrive", { "Tape drive", .35f } }, { "tWow", { "Tape wow", .2f } }, { "tMatch", { "Match amount", .85f } } };
+        { "tDrive", { "Tape drive", .35f } }, { "tWow", { "Tape wow", .2f } }, { "tBounce", { "Tape bounce", .35f } }, { "tMatch", { "Match amount", .85f } } };
     const std::map<juce::String, std::pair<juce::String, bool>> T {
         { "phOn", { "Phase on", true } }, { "phSq", { "Phase square sweep", false } }, { "sync", { "Echo host sync", true } }, { "aux", { "AUX 100% wet", false } },
         { "byp", { "Bypass", false } }, { "cut", { "Dry cut", false } }, { "mono", { "Mono", true } },
         { "thE", { "Throw echo", false } }, { "thS", { "Throw spring", false } }, { "warp", { "Warp", false } }, { "siren", { "Siren", false } }, { "kick", { "Kick spring", false } } };
     APVTS::ParameterLayout l;
     for (auto& id : knobIds())
-        l.add (std::make_unique<juce::AudioParameterFloat> (juce::ParameterID { id, 1 }, K.at (id).first, juce::NormalisableRange<float> (0, 1), K.at (id).second));
+        l.add (std::make_unique<juce::AudioParameterFloat> (juce::ParameterID { id, 1 }, K.at (id).first, juce::NormalisableRange<float> (0, 1), K.at (id).second,
+                   juce::AudioParameterFloatAttributes().withStringFromValueFunction ([id] (float v, int) { return display (id, v); })));
     for (auto& id : toggleIds())
         l.add (std::make_unique<juce::AudioParameterBool> (juce::ParameterID { id, 1 }, T.at (id).first, T.at (id).second));
     l.add (std::make_unique<juce::AudioParameterChoice> (juce::ParameterID { "mode", 1 }, "Echo heads", juce::StringArray { "Head 1","Head 2","Head 3","1+2","2+3","1+3","All" }, 0));
@@ -110,11 +139,11 @@ void ZionArkProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::Mid
     p.inG = r ("inG"); p.mix = r ("mix"); p.outG = r ("outG"); p.bk = r ("bk");
     p.phRA = r ("phRA"); p.phRB = r ("phRB"); p.phDepth = r ("phDepth"); p.phFb = r ("phFb"); p.phMix = r ("phMix");
     p.phOn = r ("phOn") > .5f; p.phSq = r ("phSq") > .5f;
-    p.eSend = r ("eSend"); p.time = r ("time"); p.eInt = r ("eInt"); p.eAge = r ("eAge"); p.eSpr = r ("eSpr"); p.eRet = r ("eRet");
+    p.eSend = r ("eSend"); p.time = r ("time"); p.eInt = r ("eInt"); p.eAge = r ("eAge"); p.eSpr = r ("eSpr"); p.eRet = r ("eRet"); p.eBass = r ("eBass"); p.eTreb = r ("eTreb");
     p.mode = (int) r ("mode"); p.sync = r ("sync") > .5f;
     p.sSend = r ("sSend"); p.sDrive = r ("sDrive"); p.sDecay = r ("sDecay"); p.sTone = r ("sTone"); p.sRet = r ("sRet");
     p.srPitch = r ("srPitch"); p.srRate = r ("srRate"); p.srDepth = r ("srDepth"); p.srWave = r ("srWave");
-    p.tDrive = r ("tDrive"); p.tWow = r ("tWow"); p.tMatch = r ("tMatch"); p.match = (int) r ("match"); p.mono = r ("mono") > .5f;
+    p.tDrive = r ("tDrive"); p.tWow = r ("tWow"); p.tBounce = r ("tBounce"); p.tMatch = r ("tMatch"); p.match = (int) r ("match"); p.mono = r ("mono") > .5f;
     p.aux = r ("aux") > .5f; p.byp = r ("byp") > .5f; p.cut = r ("cut") > .5f;
     p.thE = r ("thE") > .5f; p.thS = r ("thS") > .5f; p.warp = r ("warp") > .5f; p.siren = r ("siren") > .5f; p.kick = r ("kick") > .5f;
     bool playing = false; double ppq = 0, barBeats = 4;

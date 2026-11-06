@@ -1,5 +1,5 @@
 cmake_minimum_required (VERSION 3.22)
-project (ZION_ARK VERSION 0.2.0)
+project (ZION_ARK VERSION 0.3.0)
 set (CMAKE_CXX_STANDARD 17)
 
 set (JUCE_DIR "${CMAKE_SOURCE_DIR}/JUCE" CACHE PATH "JUCE checkout")
@@ -21,6 +21,7 @@ juce_add_plugin (ZionArk
     EDITOR_WANTS_KEYBOARD_FOCUS FALSE
     COPY_PLUGIN_AFTER_BUILD FALSE
     NEEDS_WEB_BROWSER TRUE
+    NEEDS_WEBVIEW2 TRUE
     AU_MAIN_TYPE kAudioUnitType_Effect
     VST3_CATEGORIES Fx Delay Reverb)
 
@@ -40,3 +41,8 @@ target_compile_definitions (ZionArk PUBLIC
 target_link_libraries (ZionArk
     PRIVATE ZionArkUI juce::juce_audio_utils juce::juce_gui_extra juce::juce_dsp
     PUBLIC juce::juce_recommended_config_flags juce::juce_recommended_lto_flags juce::juce_recommended_warning_flags)
+
+if (WIN32)
+    # Windows: WebView2 linked statically, so no extra DLL has to be shipped
+    target_compile_definitions (ZionArk PUBLIC JUCE_USE_WIN_WEBVIEW2_WITH_STATIC_LINKING=1)
+endif()

@@ -62,10 +62,10 @@ struct Params
 {
     float inG = .5f, mix = 1, outG = .5f, bk = 0;
     float phRA = .3f, phRB = .42f, phDepth = .75f, phFb = .5f, phMix = .8f; bool phOn = true, phSq = false;
-    float eSend = .15f, time = .5f, eInt = .45f, eAge = .55f, eSpr = .2f, eRet = .7f; int mode = 0; bool sync = true;
+    float eSend = .15f, time = .5f, eInt = .45f, eAge = .55f, eSpr = .2f, eRet = .7f, eBass = .5f, eTreb = .5f; int mode = 0; bool sync = true;
     float sSend = .25f, sDrive = .45f, sDecay = .45f, sTone = .55f, sRet = .6f;
     float srPitch = .5f, srRate = .45f, srDepth = .5f, srWave = 2.0f / 3.0f;
-    float tDrive = .35f, tWow = .2f, tMatch = .85f; int match = 1; bool mono = true;
+    float tDrive = .35f, tWow = .2f, tMatch = .85f, tBounce = .35f; int match = 1; bool mono = true;
     bool aux = false, byp = false, cut = false, thE = false, thS = false, warp = false, siren = false, kick = false;
     double hostBpm = 0;
 };
@@ -91,32 +91,46 @@ struct ReadOut
     ReadOut() { for (auto& m : mg) m = 0; }
 };
 
-//============================================================================== spring impulse response (same recipe as the preview)
+//============================================================================== spring tank (physical model, rendered to an impulse response)
+// Two springs. Each round trip runs through a cascade of stretched allpass filters (dispersion: low notes arrive first,
+// highs smear out behind them = the "drip" chirp), a low-pass at the spring's transition frequency, and the loop loss.
 inline void makeSpringIR (std::vector<float>& L, std::vector<float>& R, float decay, double sr)
 {
-    const int len = (int) (sr * (decay + 0.3)), cl = (int) (sr * 0.022);
+    const int len = (int) (sr * (decay + 0.3));
     L.assign ((size_t) len, 0.0f); R.assign ((size_t) len, 0.0f);
-    std::vector<float> chirp ((size_t) cl);
-    double ph = 0;
-    for (int i = 0; i < cl; ++i) { const double x = (double) i / cl, f = 4800.0 * std::pow (150.0 / 4800.0, x); ph += 2 * 3.14159265358979 * f / sr; chirp[(size_t) i] = (float) (std::sin (ph) * std::sin (3.14159265358979 * x) * (1 - x * 0.5)); }
-    Noise n; n.s = 9876;
+    const double fc = 4300.0;
+    const int K = std::max (1, (int) std::lround (sr / (2.0 * fc)));
+    const int M = 90; const double a = 0.62;
+    Noise nz; nz.s = 4321;
     for (int ch = 0; ch < 2; ++ch)
     {
         auto& d = ch ? R : L;
-        const double Ts[2] = { 0.0331 + ch * 0.0021, 0.0417 - ch * 0.0016 };
-        for (int si = 0; si < 2; ++si)
+        const double T = ch ? 0.0613 : 0.0551;
+        const int D = std::max (1, (int) (T * sr));
+        std::vector<double> dl ((size_t) D, 0.0), xs ((size_t) (M * K), 0.0), ys ((size_t) (M * K), 0.0);
+        int dw = 0, pos = 0;
+        Biquad lp; lp.set (Biquad::LP, (float) (fc * 0.95), 0.6f, 0, (float) sr);
+        Biquad lp2; lp2.set (Biquad::LP, (float) (fc * 1.1), 0.5f, 0, (float) sr);
+        const double g = std::pow (10.0, -3.0 * T / (decay * 1.6));   // x1.6 compensates the per-trip filter losses
+        double fb = 0;
+        for (int i = 0; i < len; ++i)
         {
-            int k = 0;
-            for (double t = 0.006 + si * 0.003; t < decay + 0.25; t += Ts[si], ++k)
+            double v = (i == 0 ? 1.0 : 0.0) + fb;
+            for (int m = 0; m < M; ++m)
             {
-                const float a = (float) (std::exp (-6.9 * t / decay) * ((k & 1) ? -1 : 1) * (0.85 + 0.15 * (n.next() + 1)));
-                const int st = (int) (t * sr);
-                for (int i = 0; i < cl && st + i < len; ++i) d[(size_t) (st + i)] += a * chirp[(size_t) i];
+                double* X = &xs[(size_t) (m * K)]; double* Y = &ys[(size_t) (m * K)];
+                const double y = a * v + X[pos] - a * Y[pos];
+                X[pos] = v; Y[pos] = y; v = y;
             }
+            pos = (pos + 1) % K;
+            v = lp2.proc (lp.proc ((float) v, 0), 0);
+            const double out = dl[(size_t) dw]; dl[(size_t) dw] = v; dw = (dw + 1) % D;
+            fb = g * out * (1.0 + 0.002 * nz.next());           // tiny randomness = two coils never quite agree
+            d[(size_t) i] = (float) out;
         }
-        for (int i = 0; i < len; ++i) { const double t = i / sr; d[(size_t) i] += (float) (n.next() * 0.12 * std::exp (-6.9 * t / decay) * std::min (1.0, t / 0.04)); }
-        double e = 0; for (float v : d) e += (double) v * v;
-        const float sc = (float) (0.9 / std::sqrt (e + 1e-12));
+        for (int i = 0; i < len; ++i) { const double t = i / sr; d[(size_t) i] += (float) (nz.next() * 0.0015 * std::exp (-6.9 * t / decay) * std::min (1.0, t / 0.05)); }
+        double e2 = 0; for (float v : d) e2 += (double) v * v;
+        const float sc = (float) (0.9 / std::sqrt (e2 + 1e-12));
         for (float& v : d) v *= sc;
     }
 }
@@ -141,7 +155,8 @@ public:
         for (int i = 0; i < 3; ++i) { sHead[i].setTime (0.02f, sr); sTime[i].setTime (0.09f, sr); }
         for (auto& b : phA) b = {};
         for (auto& b : phB) b = {};
-        lastBk = -1; lastTone = lastSt = lastEra = -1;
+        lastBk = -1; lastTone = lastSt = lastEra = -1; lastEb = lastEt = 99; lastGens = -1;
+        for (auto* b : { &eBassF, &eTrebF, &bLp, &bPk, &bHp }) b->reset();
         bump.set (Biquad::Peak, 95, 0.9f, 2.0f, sr); hf.set (Biquad::LP, 15000, 0.6f, 0, sr);
         eHp.set (Biquad::HP, 140, 0.6f, 0, sr); sHp.set (Biquad::HP, 200, 0.7f, 0, sr); hissHp.set (Biquad::HP, 2500, 0.707f, 0, sr);
         sirLp.set (Biquad::LP, 3200, 0.7f, 0, sr);
@@ -168,12 +183,16 @@ public:
         const float tc = p.warp ? 0.35f : (warpWas ? 0.25f : 0.09f); warpWas = p.warp ? true : (warpWas && std::fabs (sTime[0].v - base) > 0.002f);
         for (int i = 0; i < 3; ++i) sTime[i].setTime (tc, sr);
         const float eFb = lin (0, 1.15f, p.eInt), age = p.eAge;
-        const float tone = 7000 * std::pow (1800.0f / 7000.0f, age);
+        // slower tape (longer repeat time) loses more top end, like the real loop
+        const float tone = 7000 * std::pow (1800.0f / 7000.0f, age) * clampf (std::sqrt (0.35f / base), 0.6f, 1.5f);
         if (std::fabs (tone - lastTone) > 1) { lastTone = tone; eTone.set (Biquad::LP, tone, 0.5f, 0, sr); }
         const float eWow = 0.0002f + 0.0016f * age, eFlut = 0.00002f + 0.0001f * age;
         const int md = std::clamp (p.mode, 0, 6); int nh = 0; for (int i = 0; i < 3; ++i) nh += MODES[md][i];
         const float hg = 1.0f / std::sqrt ((float) std::max (1, nh));
         const float eSend = lin (0, 1.2f, p.eSend), eRet = lin (0, 1.3f, p.eRet), eSpr = p.eSpr;
+        const float eb = lin (-12, 12, p.eBass), et = lin (-12, 12, p.eTreb);
+        if (std::fabs (eb - lastEb) > .01f) { lastEb = eb; eBassF.set (Biquad::LowShelf, 150, .7f, eb, sr); }
+        if (std::fabs (et - lastEt) > .01f) { lastEt = et; eTrebF.set (Biquad::HighShelf, 3000, .7f, et, sr); }
         const float sSend = lin (0, 1.2f, p.sSend), sDrive = ex (.5f, 5, p.sDrive);
         const float dryT = (p.aux || p.cut) ? 0.0f : 1.0f;
         // siren
@@ -245,8 +264,11 @@ public:
             for (int c = 0; c < 2; ++c)
             {
                 const float e = eHp.proc (eTone.proc (hsum[c], c), c);
-                echoBuf[c][(size_t) ew] = x[c] * es + sir * 0.7f + sat (e * eFb, 1.6f);
-                retS[(size_t) (2 * i + c)] = e * er;
+                // record preamp: warm, slightly asymmetric drive into the tape (even harmonics)
+                const float pin = x[c] * es + sir * 0.7f;
+                const float pre = std::tanh (1.4f * (pin + 0.15f)) / 1.4f - 0.14783f;   // offset removes the bias DC exactly
+                echoBuf[c][(size_t) ew] = pre + sat (e * eFb, 1.6f);
+                retS[(size_t) (2 * i + c)] = eTrebF.proc (eBassF.proc (e, c), c) * er;
                 dryS[(size_t) (2 * i + c)] = x[c] * sDry.next (dryT);
                 float spIn = x[c] * (ssend + ths) + e * eSpr;
                 if (kickPos >= 0 && c == 0)
@@ -272,7 +294,10 @@ public:
         const auto& p = P;
         const float sTone = ex (1500, 9000, p.sTone), sRet = lin (0, 1.5f, p.sRet);
         if (std::fabs (sTone - lastSt) > 1) { lastSt = sTone; sLp.set (Biquad::LP, sTone, 0.6f, 0, sr); }
-        const float k = lin (.6f, 5, p.tDrive), wow = p.tWow * 0.0012f, flut = p.tWow * 0.00006f;
+        // BOUNCE: 0..4 generations of four-track bouncing: more saturation, thicker low-mids, duller top
+        const float gens = clampf (p.tBounce, 0, 1) * 4.0f;
+        const float k = lin (.6f, 5, p.tDrive) * (1.0f + 0.22f * gens), wow = p.tWow * 0.0012f * (1.0f + 0.15f * gens), flut = p.tWow * 0.00006f;
+        if (std::fabs (gens - lastGens) > .005f) { lastGens = gens; bLp.set (Biquad::LP, 20000 * std::pow (0.72f, gens), 0.55f, 0, sr); bPk.set (Biquad::Peak, 180, 0.8f, 0.9f * gens, sr); bHp.set (Biquad::HP, 22 + 6 * gens, 0.6f, 0, sr); }
         const int mt = std::clamp (p.match, 0, 4); const bool mOn = mt > 0 && ! p.byp;
         const float eraF = mOn ? ERA[mt] : 20000.0f;
         if (std::fabs (eraF - lastEra) > 1) { lastEra = eraF; era1.set (Biquad::LP, eraF, 0.6f, 0, sr); era2.set (Biquad::LP, eraF, 0.9f, 0, sr); }
@@ -298,6 +323,7 @@ public:
                 float v = wowBuf[c][(size_t) i0] + fr * (wowBuf[c][(size_t) i1] - wowBuf[c][(size_t) i0]);
                 v = sat (v * 0.6f, k) * 1.6f;                 // tape drive
                 v = hf.proc (bump.proc (v, c), c);             // head bump + top
+                v = bHp.proc (bPk.proc (bLp.proc (v, c), c), c);  // bounce generations
                 if (c == 0) analyse (0.5f * (v + hfLast));     // match listens before its own EQ
                 else hfLast = v;
                 s[c] = v;
@@ -328,7 +354,8 @@ private:
     Smooth sIn, sOut, sMix, sClean, sDry, sPhOn, sEret, sEsend, sSsend, sThE, sThS, sMono, sSirEnv, sSret, sHiss, sHead[3], sTime[3];
     int lastBk = -1; float bkA = 0, bkX[2] {}, bkY[2] {}; Biquad bkBq;
     AP phA[6], phB[6]; float fbA[2] {}, fbB[2] {}, lfoA = 0, lfoB = 0.37f, smA = 0, smB = 0;
-    Biquad eTone, eHp, sHp, sLp, bump, hf, hissHp, sirLp, era1, era2, mq[10], anBp[10], anBp2[10];
+    Biquad eTone, eHp, sHp, sLp, bump, hf, hissHp, sirLp, era1, era2, mq[10], anBp[10], anBp2[10], eBassF, eTrebF, bLp, bPk, bHp;
+    float lastEb = 99, lastEt = 99, lastGens = -1;
     float lastTone = -1, lastSt = -1, lastEra = -1, eWowPh = 0, eFlPh = 0, wPh = 0, fPh = 0, sLfo = 0, sOsc = 0, hfLast = 0;
     bool warpWas = false, kickWas = false; int kickPos = -1; float kickV = 0, kickPh = 0;
     Noise noise;

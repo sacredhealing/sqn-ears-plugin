@@ -40,7 +40,7 @@ button{font-family:inherit;touch-action:manipulation;-webkit-tap-highlight-color
 .plate .t{font-size:12px;font-weight:900;letter-spacing:-.03em;color:#f3dc8a;white-space:nowrap}
 .plate .lbl{flex:1;white-space:nowrap;overflow:hidden;font-size:7px;letter-spacing:.38em;color:rgba(212,175,55,.7)}
 /* header */
-.hdr{display:grid;grid-template-columns:172px 1fr 372px;gap:14px;align-items:center}
+.hdr{display:grid;grid-template-columns:172px minmax(0,1fr) 372px;gap:14px;align-items:center}
 .medal{width:166px;height:166px;perspective:700px;position:relative}
 .rot{position:absolute;inset:0;transform-style:preserve-3d;animation:sway 11s ease-in-out infinite}
 .layer{position:absolute;inset:0}.layer svg{width:100%;height:100%;display:block}
@@ -53,6 +53,7 @@ h1{font-size:66px;font-weight:900;letter-spacing:-.05em;line-height:.9;margin:8p
 .prow{display:flex;align-items:center;gap:8px}
 .prow button{width:30px;height:30px;border-radius:10px;border:1px solid rgba(212,175,55,.35);background:#0c0a07;color:var(--gold);font-size:11px}
 .pname{min-width:230px;height:30px;display:flex;align-items:center;justify-content:center;border-radius:10px;background:#030302;box-shadow:inset 0 2px 6px #000,inset 0 0 0 1px rgba(212,175,55,.2);font-size:10px;font-weight:800;letter-spacing:.3em;color:#ffcf7a;text-shadow:0 0 8px rgba(242,169,59,.6)}
+.pbtn{width:auto!important;padding:0 10px;font-size:8px!important;font-weight:800;letter-spacing:.2em}.pname input{width:100%;height:100%;background:transparent;border:none;outline:none;text-align:center;color:#ffcf7a;font:inherit;letter-spacing:inherit}
 .p432{font-size:8px;font-weight:800;letter-spacing:.4em;color:var(--gold);border:1px solid rgba(212,175,55,.45);text-shadow:0 0 8px rgba(212,175,55,.45);padding:9px 10px 9px calc(10px + .4em);border-radius:10px}
 .io{display:flex;align-items:center;justify-content:space-around;height:150px}
 .swcol{display:flex;flex-direction:column;gap:8px;width:100px}
@@ -64,7 +65,7 @@ h1{font-size:66px;font-weight:900;letter-spacing:-.05em;line-height:.9;margin:8p
 .cap::after{content:'';position:absolute;left:50%;top:3px;width:2.6px;height:34%;margin-left:-1.3px;border-radius:2px;background:linear-gradient(#FFF3B0,#D4AF37);box-shadow:0 0 4px rgba(212,175,55,.8)}
 .kv{font-size:10px;font-weight:800;color:#fff;font-variant-numeric:tabular-nums;min-height:13px;white-space:nowrap}
 .kw .lbl{letter-spacing:.28em;padding-left:.28em;white-space:nowrap;font-size:7.5px}
-.kw.sm{min-width:44px}.kw.sm .kn{width:38px;height:38px}.kw.sm .cap{inset:5px}.kw.sm .kv{font-size:9px}
+.kw.sm{min-width:0}.kw.sm .lbl{letter-spacing:.12em;padding-left:.12em;font-size:7px}.kw.sm .kn{width:38px;height:38px}.kw.sm .cap{inset:5px}.kw.sm .kv{font-size:9px}
 .kw.md .kn{width:58px;height:58px}.kw.md .cap{inset:7px}
 .kw.big .kn{width:124px;height:124px;background:repeating-conic-gradient(#b8922a 0 4deg,#5c430c 4deg 8deg);box-shadow:0 12px 26px rgba(0,0,0,.95),0 0 0 3px #0a0806,0 0 30px -6px rgba(212,175,55,.35)}
 .kw.big .cap{inset:12px;background:radial-gradient(circle at 36% 28%,#ff9aa6,#D7263D 45%,#5a0a14 100%);box-shadow:inset 0 -5px 10px rgba(0,0,0,.5),inset 0 0 0 2px rgba(255,220,150,.35),0 4px 8px rgba(0,0,0,.8)}
@@ -103,8 +104,8 @@ h1{font-size:66px;font-weight:900;letter-spacing:-.05em;line-height:.9;margin:8p
 .bkread{text-align:center;font-size:22px;font-weight:900;letter-spacing:-.04em;color:#ffcf7a;text-shadow:0 0 12px rgba(242,169,59,.5);margin-top:2px}
 canvas.vu{width:124px;height:84px;border-radius:12px;display:block;box-shadow:inset 0 0 0 1px rgba(212,175,55,.3),0 0 0 4px #050403,0 0 0 5px rgba(212,175,55,.15),0 6px 14px rgba(0,0,0,.8)}
 .made{position:absolute;right:58px;bottom:6px;font-size:6.5px;font-weight:800;letter-spacing:.45em;color:rgba(212,175,55,.35)}
-.r1{display:grid;grid-template-columns:212px 252px 1fr 276px;gap:12px}
-.r2{display:grid;grid-template-columns:1fr 496px;gap:12px}
+.r1{display:grid;grid-template-columns:212px 252px minmax(0,1fr) 276px;gap:12px}
+.r2{display:grid;grid-template-columns:minmax(0,1fr) 496px;gap:12px}
 /* showcase */
 .show{margin-top:16px;display:grid;grid-template-columns:repeat(3,1fr);gap:24px;align-items:start}.show .txt{grid-column:1/-1}.pick{display:flex;flex-direction:column;align-items:center;gap:12px;text-align:center}.usebtn.on{background:linear-gradient(180deg,#F6E27A,#D4AF37);color:#050505}
 .bigmedal{width:100%;aspect-ratio:1;perspective:1100px;position:relative}
@@ -135,7 +136,7 @@ body.plug{background:#050505;overflow:hidden}body.plug .page{padding:0;max-width
         <div class="lbl">Siddha Quantum Nexus · Kingston Dub Studio · Anno 1976</div>
         <h1>ZION ARK</h1>
         <div class="rasta"><i></i><i></i><i></i></div>
-        <div class="prow"><button id="pv">◂</button><div class="pname" id="pname">INIT</div><button id="pn">▸</button><span class="p432">A = 432</span></div>
+        <div class="prow"><button id="pv">◂</button><div class="pname" id="pname">INIT</div><button id="pn">▸</button><button id="psave" class="pbtn">SAVE</button><button id="pdel" class="pbtn" style="display:none">✕</button><span class="p432">A = 432</span></div>
       </div>
       <div class="sec io">
         <div data-id="inG"></div><div data-id="mix"></div><div data-id="outG"></div>
@@ -154,7 +155,7 @@ body.plug{background:#050505;overflow:hidden}body.plug .page{padding:0;max-width
       <div class="sec"><div class="plate"><i class="scr"></i><span class="t">Space Tape Echo</span><span class="lbl">three heads · tape loop · spring</span><i class="scr"></i></div>
         <div class="win" style="height:92px"><svg id="tapeSvg" viewBox="0 0 400 92" preserveAspectRatio="xMidYMid meet"></svg></div>
         <div class="modes" id="modes"></div>
-        <div class="krow"><div data-id="eSend"></div><div data-id="time"></div><div data-id="eInt"></div><div data-id="eAge"></div><div data-id="eSpr"></div><div data-id="eRet"></div></div></div>
+        <div class="krow"><div data-id="eSend"></div><div data-id="time"></div><div data-id="eInt"></div><div data-id="eAge"></div><div data-id="eBass"></div><div data-id="eTreb"></div><div data-id="eSpr"></div><div data-id="eRet"></div></div></div>
       <div class="sec" id="sprSec"><div class="plate"><i class="scr"></i><span class="t">Thunder Spring</span><span class="lbl">valve tank</span><i class="scr"></i></div>
         <div class="win" style="height:62px"><svg id="springSvg" viewBox="0 0 300 62" preserveAspectRatio="none"></svg></div>
         <div class="krow" style="margin-top:12px"><div data-id="sSend"></div><div data-id="sDrive"></div><div data-id="sDecay"></div></div>
@@ -170,7 +171,7 @@ body.plug{background:#050505;overflow:hidden}body.plug .page{padding:0;max-width
           <div style="display:flex;flex-direction:column;gap:6px;align-items:center"><canvas class="vu" id="vuIn"></canvas><span class="lbl">Input</span></div>
           <div style="display:flex;flex-direction:column;gap:6px;align-items:center"><canvas class="vu" id="vuOut"></canvas><span class="lbl">Output</span></div>
           <div style="display:flex;flex-direction:column;gap:7px;flex:1">
-            <div class="krow"><div data-id="tDrive"></div><div data-id="tWow"></div><div data-id="tMatch"></div></div>
+            <div class="krow"><div data-id="tDrive"></div><div data-id="tWow"></div><div data-id="tBounce"></div><div data-id="tMatch"></div></div>
             <div style="display:flex;gap:6px"><button class="tog" id="match" style="flex:1;letter-spacing:.1em"><b></b>MATCH OFF</button><button class="tog" id="mono" style="flex:1;letter-spacing:.1em"><b></b>MONO</button></div>
             <canvas id="mbars" style="width:100%;height:26px;border-radius:7px;background:#030302;box-shadow:inset 0 1px 4px #000,inset 0 0 0 1px rgba(212,175,55,.15)"></canvas>
           </div>
@@ -329,12 +330,14 @@ def('phRB','RATE B',{p:.5,map:ex(.03,8),fmt:v=>v.toFixed(2),apply:v=>ST(P.B.lfo.
 def('phDepth','DEPTH',{p:.75,fmt:pct,apply:v=>{ST(P.A.dep.gain,v*620);ST(P.B.dep.gain,v*620)}});
 def('phFb','FEEDBK',{p:.45,map:lin(0,.85),fmt:pct,apply:v=>{ST(P.A.fb.gain,v);ST(P.B.fb.gain,v)}});
 def('phMix','MIX',{p:1,fmt:pct,apply:()=>applyPhase()});
-def('eSend','SEND',{p:0,map:lin(0,1.2),fmt:pct,apply:v=>ST(A.eSend.gain,v)});
-def('time','TIME',{p:.5,steps:7,map:p=>state.sync?DIVS[Math.round(p*6)][1]*60/state.bpm:ex(.05,.8)(p),fmt:(v,c)=>state.sync?DIVS[Math.round(c.p*6)][0]:Math.round(v*1000)+'ms',apply:v=>setHeads(v)});
-def('eInt','REPEAT',{p:.42,map:lin(0,1.15),fmt:pct,apply:v=>ST(E.fb.gain,v)});
-def('eAge','AGE',{p:.45,fmt:pct,apply:v=>{ST(E.tone.frequency,7000*Math.pow(1800/7000,v));ST(E.wowG.gain,.0002+.0016*v);ST(E.flutG.gain,.00002+.0001*v)}});
-def('eSpr','→SPRG',{p:.2,fmt:pct,apply:v=>ST(E.toSpr.gain,v)});
-def('eRet','RETURN',{p:.7,map:lin(0,1.3),fmt:pct,apply:v=>ST(E.ret.gain,v)});
+def('eSend','SEND',{size:'sm',p:0,map:lin(0,1.2),fmt:pct,apply:v=>ST(A.eSend.gain,v)});
+def('time','TIME',{size:'sm',p:.5,steps:7,map:p=>state.sync?DIVS[Math.round(p*6)][1]*60/state.bpm:ex(.05,.8)(p),fmt:(v,c)=>state.sync?DIVS[Math.round(c.p*6)][0]:Math.round(v*1000)+'ms',apply:v=>setHeads(v)});
+def('eInt','REPEAT',{size:'sm',p:.42,map:lin(0,1.15),fmt:pct,apply:v=>ST(E.fb.gain,v)});
+def('eAge','AGE',{size:'sm',p:.45,fmt:pct,apply:v=>{ST(E.tone.frequency,echoTone());ST(E.wowG.gain,.0002+.0016*v);ST(E.flutG.gain,.00002+.0001*v)}});
+def('eSpr','→SPRG',{size:'sm',p:.2,fmt:pct,apply:v=>ST(E.toSpr.gain,v)});
+def('eBass','BASS',{size:'sm',fmt:v=>dB(lin(-12,12)(v)),apply:v=>ST(E.bass.gain,lin(-12,12)(v))});
+def('eTreb','TREBLE',{size:'sm',fmt:v=>dB(lin(-12,12)(v)),apply:v=>ST(E.treb.gain,lin(-12,12)(v))});
+def('eRet','RETURN',{size:'sm',p:.7,map:lin(0,1.3),fmt:pct,apply:v=>ST(E.ret.gain,v)});
 def('sSend','SEND',{p:0,map:lin(0,1.2),fmt:pct,apply:v=>ST(A.sSend.gain,v)});
 def('sDrive','DRIVE',{p:.35,map:ex(.5,5),fmt:v=>v.toFixed(1)+'x',apply:v=>ST(S.pre.gain,v)});
 def('sDecay','DECAY',{p:.45,map:lin(.8,4.5),fmt:v=>v.toFixed(1)+'s',end:()=>{if(ctx)buildSpring(C.sDecay.val())}});
@@ -344,27 +347,42 @@ def('srPitch','PITCH',{p:.5,size:'sm',map:ex(120,1800),fmt:fHz,apply:v=>{ST(SR.o
 def('srRate','RATE',{p:.45,size:'sm',map:ex(.2,14),fmt:v=>v.toFixed(1),apply:v=>ST(SR.lfo.frequency,v)});
 def('srDepth','DEPTH',{p:.5,size:'sm',fmt:pct,apply:v=>ST(SR.lg.gain,v*.6*C.srPitch.val())});
 def('srWave','SHAPE',{p:2/3,steps:4,size:'sm',map:p=>['sine','triangle','square','sawtooth'][Math.round(p*3)],fmt:v=>({sine:'SIN',triangle:'TRI',square:'SQR',sawtooth:'SAW'})[v],apply:v=>SR.lfo.type=v});
-def('tDrive','DRIVE',{p:.2,size:'sm',map:lin(.6,5),fmt:v=>v.toFixed(1)+'x',apply:v=>A.drive.curve=satCurve(v)});
+def('tDrive','DRIVE',{p:.2,size:'sm',map:lin(.6,5),fmt:v=>v.toFixed(1)+'x',apply:v=>A.drive.curve=satCurve(v*(1+.22*C.tBounce.val()*4))});
 def('tWow','WOW',{p:.15,size:'sm',fmt:pct,apply:v=>{ST(A.wowG.gain,v*.0012);ST(A.flutG.gain,v*.00006)}});
 
+def('tBounce','BOUNCE',{p:0,size:'sm',fmt:v=>(v*4).toFixed(1)+'x',apply:v=>applyBounce(v)});
 def('tMatch','AMOUNT',{p:.8,size:'sm',fmt:pct});
 const REF={cent:[31.5, 63, 125, 250, 500, 1000, 2000, 4000, 8000, 16000]},REFS=[[0.15, 9.33, 3.6, -1.34, 1.22, 0.0, -0.73, -1.76, -2.38, -18.78], [-17.84, 9.29, 0.78, -8.47, -3.18, 0.0, -5.84, -12.12, -7.19, -24.08], [-15.41, 6.72, 17.23, 11.62, 7.4, 0.0, 0.24, -1.6, -5.79, -21.1], [7.03, 13.65, 6.92, 2.94, 1.21, 0.0, -1.32, -7.05, -8.87, -15.05]],ML2=["MATCH OFF","ARK ’77","REBEL ’70","ONE ’72","NOW"],ERA=[20000,13500,12500,10500,16000];let matchG=REF.cent.map(()=>0);
 (()=>{const w=$('#bkwrap');BK.forEach((v,i)=>{const a=(-135+27*i-90)*Math.PI/180,s=document.createElement('span');s.className='tick';s.textContent=v?fHz(v):'OUT';s.style.left=91+Math.cos(a)*84+'px';s.style.top=91+Math.sin(a)*84+'px';w.appendChild(s)})})();
 $$('[data-id]').forEach(el=>mount(el,C[el.dataset.id]));
 
 /* presets */
-const INIT={inG:.5,mix:1,outG:.5,bk:0,phRA:.35,phRB:.5,phDepth:.75,phFb:.45,phMix:1,eSend:0,time:.5,eInt:.42,eAge:.45,eSpr:.2,eRet:.7,sSend:0,sDrive:.35,sDecay:.45,sTone:.55,sRet:.6,tDrive:.2,tWow:.15,tMatch:.8,_:{phOn:false,phWave:'square',aux:false,cut:false,mode:0,match:0,mono:false,auto:{cut:0,thE:0,thS:0,warp:0,kick:0,siren:0},len:{cut:1,thE:0,thS:1,warp:2,kick:1,siren:2}}};
+const INIT={inG:.5,mix:1,outG:.5,bk:0,phRA:.35,phRB:.5,phDepth:.75,phFb:.45,phMix:1,eSend:0,time:.5,eInt:.42,eAge:.45,eSpr:.2,eRet:.7,sSend:0,sDrive:.35,sDecay:.45,sTone:.55,sRet:.6,eBass:.5,eTreb:.5,tBounce:0,tDrive:.2,tWow:.15,tMatch:.8,_:{phOn:false,phWave:'square',aux:false,cut:false,mode:0,match:0,mono:false,auto:{cut:0,thE:0,thS:0,warp:0,kick:0,siren:0},len:{cut:1,thE:0,thS:1,warp:2,kick:1,siren:2}}};
 const PRE=[['INIT',{}],
- ['ARK ’77 · PARTY TIME',{tDrive:.35,tWow:.2,tMatch:.85,eSend:.15,eInt:.45,eAge:.55,sSend:.25,sDrive:.45,phRA:.3,phRB:.42,phFb:.5,phMix:.8,_:{match:1,mono:true,phOn:true,phWave:'sine'}}],
- ['SOUL REBEL ’70',{tDrive:.4,tWow:.2,tMatch:.85,eSend:.05,sSend:.12,_:{match:2,mono:true}}],
+ ['ARK ’77 · PARTY TIME',{tBounce:0.35,tDrive:.35,tWow:.2,tMatch:.85,eSend:.15,eInt:.45,eAge:.55,sSend:.25,sDrive:.45,phRA:.3,phRB:.42,phFb:.5,phMix:.8,_:{match:1,mono:true,phOn:true,phWave:'sine'}}],
+ ['SOUL REBEL ’70',{tBounce:0.45,tDrive:.4,tWow:.2,tMatch:.85,eSend:.05,sSend:.12,_:{match:2,mono:true}}],
  ['MODERN STEPPERS',{eSend:.25,eInt:.5,sSend:.2,tDrive:.35,tMatch:.75,_:{match:4,mode:3}}],
- ['ROOTS DRUM BUS',{eSend:.08,eInt:.35,sSend:.3,sDrive:.5,sDecay:.4,tDrive:.45,tWow:.12}],
- ['DUB VOCAL',{eSend:.3,eInt:.48,eAge:.5,eSpr:.3,sSend:.12,sDecay:.55,tDrive:.3}],
+ ['ROOTS DRUM BUS',{tBounce:0.25,eSend:.08,eInt:.35,sSend:.3,sDrive:.5,sDecay:.4,tDrive:.45,tWow:.12}],
+ ['DUB VOCAL',{tBounce:0.2,eSend:.3,eInt:.48,eAge:.5,eSpr:.3,sSend:.12,sDecay:.55,tDrive:.3}],
  ['DUB AUX · 100% WET',{eSend:.85,eInt:.55,eSpr:.35,eRet:.8,sSend:.55,sRet:.7,_:{aux:true}}],
- ['ARK SWIRL',{eSend:.3,eAge:.6,sSend:.3,sDrive:.55,tDrive:.55,tWow:.3,phRA:.45,phRB:.55,phFb:.55,_:{phOn:true,phWave:'square'}}],
- ['WATERHOUSE STEPS',{bk:.4,eSend:.25,eInt:.5,sSend:.5,sDrive:.7,_:{mode:3}}]];
-let pi=1;
-function loadPreset(i){pi=(i+PRE.length)%PRE.length;const p=Object.assign({},INIT,PRE[pi][1]),st=Object.assign({},INIT._,PRE[pi][1]._||{});
+ ['ARK SWIRL',{tBounce:0.5,eSend:.3,eAge:.6,sSend:.3,sDrive:.55,tDrive:.55,tWow:.3,phRA:.45,phRB:.55,phFb:.55,_:{phOn:true,phWave:'square'}}],
+ ['WATERHOUSE STEPS',{tBounce:0.3,bk:.4,eSend:.25,eInt:.5,sSend:.5,sDrive:.7,_:{mode:3}}]];
+let pi=1;const BUILTIN=PRE.length;
+// your own presets: stored by the plugin in one file on your Mac (browser preview: this browser only)
+const zaStore={load:async()=>{try{return localStorage.getItem('zionArkPresets')||'[]'}catch(_){return'[]'}},save:async t=>{try{localStorage.setItem('zionArkPresets',t);return true}catch(_){return false}}};
+function snapshot(){const p={};Object.values(C).forEach(c=>{if(c.id!=='bpm')p[c.id]=+c.p.toFixed(4)});return Object.assign(p,{_:{phOn:state.phOn,phWave:state.phWave,aux:state.aux,cut:false,mode:state.mode,match:state.match,mono:state.mono,sync:state.sync,auto:Object.assign({},state.auto),len:Object.assign({},state.len)}})}
+async function reloadUser(){let u=[];try{u=JSON.parse(await zaStore.load())}catch(_){}PRE.length=BUILTIN;(Array.isArray(u)?u:[]).forEach(x=>x&&x.name&&x.p&&PRE.push(['★ '+x.name,x.p,true]))}
+async function storeUser(){const u=PRE.slice(BUILTIN).map(x=>({name:x[0].slice(2),p:x[1]}));return zaStore.save(JSON.stringify(u))}
+function showDel(){$('#pdel').style.display=PRE[pi]&&PRE[pi][2]?'':'none'}
+$('#psave').onclick=()=>{const box=$('#pname');if(box.querySelector('input'))return;const cur=PRE[pi]&&PRE[pi][2]?PRE[pi][0].slice(2):'MY DUB '+(PRE.length-BUILTIN+1);
+  box.innerHTML='<input maxlength="24">';const inp=box.querySelector('input');inp.value=cur;inp.focus();inp.select();
+  const done=async ok=>{const name=inp.value.trim().toUpperCase();box.textContent=PRE[pi]?PRE[pi][0]:'';if(!ok||!name)return;
+    const at=PRE.findIndex((x,i)=>i>=BUILTIN&&x[0]==='★ '+name);const entry=['★ '+name,snapshot(),true];if(at>=0){PRE[at]=entry;pi=at}else{PRE.push(entry);pi=PRE.length-1}
+    box.textContent=(await storeUser())?entry[0]:'NOT SAVED';showDel()};
+  inp.addEventListener('keydown',e=>{if(e.key==='Enter')done(true);if(e.key==='Escape')done(false)});inp.addEventListener('blur',()=>done(true))};
+$('#pdel').onclick=async()=>{if(!(PRE[pi]&&PRE[pi][2]))return;PRE.splice(pi,1);await storeUser();loadPreset(0)};
+function loadPreset(i){pi=(i+PRE.length)%PRE.length;const user=!!PRE[pi][2],base=user?Object.assign({},INIT,{_:Object.assign({},INIT._)}):INIT;
+  const p=Object.assign({},base,PRE[pi][1]),st=Object.assign({},INIT._,PRE[pi][1]._||{});showDel();
   Object.assign(state,st);Object.keys(p).forEach(k=>{if(C[k])setP(C[k],p[k],true)});$('#pname').textContent=PRE[pi][0];if(ctx)buildSpring(C.sDecay.val());refreshToggles()}
 $('#pv').onclick=()=>loadPreset(pi-1);$('#pn').onclick=()=>loadPreset(pi+1);
 
@@ -378,7 +396,9 @@ const MODES=[[1,0,0],[0,1,0],[0,0,1],[1,1,0],[0,1,1],[1,0,1],[1,1,1]],ML=['HEAD 
   const sc=$('#face');[[8,8],[8,null],[null,8],[null,null]].forEach(([l,t],i)=>{const s=document.createElement('i');s.className='scr cs';s.style.setProperty('--r',(i*47+20)+'deg');if(l!==null)s.style.left='6px';else s.style.right='6px';if(t!==null)s.style.top='8px';else s.style.bottom='6px';sc.appendChild(s)});
   $$('.plate .scr').forEach((s,i)=>s.style.setProperty('--r',(i*61)%180+'deg'));})();
 function applyMode(){const md=MODES[state.mode],n=md.reduce((a,b)=>a+b);$$('#modes button').forEach((b,i)=>b.classList.toggle('on',i===state.mode));md.forEach((on,i)=>{$('#hd'+i).classList.toggle('on',!!on);if(ctx)ST(E.hg[i].gain,on?1/Math.sqrt(n):0,.02)})}
-function setHeads(v,tc=.09){E.heads.forEach((d,i)=>d.delayTime.setTargetAtTime(v*E.ratios[i],ctx.currentTime,tc))}
+function echoTone(){return 7000*Math.pow(1800/7000,C.eAge.val())*Math.max(.6,Math.min(1.5,Math.sqrt(.35/C.time.val())))}
+function applyBounce(v){const g=v*4;ST(A.bLp.frequency,20000*Math.pow(.72,g));ST(A.bPk.gain,.9*g);ST(A.bHp.frequency,22+6*g);A.drive.curve=satCurve(C.tDrive.val()*(1+.22*g))}
+function setHeads(v,tc=.09){if(ctx&&E.tone)ST(E.tone.frequency,echoTone());E.heads.forEach((d,i)=>d.delayTime.setTargetAtTime(v*E.ratios[i],ctx.currentTime,tc))}
 function refreshToggles(){$('#phOn').classList.toggle('on',state.phOn);$('#phWave').classList.toggle('on',state.phWave==='square');$('#phWave').lastChild.textContent=state.phWave==='square'?'SQUARE':'SINE';
   $('#aux').classList.toggle('on',state.aux);$('#aux span').textContent=state.aux?'AUX 100%':'INSERT';$('#sync').classList.toggle('on',state.sync);$('#byp').classList.toggle('on',state.byp);$('#pCut').classList.toggle('on',state.cut);$$('.chip.ev').forEach(b=>{const v=state.auto[b.dataset.p];b.textContent=v?'EVERY '+EVERY[v]:'AUTO OFF';b.classList.toggle('on',v>0)});$$('.chip.ln').forEach(b=>{b.textContent='LAST '+LEN_L[state.len[b.dataset.p]];b.classList.toggle('on',state.auto[b.dataset.p]>0)});$('#match').classList.toggle('on',state.match>0);$('#match').lastChild.textContent=ML2[state.match];$('#mono').classList.toggle('on',state.mono);
   applyMode();if(ctx){applyIO();applyPhase();applyTape()}if(onState&&!hostSet)onState()}
@@ -426,9 +446,9 @@ function initAudio(){
   S.in=G(1);S.pre=G(1);S.sh=SH(1.2);S.hp=BQ('highpass',200,.7);S.conv=ctx.createConvolver();S.conv.normalize=false;S.tone=BQ('lowpass',5000,.6);S.ret=G(.9);
   S.in.connect(S.pre).connect(S.sh).connect(S.hp).connect(S.conv).connect(S.tone).connect(S.ret).connect(A.sum);buildSpring(C.sDecay.val());
   // Space Tape Echo
-  E.in=G(1);E.write=G(1);E.in.connect(E.write);E.ratios=[1,1.95,2.85];E.heads=[];E.hg=[];E.sum=G(1);E.wowG=G(0);E.flutG=G(0);OSC(.7).connect(E.wowG);OSC(7.2).connect(E.flutG);
+  E.in=G(1);E.write=G(1);E.pre=ctx.createWaveShaper();{const n=2048,c=new Float32Array(n),o=Math.tanh(.21)/1.4;for(let i=0;i<n;i++){const x=i/(n-1)*2-1;c[i]=Math.tanh(1.4*(x+.15))/1.4-o}E.pre.curve=c}E.in.connect(E.pre).connect(E.write);E.ratios=[1,1.95,2.85];E.heads=[];E.hg=[];E.sum=G(1);E.wowG=G(0);E.flutG=G(0);OSC(.7).connect(E.wowG);OSC(7.2).connect(E.flutG);
   for(let i=0;i<3;i++){const d=ctx.createDelay(6);d.delayTime.value=C.time.val()*E.ratios[i];E.write.connect(d);E.wowG.connect(d.delayTime);E.flutG.connect(d.delayTime);const g=G(0);d.connect(g).connect(E.sum);E.heads.push(d);E.hg.push(g)}
-  E.tone=BQ('lowpass',4000,.5);E.hp=BQ('highpass',140,.6);E.sum.connect(E.tone).connect(E.hp);E.ret=G(.7);E.hp.connect(E.ret).connect(A.sum);E.toSpr=G(.2);E.hp.connect(E.toSpr).connect(S.in);
+  E.tone=BQ('lowpass',4000,.5);E.hp=BQ('highpass',140,.6);E.sum.connect(E.tone).connect(E.hp);E.bass=BQ('lowshelf',150,.7,0);E.treb=BQ('highshelf',3000,.7,0);E.ret=G(.7);E.hp.connect(E.bass).connect(E.treb).connect(E.ret).connect(A.sum);E.toSpr=G(.2);E.hp.connect(E.toSpr).connect(S.in);
   E.fb=G(.5);E.sat=SH(1.6);E.hp.connect(E.fb).connect(E.sat).connect(E.write);
   // sends + throws (post filter & phase)
   A.eSend=G(0);A.eThrow=G(0);A.sSend=G(0);A.sThrow=G(0);P.out.connect(A.eSend).connect(E.in);P.out.connect(A.eThrow).connect(E.in);P.out.connect(A.sSend).connect(S.in);P.out.connect(A.sThrow).connect(S.in);
@@ -438,7 +458,8 @@ function initAudio(){
   A.wow=ctx.createDelay(.1);A.wow.delayTime.value=.01;A.wowG=G(0);OSC(.55).connect(A.wowG).connect(A.wow.delayTime);A.flutG=G(0);OSC(6.3).connect(A.flutG).connect(A.wow.delayTime);
   A.pre=G(.6);A.drive=SH(1.5);A.post=G(1.6);A.bump=BQ('peaking',95,.9,2);A.hf=BQ('lowpass',15000,.6);A.wetG=G(1);
   A.st=G(1);A.mo=G(0);A.mo.channelCount=1;A.mo.channelCountMode='explicit';A.sum.connect(A.st).connect(A.wow);A.sum.connect(A.mo).connect(A.wow);
-  A.wow.connect(A.pre).connect(A.drive).connect(A.post).connect(A.bump).connect(A.hf);
+  A.bLp=BQ('lowpass',20000,.55);A.bPk=BQ('peaking',180,.8,0);A.bHp=BQ('highpass',22,.6);
+  A.wow.connect(A.pre).connect(A.drive).connect(A.post).connect(A.bump).connect(A.bLp).connect(A.bPk).connect(A.bHp).connect(A.hf);
   A.meq=REF.cent.map((c,i)=>BQ(i===0?'lowshelf':i===9?'highshelf':'peaking',c,1.2,0));let mn=A.hf;A.meq.forEach(b=>{mn.connect(b);mn=b});
   A.era1=BQ('lowpass',20000,.6);A.era2=BQ('lowpass',20000,.9);mn.connect(A.era1).connect(A.era2).connect(A.wetG);
   A.anM=ctx.createAnalyser();A.anM.fftSize=8192;A.anM.smoothingTimeConstant=.85;A.hf.connect(A.anM);
@@ -454,11 +475,15 @@ function initAudio(){
   A.safe=ctx.createDynamicsCompressor();A.safe.threshold.value=-2;A.safe.ratio.value=20;A.safe.attack.value=.002;A.safe.release.value=.12;A.outG.connect(A.safe).connect(ctx.destination);
   Object.values(C).forEach(c=>c.apply&&c.apply(c.val()));applySrc();refreshToggles();
 }
-function buildSpring(decay){const sr=ctx.sampleRate,len=Math.floor(sr*(decay+.3)),buf=ctx.createBuffer(2,len,sr),cl=Math.floor(sr*.022),chirp=new Float32Array(cl);let ph=0;
-  for(let i=0;i<cl;i++){const x=i/cl,f=4800*Math.pow(150/4800,x);ph+=2*Math.PI*f/sr;chirp[i]=Math.sin(ph)*Math.sin(Math.PI*x)*(1-x*.5)}
-  for(let ch=0;ch<2;ch++){const d=buf.getChannelData(ch);[.0331+ch*.0021,.0417-ch*.0016].forEach((T,si)=>{let k=0;for(let t=.006+si*.003;t<decay+.25;t+=T,k++){const a=Math.exp(-6.9*t/decay)*(k%2?-1:1)*(.85+Math.random()*.3),st=Math.floor(t*sr);for(let i=0;i<cl&&st+i<len;i++)d[st+i]+=a*chirp[i]}});
-    for(let i=0;i<len;i++){const t=i/sr;d[i]+=(Math.random()*2-1)*.12*Math.exp(-6.9*t/decay)*Math.min(1,t/.04)}
-    let e=0;for(let i=0;i<len;i++)e+=d[i]*d[i];const sc=.9/Math.sqrt(e);for(let i=0;i<len;i++)d[i]*=sc}
+function buildSpring(decay){const sr=ctx.sampleRate,len=Math.floor(sr*(decay+.3)),buf=ctx.createBuffer(2,len,sr),fc=4300,K=Math.max(1,Math.round(sr/(2*fc))),M=90,a=.62;
+  const lpc=(f,q)=>{const w=2*Math.PI*f/sr,cw=Math.cos(w),al=Math.sin(w)/(2*q),a0=1+al;return[(1-cw)/2/a0,(1-cw)/a0,(1-cw)/2/a0,-2*cw/a0,(1-al)/a0]};
+  for(let ch=0;ch<2;ch++){const d=buf.getChannelData(ch),T=ch?.0613:.0551,D=Math.max(1,Math.floor(T*sr)),dl=new Float64Array(D),xs=new Float64Array(M*K),ys=new Float64Array(M*K),g=Math.pow(10,-3*T/(decay*1.6));
+    const f1=lpc(fc*.95,.6),f2=lpc(fc*1.1,.5);let z=[0,0,0,0],dw=0,pos=0,fb=0;
+    for(let i=0;i<len;i++){let v=(i===0?1:0)+fb;for(let m=0,o=0;m<M;m++,o+=K){const y=a*v+xs[o+pos]-a*ys[o+pos];xs[o+pos]=v;ys[o+pos]=y;v=y}pos=(pos+1)%K;
+      let y1=f1[0]*v+z[0];z[0]=f1[1]*v-f1[3]*y1+z[1];z[1]=f1[2]*v-f1[4]*y1;let y2=f2[0]*y1+z[2];z[2]=f2[1]*y1-f2[3]*y2+z[3];z[3]=f2[2]*y1-f2[4]*y2;
+      const out=dl[dw];dl[dw]=y2;dw=(dw+1)%D;fb=g*out*(1+.002*(Math.random()*2-1));d[i]=out}
+    for(let i=0;i<len;i++){const t=i/sr;d[i]+=(Math.random()*2-1)*.0015*Math.exp(-6.9*t/decay)*Math.min(1,t/.05)}
+    let e=0;for(let i=0;i<len;i++)e+=d[i]*d[i];const sc=.9/Math.sqrt(e+1e-12);for(let i=0;i<len;i++)d[i]*=sc}
   S.conv.buffer=buf}
 
 /* ================= PREVIEW SOURCES (A=432) ================= */
@@ -520,12 +545,12 @@ function frame(){const now=performance.now(),dt=Math.min(.1,(now-last)/1000);las
   $('#lampA').style.opacity=.1+.9*k*sw(pa);$('#lampB').style.opacity=.1+.9*k*sw(pb);
   requestAnimationFrame(frame)}
 function fit(){const w=Math.min(window.innerWidth-24,1280),s=PLUG?Math.min(window.innerWidth/1280,window.innerHeight/760):w/1280;$('#stage').style.transform=`scale(${s})`;$('#holder').style.width=1280*s+'px';$('#holder').style.height=760*s+'px'}
-addEventListener('resize',fit);fit();if(PLUG)$('#pname').textContent='CHOOSE PRESET';else loadPreset(1);requestAnimationFrame(frame);
+addEventListener('resize',fit);fit();if(PLUG)$('#pname').textContent='CHOOSE PRESET';else loadPreset(1);reloadUser();requestAnimationFrame(frame);
 </script>
 <script type="module">
 if (window.__JUCE__) {
   const Juce = await import("./juce/index.js");
-  const KNOBS = ["inG","mix","outG","bk","phRA","phRB","phDepth","phFb","phMix","eSend","time","eInt","eAge","eSpr","eRet","sSend","sDrive","sDecay","sTone","sRet","srPitch","srRate","srDepth","srWave","tDrive","tWow","tMatch"];
+  const KNOBS = ["inG","mix","outG","bk","phRA","phRB","phDepth","phFb","phMix","eSend","time","eInt","eAge","eSpr","eRet","eBass","eTreb","sSend","sDrive","sDecay","sTone","sRet","srPitch","srRate","srDepth","srWave","tDrive","tWow","tBounce","tMatch"];
   const TOG = ["phOn","phSq","sync","aux","byp","cut","mono"], AUTO = ["cut","thE","thS","warp","kick","siren"].map(k => [k, "a_" + k, "l_" + k]), PADS = { thE:"#pTE", thS:"#pTS", warp:"#pWarp", siren:"#pSir", kick:"#pKick" };
   const S = {}, T = {}, P = {};
   const fromHost = (fn) => { hostSet = true; try { fn(); } finally { hostSet = false; } };
@@ -533,7 +558,7 @@ if (window.__JUCE__) {
     st.valueChangedEvent.addListener(sync); st.propertiesChangedEvent.addListener(sync); });
   const readToggles = () => fromHost(() => {
     state.phOn = T.phOn.getValue(); state.phWave = T.phSq.getValue() ? "square" : "sine"; state.aux = T.aux.getValue(); state.byp = T.byp.getValue();
-    state.cut = T.cut.getValue(); state.mono = T.mono.getValue(); const ci = (cb, d) => cb.properties.choices.length > 1 ? cb.getChoiceIndex() : d; state.mode = ci(T.mode, state.mode); state.match = ci(T.match, state.match);
+    state.cut = T.cut.getValue(); state.mono = T.mono.getValue(); const ci = (cb, d) => { const n = cb.properties.choices.length, i = cb.getChoiceIndex(); return n > 1 && Number.isInteger(i) && i >= 0 && i < n ? i : d; }; state.mode = ci(T.mode, state.mode); state.match = ci(T.match, state.match);
     const au = {}, ln = {}; AUTO.forEach(([k, a, l]) => { au[k] = ci(T[a], state.auto[k]); ln[k] = ci(T[l], state.len[k]); }); state.auto = au; state.len = ln;
     const sy = T.sync.getValue(); if (sy !== state.sync) { state.sync = sy; C.time.steps = sy ? 7 : 0; }
     refreshToggles(); C.time.render(); });
@@ -550,6 +575,8 @@ if (window.__JUCE__) {
     AUTO.forEach(([k, a, l]) => { if (T[a].getChoiceIndex() !== state.auto[k]) T[a].setChoiceIndex(state.auto[k]); if (T[l].getChoiceIndex() !== state.len[k]) T[l].setChoiceIndex(state.len[k]); });
   };
   window.zaPad = (id, v) => P[id] && P[id].setValue(!!v);
+  const nLoad = Juce.getNativeFunction("zaLoadPresets"), nSave = Juce.getNativeFunction("zaSavePresets");
+  zaStore.load = async () => String(await nLoad() || "[]"); zaStore.save = async (t) => !!(await nSave(t)); reloadUser();
   window.__JUCE__.backend.addEventListener("meters", (m) => { M = m; ["cut","thE","thS","warp","kick","siren"].forEach((k, i) => $(PADEL[k]).classList.toggle("auto", !!((m.am || 0) & (1 << i)))); if (Math.abs((m.bpm || 120) - state.bpm) > .01) { state.bpm = m.bpm || 120; C.time.render(); } });
 }
 </script>

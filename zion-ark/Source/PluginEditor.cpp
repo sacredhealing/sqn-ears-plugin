@@ -1,12 +1,26 @@
 #include "PluginEditor.h"
 #include "BinaryData.h"
 
+static juce::File presetFile()
+{
+    auto base = juce::File::getSpecialLocation (juce::File::userApplicationDataDirectory);
+   #if JUCE_MAC
+    base = base.getChildFile ("Application Support");
+   #endif
+    return base.getChildFile ("Siddha Quantum Nexus").getChildFile ("Zion Ark").getChildFile ("presets.json");
+}
+
 ZionArkEditor::ZionArkEditor (ZionArkProcessor& p) : AudioProcessorEditor (&p), proc (p)
 {
     auto opts = juce::WebBrowserComponent::Options {}
                     .withNativeIntegrationEnabled()
                     .withKeepPageLoadedWhenBrowserIsHidden()
-                    .withResourceProvider ([this] (const auto& url) { return resource (url); });
+                    .withResourceProvider ([this] (const auto& url) { return resource (url); })
+                    // your own presets live in one file shared by every session: ~/Library/Application Support/Siddha Quantum Nexus/Zion Ark/presets.json
+                    .withNativeFunction ("zaLoadPresets", [] (const juce::Array<juce::var>&, juce::WebBrowserComponent::NativeFunctionCompletion done)
+                                         { done (presetFile().existsAsFile() ? presetFile().loadFileAsString() : juce::String ("[]")); })
+                    .withNativeFunction ("zaSavePresets", [] (const juce::Array<juce::var>& a, juce::WebBrowserComponent::NativeFunctionCompletion done)
+                                         { presetFile().getParentDirectory().createDirectory(); done (a.size() > 0 && presetFile().replaceWithText (a[0].toString())); });
 
     for (auto& id : ZionArkProcessor::knobIds()) { sliders.push_back (std::make_unique<juce::WebSliderRelay> (id)); opts = opts.withOptionsFrom (*sliders.back()); }
     for (auto& id : ZionArkProcessor::toggleIds()) { toggles.push_back (std::make_unique<juce::WebToggleButtonRelay> (id)); opts = opts.withOptionsFrom (*toggles.back()); }

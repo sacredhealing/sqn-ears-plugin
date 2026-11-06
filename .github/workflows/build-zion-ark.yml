@@ -38,8 +38,8 @@ jobs:
           mkdir -p pkg/au pkg/vst3
           cp -R "$A/AU/Zion Ark.component" pkg/au/
           cp -R "$A/VST3/Zion Ark.vst3" pkg/vst3/
-          pkgbuild --root pkg/au --identifier com.siddhaquantumnexus.zionark.au --version 0.2.0 --install-location "/Library/Audio/Plug-Ins/Components" au.pkg
-          pkgbuild --root pkg/vst3 --identifier com.siddhaquantumnexus.zionark.vst3 --version 0.2.0 --install-location "/Library/Audio/Plug-Ins/VST3" vst3.pkg
+          pkgbuild --root pkg/au --identifier com.siddhaquantumnexus.zionark.au --version 0.3.0 --install-location "/Library/Audio/Plug-Ins/Components" au.pkg
+          pkgbuild --root pkg/vst3 --identifier com.siddhaquantumnexus.zionark.vst3 --version 0.3.0 --install-location "/Library/Audio/Plug-Ins/VST3" vst3.pkg
           productbuild --package au.pkg --package vst3.pkg "Zion_Ark_Installer.pkg"
           ls -la Zion_Ark_Installer.pkg
       - uses: actions/upload-artifact@v4
@@ -53,3 +53,30 @@ jobs:
           gh release delete zion-ark-latest -y --cleanup-tag || true
           ditto -c -k --keepParent Zion_Ark_Installer.pkg Zion_Ark_Installer.zip
           gh release create zion-ark-latest Zion_Ark_Installer.zip Zion_Ark_Installer.pkg --target "$GITHUB_SHA" --title "Zion Ark - latest" --notes "Double-click Zion_Ark_Installer.pkg to install Zion Ark (AU + VST3), then restart Mixbus. Put it on any track or bus; use AUX for a send bus."
+
+  windows:
+    needs: mac
+    runs-on: windows-latest
+    defaults:
+      run:
+        working-directory: zion-ark
+    steps:
+      - uses: actions/checkout@v4
+      - name: Get JUCE 8
+        run: git clone --depth 1 --branch 8.0.4 https://github.com/juce-framework/JUCE.git JUCE
+      - name: Get WebView2 SDK
+        shell: pwsh
+        run: |
+          Register-PackageSource -ProviderName NuGet -Name nugetRepository -Location https://www.nuget.org/api/v2 -Force -ErrorAction SilentlyContinue
+          Install-Package Microsoft.Web.WebView2 -Scope CurrentUser -RequiredVersion 1.0.1901.177 -Source nugetRepository -Force
+      - name: Build VST3 (Windows x64)
+        run: |
+          cmake -B build -G "Visual Studio 17 2022" -A x64
+          cmake --build build --config Release --target ZionArk_VST3
+      - name: Zip and attach to the release
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          Compress-Archive -Path "build/ZionArk_artefacts/Release/VST3/Zion Ark.vst3" -DestinationPath Zion_Ark_Windows_VST3.zip
+          gh release upload zion-ark-latest Zion_Ark_Windows_VST3.zip --clobber
