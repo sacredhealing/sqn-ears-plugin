@@ -79,9 +79,10 @@ html,body{margin:0;height:100%;background:#030303;overflow:hidden;font-family:"P
 .binhead{display:flex;justify-content:space-between;align-items:center}
 .tog{border:1px solid rgba(212,175,55,.45);border-radius:999px;padding:5px 12px;font-weight:800;font-size:8px;letter-spacing:.35em;color:var(--muted);cursor:pointer}
 .tog.on{color:#1a1205;background:linear-gradient(180deg,#FFF0B8,#D4AF37 55%,#9C7414);box-shadow:0 0 18px rgba(212,175,55,.55)}
-.binbig{font-weight:900;font-size:19px;letter-spacing:-.03em;margin-top:6px}.binbig em{font-style:normal;color:var(--cyan);text-shadow:0 0 12px rgba(34,211,238,.5)}
+.binbig{font-weight:900;font-size:18px;letter-spacing:-.03em;margin-top:4px}.binbig em{font-style:normal;color:var(--cyan);text-shadow:0 0 12px rgba(34,211,238,.5)}
 .binwhy{font-size:10px;color:var(--muted);margin-top:2px;min-height:14px}
-.minis{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px}
+.minis{display:flex;flex-wrap:wrap;gap:4px;margin-top:5px}
+.binmean{font-size:10px;line-height:1.45;color:var(--gold2);margin-top:3px;min-height:29px}.binmean b{color:#cffafe;font-weight:700}
 .mini{border:1px solid rgba(255,255,255,.08);border-radius:999px;padding:3px 7px;font-size:9px;color:var(--muted);cursor:pointer;background:rgba(255,255,255,.02)}
 .mini.on{border-color:var(--cyan);color:#cffafe;background:rgba(34,211,238,.12);box-shadow:0 0 10px rgba(34,211,238,.3)}
 .mini.g.on{border-color:var(--gold);color:var(--gold2);background:rgba(212,175,55,.12);box-shadow:0 0 10px rgba(212,175,55,.3)}
@@ -124,7 +125,7 @@ html,body{margin:0;height:100%;background:#030303;overflow:hidden;font-family:"P
   <div class="card"><div class="lbl d">Tone · what Ears changed</div><canvas id="curve"></canvas><div class="moves" id="moves"><span>Press Master and play the song: Ears learns and masters while it plays</span></div></div>
   <div class="card" id="binCard"><div class="binhead"><div class="lbl">Binaural · headphones</div><div class="tog" id="binTog">OFF</div></div>
    <div class="binbig" id="binBig">— Hz · <em>— Hz</em></div><div class="binwhy" id="binWhy">Turn on: Ears tunes the tone to your song's key and tempo</div>
-   <div class="minis" id="binStates"></div><div class="minis" id="binCars"></div>
+   <div class="binmean" id="binMean"></div><div class="minis" id="binStates"></div><div class="minis" id="binCars"></div>
    <div class="vol"><span>Volume</span><input type="range" id="binVol" min="0" max="1000" value="529"><span id="binVolV">-22 dB</span></div></div>
   <div class="card"><div class="lbl d">Working now</div>
    <div class="dyn"><span>Harsh</span><div class="meter"><i id="dH" style="width:0;background:#22D3EE;box-shadow:0 0 10px #22D3EE"></i></div><em id="dHv">0.0</em>
@@ -226,6 +227,9 @@ $("binVol").addEventListener("pointerdown", () => binV.sliderDragStarted());
 $("binVol").addEventListener("input", e => { binV.setNormalisedValue(e.target.value / 1000); $("binVolV").textContent = Math.round(binV.getScaledValue()) + " dB"; });
 $("binVol").addEventListener("change", () => binV.sliderDragEnded());
 [binT, binS, binC, binV].forEach(x => { x.valueChangedEvent.addListener(paintBin); if (x.propertiesChangedEvent) x.propertiesChangedEvent.addListener(paintBin); });
+// what each state and frequency is (traditional meanings, from the SQN sound library)
+const STATE_MEAN = (b) => b < 1 ? "Epsilon — transcendental stillness, samadhi" : b < 4 ? "Delta — deep sleep, restoration, cellular repair" : Math.abs(b - 7.83) < .01 ? "Schumann — Earth's heartbeat, grounding, coherence" : b < 8 ? "Theta — deep meditation, intuition, inner vision" : b < 13 ? "Alpha — relaxed awareness, calm open heart" : b < 30 ? "Beta — awake, alert focus" : "Gamma — insight, unity, peak awareness";
+const HZ_MEAN = { 108: "Prana — life force in every layer", 174: "Foundation — grounding, relief, safety", 285: "Restoring the energy field and tissue", 396: "Liberation — releasing fear and guilt", 417: "Transmutation — undoing, making change", 432: "Cosmic harmony — Vedic natural tuning", 528: "Love & DNA restore — transformation", 639: "Heart connection — relationships, coherence", 741: "Awakening intuition — clearing, truth", 852: "Third eye — returning to spiritual order", 963: "Crown — unity consciousness" };
 const KEYS = ["C","C#","D","Eb","E","F","F#","G","Ab","A","Bb","B"];
 const band = (b) => b < 1 ? "ε" : b < 4 ? "δ" : Math.abs(b - 7.83) < .01 ? "Schumann" : b < 8 ? "θ" : b < 13 ? "α" : b < 30 ? "β" : "γ";
 
@@ -270,6 +274,8 @@ window.__JUCE__.backend.addEventListener("meters", (d) => {
   if (binC.getChoiceIndex() === 0 && d.key >= 0) why.push(`in tune with ${KEYS[d.key]} ${d.minor ? "minor" : "major"}`);
   if (d.carrierIdx >= 0 && Math.abs(d.carrierPlayed - d.carrierHz) > .5) why.push(`played at ${d.carrierPlayed.toFixed(1)} Hz`);
   if (locked) why.push(`locked to ${Math.round(d.bpm)} BPM`);
+  const hm = d.carrierIdx >= 0 ? HZ_MEAN[Math.round(d.carrierHz)] : (d.carrierPlayed > 0 ? "The song's own key note — pure harmony with the music" : "");
+  $("binMean").innerHTML = d.beatHz ? `<b>${STATE_MEAN(d.beatHz)}</b>${hm ? "<br>" + Math.round(d.carrierHz || d.carrierPlayed) + " Hz · " + hm : ""}` : "";
   $("binWhy").textContent = why.length ? why.join(" · ") : (d.key >= 0 ? "" : "Press Master and play: Ears hears key and tempo");
   if (d.state >= 2) $("moves").innerHTML = `<span>Bass <b>${sg(d.ls)}</b></span><span>Low-mid <b>${sg(d.lm)}</b></span>${d.mudg < -0.05 ? `<span>Mud ${Math.round(d.mudf)} Hz <b>${sg(d.mudg)}</b></span>` : ""}<span>Presence <b>${sg(d.pr)}</b></span><span>Air <b>${sg(d.hs)}</b></span><span>Gain <b>${sg(d.gain)}</b></span>`;
 });
