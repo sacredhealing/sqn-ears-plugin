@@ -63,8 +63,10 @@ inline const std::array<Style, 12>& styles()
         { "Sovereign",       -11.0f, { 0, 0, 0, 0, 0, 0, 0, 0, 0 },                      0.00f, 0.5f, 1.0f,  0.0f },
         // MEASURED: Midnite (4 reference songs) - mono bass, open top, light glue (they recorded live, little compression)
         { "Zion Roots",      -12.5f, { 1.0f, -2.2f, -1.1f, 0.2f, 0.0f, -0.1f, -0.2f, 1.3f, 1.2f }, 0.30f, 0.3f, 1.0f, 0.0f, 0.97f },
-        { "Kingston 1973",   -13.0f, { 1.5f, 1.5f, 1, 0.5f, 0, -0.5f, -1.5f, -3, -5 },    0.70f, 0.6f, 1.3f, -1.0f },
-        { "Island '77",      -12.0f, { 2, 1.5f, 0.5f, 0, 0, 0, -0.5f, -1.5f, -3 },        0.50f, 0.6f, 1.1f,  0.0f },
+        // MEASURED (1 song, blended 60/40 with design): early-70s Upsetter-era roots - mono, big low end
+        { "Kingston 1973",   -13.0f, { 3.4f, 0.7f, -1.3f, -0.5f, 0.7f, -0.6f, -1.9f, 0.1f, -2.7f }, 0.70f, 0.6f, 1.3f, 0.0f, 0.97f },
+        // MEASURED (1 song, blended 60/40 with design): late-70s Island-era roots - forward mids, open stereo
+        { "Island '77",      -14.0f, { -1.2f, -2.0f, -0.5f, 0.5f, 1.4f, 1.4f, 0.4f, 0.7f, -1.1f }, 0.50f, 0.5f, 1.1f, 0.0f, 0.85f },
         { "Dub Chamber",     -12.0f, { 2.5f, 2, 0, -0.5f, -0.5f, -1, -1.5f, -2, -3 },     0.50f, 0.5f, 1.2f,  1.0f },
         // MEASURED: 1992-93 West Coast (4 reference songs)
         { "West Coast '92",  -10.2f, { 0.1f, -2.6f, -1.7f, -0.6f, -1.4f, -0.1f, 2.3f, 3.1f, 1.0f }, 0.25f, 0.8f, 0.8f, 0.0f, 0.87f },
@@ -75,7 +77,8 @@ inline const std::array<Style, 12>& styles()
         // MEASURED: 1993-95 New York (4 reference songs)
         { "Golden Era '94",  -12.0f, { 0.2f, 0.2f, -0.5f, -0.6f, -1.3f, -0.3f, 2.1f, 1.2f, -1.0f }, 0.30f, 0.7f, 0.9f, 0.0f, 0.92f },
         { "808 Modern",       -9.0f, { 2.5f, 1.5f, -1, -0.5f, 0, 0, 0.5f, 1.5f, 2 },      0.00f, 0.6f, 1.0f,  1.0f },
-        { "Crystal Pop '82", -11.5f, { 0.5f, 0.5f, -1, -0.5f, 0, 0.5f, 1, 1.5f, 1.5f },   0.10f, 0.5f, 1.0f,  1.5f },
+        // MEASURED: early-80s pop (1 reference song) - clean, bright top, wide, very dynamic
+        { "Crystal Pop '82", -13.5f, { -1.3f, -2.3f, -2.4f, -1.1f, -0.1f, 0.3f, 1.4f, 2.7f, 2.8f }, 0.10f, 0.4f, 1.0f, 0.0f, 0.82f },
         { "Mantra Temple",   -16.0f, { -1, -1, -0.5f, 0, 0, 0, 0, 0.5f, 1 },              0.20f, 0.2f, 1.2f,  1.5f },
     } };
     return s;

@@ -131,7 +131,7 @@ if (!window.__JUCE__) {
 import * as Juce from "./juce/index.js";
 const $ = (id) => document.getElementById(id);
 const NAMES = ["Sovereign","Zion Roots","Kingston 1973","Island '77","Dub Chamber","West Coast '92","G-Funk '96","West Coast '99","Golden Era '94","808 Modern","Crystal Pop '82","Mantra Temple"];
-const TARGET = [-11,-12.5,-13,-12,-12,-10.2,-10.4,-9,-12,-9,-11.5,-16];
+const TARGET = [-11,-12.5,-13,-14,-12,-10.2,-10.4,-9,-12,-9,-13.5,-16];
 const listen = Juce.getToggleState("listen"), fix = Juce.getToggleState("fix"), lim = Juce.getToggleState("limiter");
 const sound = Juce.getComboBoxState("sound");
 let M = { state:0, spec:[] }, abHeld = false;
@@ -152,7 +152,7 @@ $("abBtn").addEventListener("pointerdown", abDown);
 
 // sounds
 const chips = $("chips");
-NAMES.forEach((n, i) => { const c = document.createElement("div"); c.className = "chip" + ([1,5,6,7,8].includes(i) ? " m" : ""); c.title = [1,5,6,7,8].includes(i) ? "Measured from real reference records" : ""; c.textContent = n; c.onclick = () => sound.setChoiceIndex(i); chips.appendChild(c); });
+NAMES.forEach((n, i) => { const c = document.createElement("div"); c.className = "chip" + ([1,2,3,5,6,7,8,10].includes(i) ? " m" : ""); c.title = [1,2,3,5,6,7,8,10].includes(i) ? "Measured from real reference records" : ""; c.textContent = n; c.onclick = () => sound.setChoiceIndex(i); chips.appendChild(c); });
 function paintChips(){ const i = sound.getChoiceIndex(); [...chips.children].forEach((c, k) => c.classList.toggle("on", k === i)); }
 sound.valueChangedEvent.addListener(paintChips); sound.propertiesChangedEvent.addListener(paintChips);
 
