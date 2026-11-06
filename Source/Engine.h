@@ -142,6 +142,17 @@ struct MusicSense
     }
 };
 
+
+//============================================================================== Tape 1973: a 1/4" two-track machine after the console
+// saturation (soft, mostly 3rd + a little 2nd harmonic), transient rounding, wow & flutter,
+// head bump and top loss kept small (compensated), auto-gain so the level does not jump.
+constexpr int kTapeDelay = 4;   // samples, always present so latency never changes
+struct TapeCh
+{
+    Biquad bump, dip, hf, dc; double buf[16] {}; int w = 0;
+    double env = 0, rms = 0, inP = 1e-9, outP = 1e-9, g = 1;
+};
+
 //============================================================================== binaural generator (L and R carriers differ by the beat)
 struct Binaural
 {
@@ -233,7 +244,7 @@ struct Plan
     float eq[9] {}, weq[9] {}; bool useW = false, capped = false; float gain = 0, trim = 0, ls = 0, lm = 0, pr = 0, hs = 0, mudf = 250, mudg = 0, width = 0, hbase = 0.12f, hbabs = 1e-6f;
 };
 constexpr double kLearnSecs = 30.0;   // seconds of music SQN Ears listens to before it locks
-struct Params { bool listen = false, fix = false, limiter = true, binaural = false; int sound = 0, binState = 0, binCarrier = 0; float amount = 100, console = 0, harsh = 50, glue = 50, binVol = -22, loudOff = 0; double hostBpm = 0, posSec = -1; bool playing = true; };
+struct Params { bool listen = false, fix = false, limiter = true, binaural = false; int sound = 0, binState = 0, binCarrier = 0; float amount = 100, console = 0, tape = 0, harsh = 50, glue = 50, binVol = -22, loudOff = 0; double hostBpm = 0, posSec = -1; bool playing = true; };
 
 struct Readout
 {
@@ -251,7 +262,7 @@ public:
     Analysis an; Plan fx; Readout ro;
     std::atomic<bool> uiOpen { false };
 
-    int latency() const { return LA - 1; }
+    int latency() const { return LA - 1 + kTapeDelay; }
 
     void prepare (double rate)
     {
@@ -344,6 +355,50 @@ public:
             {
                 L[i] = (float) console (cf[0].tlo, cf[0].thi, cf[0].tdc, L[i], vc);
                 R[i] = (float) console (cf[1].tlo, cf[1].thi, cf[1].tdc, R[i], vc);
+            }
+        }
+
+        // Tape 1973 (works with or without Master, like the console)
+        {
+            const double t = clampv (p.tape / 100.0, 0.0, 1.0);
+            if (std::abs (t - lastTape) > 0.005)
+            {
+                for (auto& c : tapeCh)
+                {
+                    c.bump.set (Bq::Peaking, 55, 1.0, 0.9 * t, sr); c.dip.set (Bq::Peaking, 120, 1.2, -0.4 * t, sr);
+                    c.hf.set (Bq::HighShelf, 15000, 0.7071, -0.7 * t, sr); c.dc.set (Bq::HighPass, 5, 0.7071, 0, sr);
+                }
+                lastTape = t;
+            }
+            const double wowInc = 2 * kPi * 0.55 / sr, flInc = 2 * kPi * 6.8 / sr;
+            const double a = 1.2 * t, eA = coef (0.001), eR = coef (0.06), rK = coef (0.3), gK = coef (1.0);
+            for (int i = 0; i < n; ++i)
+            {
+                wowPh += wowInc; if (wowPh > 2 * kPi) wowPh -= 2 * kPi;
+                flPh += flInc; if (flPh > 2 * kPi) flPh -= 2 * kPi;
+                const double dly = kTapeDelay + t * (2.4 * std::sin (wowPh) + 0.12 * std::sin (flPh));
+                for (int c = 0; c < 2; ++c)
+                {
+                    auto& s = tapeCh[c]; float* X = c == 0 ? L : R;
+                    s.buf[s.w] = X[i];
+                    const double rp = s.w - dly + 16; const int i0 = (int) std::floor (rp); const double fr = rp - i0;
+                    double y = s.buf[i0 & 15] * (1 - fr) + s.buf[(i0 + 1) & 15] * fr;
+                    s.w = (s.w + 1) & 15;
+                    if (t > 0.001)
+                    {
+                        const double x0 = y;
+                        y = std::tanh (a * y) / a + 0.04 * t * y * y;              // tape saturation
+                        const double ay = std::abs (y);
+                        s.env += (ay > s.env ? eA : eR) * (ay - s.env); s.rms += rK * (y * y - s.rms);
+                        const double thr = 2.2 * std::sqrt (s.rms + 1e-12);
+                        if (s.env > thr) y *= std::pow (thr / s.env, 0.35 * t);     // rounds sharp transients
+                        y = s.dc.run (s.hf.run (s.dip.run (s.bump.run (y))));
+                        s.inP += gK * (x0 * x0 - s.inP); s.outP += gK * (y * y - s.outP);
+                        s.g += 0.0005 * (clampv (std::sqrt (s.inP / std::max (s.outP, 1e-12)), 0.7, 1.4) - s.g);
+                        y *= s.g;                                                  // keeps the level steady
+                    }
+                    X[i] = (float) y;
+                }
             }
         }
 
@@ -501,6 +556,7 @@ private:
 public:
     double songEnd = 0, frontier = 0;   // confirmed end of the music on the timeline (saved), furthest point heard so far
 private:
+    TapeCh tapeCh[2]; double wowPh = 0, flPh = 0, lastTape = -1;
     bool learning = false, lastFixP = false; double planAt = 0, silent = 0;
     double mixv = 0; bool lastListen = false; int lastStyle = -1, lastLim = -1, lastFix = 0; float lastAmount = 100, lastVc = -1; bool coeffDirty = true;
 

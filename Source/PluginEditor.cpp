@@ -14,6 +14,7 @@ SqnEarsEditor::SqnEarsEditor (SqnEarsProcessor& p)
       binCarA (*p.state.getParameter ("binCarrier"), binCarR, nullptr),
       amountA (fparam (p, "amount"), amountR, nullptr),
       consoleA (fparam (p, "console"), consoleR, nullptr),
+      tapeA (fparam (p, "tape"), tapeR, nullptr),
       harshA (fparam (p, "harsh"), harshR, nullptr),
       glueA (fparam (p, "glue"), glueR, nullptr),
       binVolA (fparam (p, "binVol"), binVolR, nullptr),
