@@ -24,7 +24,7 @@ private:
     SqnEarsProcessor& proc;
     juce::WebToggleButtonRelay listenR { "listen" }, fixR { "fix" }, limiterR { "limiter" }, binR { "binaural" };
     juce::WebComboBoxRelay soundR { "sound" }, binStateR { "binState" }, binCarR { "binCarrier" };
-    juce::WebSliderRelay amountR { "amount" }, consoleR { "console" }, tapeR { "tape" }, harshR { "harsh" }, glueR { "glue" }, binVolR { "binVol" }, loudR { "loudOff" };
+    juce::WebSliderRelay amountR { "amount" }, consoleR { "console" }, tapeR { "tape" }, clarR { "clarity" }, widthR { "widthUser" }, harshR { "harsh" }, glueR { "glue" }, binVolR { "binVol" }, loudR { "loudOff" };
     juce::WebControlParameterIndexReceiver paramIndex;
 
     SqnBrowser web { juce::WebBrowserComponent::Options {}
@@ -32,13 +32,13 @@ private:
                          .withKeepPageLoadedWhenBrowserIsHidden()
                          .withOptionsFrom (listenR).withOptionsFrom (fixR).withOptionsFrom (limiterR).withOptionsFrom (binR)
                          .withOptionsFrom (soundR).withOptionsFrom (binStateR).withOptionsFrom (binCarR).withOptionsFrom (binVolR).withOptionsFrom (loudR)
-                         .withOptionsFrom (amountR).withOptionsFrom (consoleR).withOptionsFrom (tapeR).withOptionsFrom (harshR).withOptionsFrom (glueR)
+                         .withOptionsFrom (amountR).withOptionsFrom (consoleR).withOptionsFrom (tapeR).withOptionsFrom (clarR).withOptionsFrom (widthR).withOptionsFrom (harshR).withOptionsFrom (glueR)
                          .withOptionsFrom (paramIndex)
                          .withResourceProvider ([this] (const auto& url) { return resource (url); }) };
 
     juce::WebToggleButtonParameterAttachment listenA, fixA, limiterA, binA;
     juce::WebComboBoxParameterAttachment soundA, binStateA, binCarA;
-    juce::WebSliderParameterAttachment amountA, consoleA, tapeA, harshA, glueA, binVolA, loudA;
+    juce::WebSliderParameterAttachment amountA, consoleA, tapeA, clarA, widthA, harshA, glueA, binVolA, loudA;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SqnEarsEditor)
 };

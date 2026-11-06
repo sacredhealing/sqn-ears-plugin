@@ -244,7 +244,7 @@ struct Plan
     float eq[9] {}, weq[9] {}; bool useW = false, capped = false; float gain = 0, trim = 0, ls = 0, lm = 0, pr = 0, hs = 0, mudf = 250, mudg = 0, width = 0, hbase = 0.12f, hbabs = 1e-6f;
 };
 constexpr double kLearnSecs = 30.0;   // seconds of music SQN Ears listens to before it locks
-struct Params { bool listen = false, fix = false, limiter = true, binaural = false; int sound = 0, binState = 0, binCarrier = 0; float amount = 100, console = 0, tape = 0, harsh = 50, glue = 50, binVol = -22, loudOff = 0; double hostBpm = 0, posSec = -1; bool playing = true; };
+struct Params { bool listen = false, fix = false, limiter = true, binaural = false; int sound = 0, binState = 0, binCarrier = 0; float amount = 100, console = 0, tape = 0, clarity = 0, widthUser = 0, harsh = 50, glue = 50, binVol = -22, loudOff = 0; double hostBpm = 0, posSec = -1; bool playing = true; };
 
 struct Readout
 {
@@ -288,7 +288,7 @@ public:
             Biquad t; t.set (Bq::Peaking, centers[j], 1.41, 1.0, sr);
             for (int i = 0; i < 9; ++i) octResp[i][j] = t.magDb (std::min (centers[i], sr * 0.45), sr);
         }
-        sense.prepare (sr); bin.k = coef (0.25); bin.gIn = coef (2.5 / 4.6); bin.gOut = coef (3.0 / 4.6);
+        sense.prepare (sr); bin.k = coef (0.25); wHP.set (Bq::HighPass, 250, 0.7071, 0, sr); wHP.reset(); lastClar = -1; lastTape = -1; bin.gIn = coef (2.5 / 4.6); bin.gOut = coef (3.0 / 4.6);
         ha = coef (0.005); hr = coef (0.08); ga = coef (0.02); grl = coef (0.2); gsk = coef (0.2); rc = coef (0.08); specRel = coef (0.25);
         for (int p = 1; p <= 3; ++p)
         {
@@ -400,6 +400,41 @@ public:
                     X[i] = (float) y;
                 }
             }
+        }
+
+        // Clarity: British-console style presence (broad 4.8 kHz) + 12 kHz air shelf + gentle high-band harmonic sparkle
+        {
+            const double c = clampv (p.clarity / 100.0, 0.0, 1.0);
+            if (std::abs (c - lastClar) > 0.005)
+            {
+                for (auto& q : clar) { q.pres.set (Bq::Peaking, 4800, 0.7, 3.0 * c, sr); q.air.set (Bq::HighShelf, 12000, 0.7071, 2.5 * c, sr); q.hp.set (Bq::HighPass, 3000, 0.7071, 0, sr); }
+                lastClar = c;
+            }
+            if (c > 0.001)
+                for (int i = 0; i < n; ++i)
+                    for (int ch = 0; ch < 2; ++ch)
+                    {
+                        auto& q = clar[ch]; float* X = ch == 0 ? L : R;
+                        double y = q.air.run (q.pres.run (X[i]));
+                        const double h = q.hp.run (y), sat = std::tanh (3.0 * h) / 3.0;
+                        y += 0.6 * c * (h - sat) * -1.0;   // adds only the harmonics the high band creates (sparkle), not level
+                        X[i] = (float) y;
+                    }
+        }
+        // Width (user): narrower to the left, wider to the right; only above 250 Hz, the bass stays mono
+        {
+            const double w = clampv (p.widthUser / 100.0, -1.0, 1.0);
+            if (std::abs (w) > 0.005)
+            {
+                const double k = w > 0 ? std::pow (10.0, 6.0 * w / 20.0) - 1.0 : std::pow (10.0, 12.0 * w / 20.0) - 1.0;
+                for (int i = 0; i < n; ++i)
+                {
+                    const double m = (L[i] + R[i]) * 0.5, s = (L[i] - R[i]) * 0.5, sh = wHP.run (s);
+                    const double so = s + k * sh;
+                    L[i] = (float) (m + so); R[i] = (float) (m - so);
+                }
+            }
+            else wHP.reset();
         }
 
         const int target = (p.fix && fx.ready) ? 1 : 0;
@@ -557,6 +592,7 @@ public:
     double songEnd = 0, frontier = 0;   // confirmed end of the music on the timeline (saved), furthest point heard so far
 private:
     TapeCh tapeCh[2]; double wowPh = 0, flPh = 0, lastTape = -1;
+    struct ClarCh { Biquad pres, air, hp; } clar[2]; double lastClar = -1; Biquad wHP;
     bool learning = false, lastFixP = false; double planAt = 0, silent = 0;
     double mixv = 0; bool lastListen = false; int lastStyle = -1, lastLim = -1, lastFix = 0; float lastAmount = 100, lastVc = -1; bool coeffDirty = true;
 

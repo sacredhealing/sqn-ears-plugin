@@ -37,6 +37,6 @@ private:
     juce::SpinLock lock;
     std::atomic<float>* pListen = nullptr, * pFix = nullptr, * pSound = nullptr, * pAmount = nullptr, * pConsole = nullptr,
                       * pHarsh = nullptr, * pGlue = nullptr, * pLimiter = nullptr,
-                      * pTape = nullptr, * pLoud = nullptr, * pBin = nullptr, * pBinState = nullptr, * pBinCar = nullptr, * pBinVol = nullptr;
+                      * pTape = nullptr, * pClar = nullptr, * pWidth = nullptr, * pLoud = nullptr, * pBin = nullptr, * pBinState = nullptr, * pBinCar = nullptr, * pBinVol = nullptr;
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SqnEarsProcessor)
 };

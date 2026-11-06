@@ -106,6 +106,9 @@ html,body{margin:0;height:100%;background:#030303;overflow:hidden;font-family:"P
 #curve{height:46px}
 #curve{width:100%;height:58px;display:block}
 .moves{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:11px;color:var(--muted)}.moves b{color:#F4F1E8;font-family:"SF Mono",Menlo,monospace;font-weight:500}
+.wslide{margin-top:9px}.wlab{display:flex;justify-content:space-between;align-items:center;font-size:8px;letter-spacing:.2em;text-transform:uppercase;color:var(--faint);font-weight:800}.wlab b{color:var(--cyan);letter-spacing:.12em;font-size:8.5px}
+#wUser{width:100%;-webkit-appearance:none;appearance:none;height:5px;border-radius:5px;margin-top:6px;background:linear-gradient(90deg,rgba(34,211,238,.25),rgba(212,175,55,.6) 50%,rgba(34,211,238,.9));outline:none}
+#wUser::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;border-radius:50%;background:radial-gradient(circle at 40% 30%,#e0fbff,#22D3EE 60%,#0e7490);box-shadow:0 0 12px rgba(34,211,238,.9);cursor:pointer}
 .dyn{display:grid;grid-template-columns:auto 1fr auto;gap:5px 8px;align-items:center;font-size:10px;color:var(--muted);margin-top:6px}
 .dyn .meter{margin:0}
 .dyn em{font-style:normal;font-family:"SF Mono",Menlo,monospace;color:#F4F1E8;min-width:38px;text-align:right}
@@ -115,7 +118,7 @@ html,body{margin:0;height:100%;background:#030303;overflow:hidden;font-family:"P
 <canvas id="stars"></canvas>
 <div class="ui">
  <div class="top">
-  <div class="brand"><div class="lbl">Siddha Quantum Nexus · Master Intelligence</div><b>SQN <em>Ears</em><sup class="ver">v3.0</sup></b></div>
+  <div class="brand"><div class="lbl">Siddha Quantum Nexus · Master Intelligence</div><b>SQN <em>Ears</em><sup class="ver">v3.1</sup></b></div>
   <div class="pills"><div class="pill" id="music" title="Tempo · key · tuning, heard from your song"><i style="background:var(--cyan);box-shadow:0 0 10px var(--cyan)"></i><span>— BPM · — KEY</span></div><div class="pill btn" id="limBtn" title="SQN Ears' own peak limiter: catches every peak at -1.5 dB so the master can reach its loudness safely"><i></i><span>Limiter on</span></div><div class="pill" id="status"><i></i><span>Press Master</span></div></div>
  </div>
  <div class="col">
@@ -152,6 +155,7 @@ html,body{margin:0;height:100%;background:#030303;overflow:hidden;font-family:"P
    <div class="dyn"><span>Harsh</span><div class="meter"><i id="dH" style="width:0;background:#22D3EE;box-shadow:0 0 10px #22D3EE"></i></div><em id="dHv">0.0</em>
    <span>Glue</span><div class="meter"><i id="dG" style="width:0;background:#D4AF37;box-shadow:0 0 10px #D4AF37"></i></div><em id="dGv">0.0</em>
    <span>Limit</span><div class="meter"><i id="dL" style="width:0;background:#F2545B;box-shadow:0 0 10px #F2545B"></i></div><em id="dLv">0.0</em></div>
+   <div class="wslide"><div class="wlab"><span>Narrow</span><b id="wVal">Width · Ears</b><span>Wide</span></div><input type="range" id="wUser" min="0" max="1000" value="500"></div>
    <div class="s" id="stream" style="margin-top:6px">Spotify / YouTube: —</div></div>
  </div>
 </div></div>
@@ -160,12 +164,12 @@ html,body{margin:0;height:100%;background:#030303;overflow:hidden;font-family:"P
 if (!window.__JUCE__) {
   const L = {}, demo = { listen:false, fix:true, limiter:true, binaural:true };
   window.__SQN_DEMO__ = true;
-  window.__JUCE__ = { initialisationData:{ __juce__sliders:["amount","console","tape","harsh","glue","binVol","loudOff"], __juce__toggles:["listen","fix","limiter","binaural"], __juce__comboBoxes:["sound","binState","binCarrier"], __juce__functions:[] },
+  window.__JUCE__ = { initialisationData:{ __juce__sliders:["amount","console","tape","harsh","glue","clarity","widthUser","binVol","loudOff"], __juce__toggles:["listen","fix","limiter","binaural"], __juce__comboBoxes:["sound","binState","binCarrier"], __juce__functions:[] },
     backend:{ addEventListener(id,fn){ (L[id]=L[id]||[]).push(fn); return [id,fn]; }, removeEventListener(){},
       emitEvent(id,ev){ const fire=(e)=>setTimeout(()=>(L[id]||[]).forEach(f=>f(e)));
-        const vals={amount:100,console:60,tape:45,harsh:50,glue:50,binVol:-22,loudOff:1};
+        const vals={amount:100,console:60,tape:45,harsh:50,glue:50,clarity:35,widthUser:30,binVol:-22,loudOff:1};
         if(ev.eventType==="requestInitialUpdate"){
-          if(id.startsWith("__juce__slider")){const n=id.slice(14);fire({eventType:"propertiesChanged",start:n==="binVol"?-40:n==="loudOff"?-4:0,end:n==="binVol"?-6:n==="loudOff"?4:100,skew:1,name:n,label:"%",numSteps:1001,interval:0.1,parameterIndex:0});fire({eventType:"valueChanged",value:vals[n]});}
+          if(id.startsWith("__juce__slider")){const n=id.slice(14);fire({eventType:"propertiesChanged",start:n==="binVol"?-40:n==="loudOff"?-4:n==="widthUser"?-100:0,end:n==="binVol"?-6:n==="loudOff"?4:100,skew:1,name:n,label:"%",numSteps:1001,interval:0.1,parameterIndex:0});fire({eventType:"valueChanged",value:vals[n]});}
           if(id.startsWith("__juce__toggle")){const n=id.slice(14);fire({eventType:"valueChanged",value:demo[n]});}
           if(id==="__juce__comboBoxbinState"){fire({eventType:"propertiesChanged",name:"s",parameterIndex:0,choices:["Auto","Epsilon","Delta","Theta","Schumann","Alpha","Beta","Gamma"]});fire({eventType:"valueChanged",value:0});return;}
           if(id==="__juce__comboBoxbinCarrier"){fire({eventType:"propertiesChanged",name:"c",parameterIndex:0,choices:["Auto","108","174","285","396","417","432","528","639","741","852","963"]});fire({eventType:"valueChanged",value:0});return;}
@@ -207,7 +211,7 @@ function paintChips(){ const i = sound.getChoiceIndex(); [...chips.children].for
 sound.valueChangedEvent.addListener(paintChips); sound.propertiesChangedEvent.addListener(paintChips);
 
 // knobs
-const KN = [["amount","Amount","#D4AF37",100],["console","Console 1973","#E0913A",0],["tape","Tape 1973","#C8894A",0],["harsh","Harsh tamer","#22D3EE",50],["glue","Glue","#F6DE8D",50]];
+const KN = [["amount","Amount","#D4AF37",100],["console","Console 1973","#E0913A",0],["tape","Tape 1973","#C8894A",0],["harsh","Harsh tamer","#22D3EE",50],["glue","Glue","#F6DE8D",50],["clarity","Clarity","#E2ECF7",0]];
 KN.forEach(([id, label, col, def]) => {
   const st = Juce.getSliderState(id);
   const k = document.createElement("div"); k.className = "k";
@@ -231,6 +235,15 @@ const paintLoud = () => { const v = loud.getScaledValue(); $("loV").textContent 
 const stepLoud = (dir) => { const v = Math.max(-4, Math.min(4, Math.round(loud.getScaledValue() + dir))); loud.sliderDragStarted(); loud.setNormalisedValue((v + 4) / 8); loud.sliderDragEnded(); paintLoud(); };
 $("loMinus").onclick = () => stepLoud(-1); $("loPlus").onclick = () => stepLoud(1);
 loud.valueChangedEvent.addListener(paintLoud); loud.propertiesChangedEvent.addListener(paintLoud);
+
+// width slider: left narrower, right wider, centre = Ears' own; double-click returns to centre
+const wU = Juce.getSliderState("widthUser");
+const paintW = () => { const v = wU.getScaledValue(); $("wUser").value = Math.round(wU.getNormalisedValue() * 1000); $("wVal").textContent = Math.abs(v) < 1 ? "Width · Ears" : (v > 0 ? "Wider +" : "Narrower ") + Math.round(v) + "%"; };
+$("wUser").addEventListener("pointerdown", () => wU.sliderDragStarted());
+$("wUser").addEventListener("input", e => { let n = e.target.value / 1000; if (Math.abs(n - .5) < .02) n = .5; wU.setNormalisedValue(n); paintW(); });
+$("wUser").addEventListener("change", () => wU.sliderDragEnded());
+$("wUser").addEventListener("dblclick", () => { wU.sliderDragStarted(); wU.setNormalisedValue(.5); wU.sliderDragEnded(); paintW(); });
+wU.valueChangedEvent.addListener(paintW); wU.propertiesChangedEvent.addListener(paintW);
 
 // binaural
 const binT = Juce.getToggleState("binaural"), binS = Juce.getComboBoxState("binState"), binC = Juce.getComboBoxState("binCarrier"), binV = Juce.getSliderState("binVol");
@@ -379,5 +392,5 @@ function drawWave(){
   drawWave();
   requestAnimationFrame(frame);
 })();
-paintButtons(); paintBin(); paintLoud();
+paintButtons(); paintBin(); paintLoud(); paintW();
 </script></body></html>

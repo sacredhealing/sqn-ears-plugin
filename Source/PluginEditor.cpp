@@ -15,6 +15,8 @@ SqnEarsEditor::SqnEarsEditor (SqnEarsProcessor& p)
       amountA (fparam (p, "amount"), amountR, nullptr),
       consoleA (fparam (p, "console"), consoleR, nullptr),
       tapeA (fparam (p, "tape"), tapeR, nullptr),
+      clarA (fparam (p, "clarity"), clarR, nullptr),
+      widthA (fparam (p, "widthUser"), widthR, nullptr),
       harshA (fparam (p, "harsh"), harshR, nullptr),
       glueA (fparam (p, "glue"), glueR, nullptr),
       binVolA (fparam (p, "binVol"), binVolR, nullptr),

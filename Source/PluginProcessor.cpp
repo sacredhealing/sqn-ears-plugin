@@ -15,6 +15,8 @@ APVTS::ParameterLayout SqnEarsProcessor::layout()
     l.add (std::make_unique<juce::AudioParameterFloat> (juce::ParameterID { "amount", 1 }, "Amount", juce::NormalisableRange<float> (0, 100, 0.1f), 100.0f, pct));
     l.add (std::make_unique<juce::AudioParameterFloat> (juce::ParameterID { "console", 1 }, "Vintage Console 1973", juce::NormalisableRange<float> (0, 100, 0.1f), 0.0f, pct));
     l.add (std::make_unique<juce::AudioParameterFloat> (juce::ParameterID { "tape", 1 }, "Tape 1973", juce::NormalisableRange<float> (0, 100, 0.1f), 0.0f, pct));
+    l.add (std::make_unique<juce::AudioParameterFloat> (juce::ParameterID { "clarity", 1 }, "Clarity", juce::NormalisableRange<float> (0, 100, 0.1f), 0.0f, pct));
+    l.add (std::make_unique<juce::AudioParameterFloat> (juce::ParameterID { "widthUser", 1 }, "Width", juce::NormalisableRange<float> (-100, 100, 0.1f), 0.0f, pct));
     l.add (std::make_unique<juce::AudioParameterFloat> (juce::ParameterID { "harsh", 1 }, "Harshness tamer", juce::NormalisableRange<float> (0, 100, 0.1f), 50.0f, pct));
     l.add (std::make_unique<juce::AudioParameterFloat> (juce::ParameterID { "glue", 1 }, "Glue", juce::NormalisableRange<float> (0, 100, 0.1f), 50.0f, pct));
     l.add (std::make_unique<juce::AudioParameterBool> (juce::ParameterID { "limiter", 1 }, "Loud (peak limiter)", true));
@@ -37,7 +39,7 @@ SqnEarsProcessor::SqnEarsProcessor()
 {
     pListen = state.getRawParameterValue ("listen"); pFix = state.getRawParameterValue ("fix");
     pSound = state.getRawParameterValue ("sound"); pAmount = state.getRawParameterValue ("amount");
-    pConsole = state.getRawParameterValue ("console"); pTape = state.getRawParameterValue ("tape"); pHarsh = state.getRawParameterValue ("harsh");
+    pConsole = state.getRawParameterValue ("console"); pTape = state.getRawParameterValue ("tape"); pClar = state.getRawParameterValue ("clarity"); pWidth = state.getRawParameterValue ("widthUser"); pHarsh = state.getRawParameterValue ("harsh");
     pGlue = state.getRawParameterValue ("glue"); pLimiter = state.getRawParameterValue ("limiter");
     pLoud = state.getRawParameterValue ("loudOff");
     pBin = state.getRawParameterValue ("binaural"); pBinState = state.getRawParameterValue ("binState");
@@ -62,7 +64,7 @@ void SqnEarsProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::Mid
     if (buffer.getNumChannels() < 2) return;
     sqn::Params p;
     p.listen = pListen->load() > 0.5f; p.fix = pFix->load() > 0.5f; p.limiter = pLimiter->load() > 0.5f;
-    p.sound = (int) pSound->load(); p.amount = pAmount->load(); p.console = pConsole->load(); p.tape = pTape->load();
+    p.sound = (int) pSound->load(); p.amount = pAmount->load(); p.console = pConsole->load(); p.tape = pTape->load(); p.clarity = pClar->load(); p.widthUser = pWidth->load();
     p.harsh = pHarsh->load(); p.glue = pGlue->load();
     p.loudOff = pLoud->load();
     p.binaural = pBin->load() > 0.5f; p.binState = (int) pBinState->load(); p.binCarrier = (int) pBinCar->load(); p.binVol = pBinVol->load();
