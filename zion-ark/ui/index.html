@@ -168,7 +168,7 @@ body.plug{background:#050505;overflow:hidden}body.plug .page{padding:0;max-width
           <div style="display:flex;flex-direction:column;gap:6px;align-items:center"><canvas class="vu" id="vuIn"></canvas><span class="lbl">Input</span></div>
           <div style="display:flex;flex-direction:column;gap:6px;align-items:center"><canvas class="vu" id="vuOut"></canvas><span class="lbl">Output</span></div>
           <div style="display:flex;flex-direction:column;gap:7px;flex:1">
-            <div class="krow"><div data-id="tDrive"></div><div data-id="tWow"></div><div data-id="tHiss"></div><div data-id="tMatch"></div></div>
+            <div class="krow"><div data-id="tDrive"></div><div data-id="tWow"></div><div data-id="tMatch"></div></div>
             <div style="display:flex;gap:6px"><button class="tog" id="match" style="flex:1;letter-spacing:.1em"><b></b>MATCH OFF</button><button class="tog" id="mono" style="flex:1;letter-spacing:.1em"><b></b>MONO</button></div>
             <canvas id="mbars" style="width:100%;height:26px;border-radius:7px;background:#030302;box-shadow:inset 0 1px 4px #000,inset 0 0 0 1px rgba(212,175,55,.15)"></canvas>
           </div>
@@ -343,7 +343,6 @@ def('srDepth','DEPTH',{p:.5,size:'sm',fmt:pct,apply:v=>ST(SR.lg.gain,v*.6*C.srPi
 def('srWave','SHAPE',{p:2/3,steps:4,size:'sm',map:p=>['sine','triangle','square','sawtooth'][Math.round(p*3)],fmt:v=>({sine:'SIN',triangle:'TRI',square:'SQR',sawtooth:'SAW'})[v],apply:v=>SR.lfo.type=v});
 def('tDrive','DRIVE',{p:.2,size:'sm',map:lin(.6,5),fmt:v=>v.toFixed(1)+'x',apply:v=>A.drive.curve=satCurve(v)});
 def('tWow','WOW',{p:.15,size:'sm',fmt:pct,apply:v=>{ST(A.wowG.gain,v*.0012);ST(A.flutG.gain,v*.00006)}});
-def('tHiss','HISS',{p:.05,size:'sm',map:lin(0,.02),fmt:v=>Math.round(v/.02*100)+'%',apply:v=>ST(A.hissG.gain,v)});
 
 def('tMatch','AMOUNT',{p:.8,size:'sm',fmt:pct});
 const REF={cent:[31.5, 63, 125, 250, 500, 1000, 2000, 4000, 8000, 16000]},REFS=[[0.15, 9.33, 3.6, -1.34, 1.22, 0.0, -0.73, -1.76, -2.38, -18.78], [-17.84, 9.29, 0.78, -8.47, -3.18, 0.0, -5.84, -12.12, -7.19, -24.08], [-15.41, 6.72, 17.23, 11.62, 7.4, 0.0, 0.24, -1.6, -5.79, -21.1], [7.03, 13.65, 6.92, 2.94, 1.21, 0.0, -1.32, -7.05, -8.87, -15.05]],ML2=["MATCH OFF","ARK ’77","REBEL ’70","ONE ’72","NOW"],ERA=[20000,13500,12500,10500,16000];let matchG=REF.cent.map(()=>0);
@@ -351,15 +350,15 @@ const REF={cent:[31.5, 63, 125, 250, 500, 1000, 2000, 4000, 8000, 16000]},REFS=[
 $$('[data-id]').forEach(el=>mount(el,C[el.dataset.id]));
 
 /* presets */
-const INIT={inG:.5,mix:1,outG:.5,bk:0,phRA:.35,phRB:.5,phDepth:.75,phFb:.45,phMix:1,eSend:0,time:.5,eInt:.42,eAge:.45,eSpr:.2,eRet:.7,sSend:0,sDrive:.35,sDecay:.45,sTone:.55,sRet:.6,tDrive:.2,tWow:.15,tHiss:.05,tMatch:.8,_:{phOn:false,phWave:'square',aux:false,cut:false,mode:0,match:0,mono:false}};
+const INIT={inG:.5,mix:1,outG:.5,bk:0,phRA:.35,phRB:.5,phDepth:.75,phFb:.45,phMix:1,eSend:0,time:.5,eInt:.42,eAge:.45,eSpr:.2,eRet:.7,sSend:0,sDrive:.35,sDecay:.45,sTone:.55,sRet:.6,tDrive:.2,tWow:.15,tMatch:.8,_:{phOn:false,phWave:'square',aux:false,cut:false,mode:0,match:0,mono:false}};
 const PRE=[['INIT',{}],
- ['ARK ’77 · PARTY TIME',{tDrive:.35,tWow:.2,tHiss:.1,tMatch:.85,eSend:.15,eInt:.45,eAge:.55,sSend:.25,sDrive:.45,phRA:.3,phRB:.42,phFb:.5,phMix:.8,_:{match:1,mono:true,phOn:true,phWave:'sine'}}],
- ['SOUL REBEL ’70',{tDrive:.4,tWow:.2,tHiss:.15,tMatch:.85,eSend:.05,sSend:.12,_:{match:2,mono:true}}],
+ ['ARK ’77 · PARTY TIME',{tDrive:.35,tWow:.2,tMatch:.85,eSend:.15,eInt:.45,eAge:.55,sSend:.25,sDrive:.45,phRA:.3,phRB:.42,phFb:.5,phMix:.8,_:{match:1,mono:true,phOn:true,phWave:'sine'}}],
+ ['SOUL REBEL ’70',{tDrive:.4,tWow:.2,tMatch:.85,eSend:.05,sSend:.12,_:{match:2,mono:true}}],
  ['MODERN STEPPERS',{eSend:.25,eInt:.5,sSend:.2,tDrive:.35,tMatch:.75,_:{match:4,mode:3}}],
- ['ROOTS DRUM BUS',{eSend:.08,eInt:.35,sSend:.3,sDrive:.5,sDecay:.4,tDrive:.45,tWow:.12,tHiss:.1}],
+ ['ROOTS DRUM BUS',{eSend:.08,eInt:.35,sSend:.3,sDrive:.5,sDecay:.4,tDrive:.45,tWow:.12}],
  ['DUB VOCAL',{eSend:.3,eInt:.48,eAge:.5,eSpr:.3,sSend:.12,sDecay:.55,tDrive:.3}],
  ['DUB AUX · 100% WET',{eSend:.85,eInt:.55,eSpr:.35,eRet:.8,sSend:.55,sRet:.7,_:{aux:true}}],
- ['ARK SWIRL',{eSend:.3,eAge:.6,sSend:.3,sDrive:.55,tDrive:.55,tWow:.3,tHiss:.2,phRA:.45,phRB:.55,phFb:.55,_:{phOn:true,phWave:'square'}}],
+ ['ARK SWIRL',{eSend:.3,eAge:.6,sSend:.3,sDrive:.55,tDrive:.55,tWow:.3,phRA:.45,phRB:.55,phFb:.55,_:{phOn:true,phWave:'square'}}],
  ['WATERHOUSE STEPS',{bk:.4,eSend:.25,eInt:.5,sSend:.5,sDrive:.7,_:{mode:3}}]];
 let pi=1;
 function loadPreset(i){pi=(i+PRE.length)%PRE.length;const p=Object.assign({},INIT,PRE[pi][1]),st=Object.assign({},INIT._,PRE[pi][1]._||{});
@@ -444,7 +443,7 @@ function initAudio(){
     if(bands[5]<-95)return;const rel=bands.map(b=>b-bands[5]);avg=avg?avg.map((a,i)=>a+.2*(rel[i]-a)):rel;
     const g=REFS[state.match-1].map((r,i)=>r-avg[i]),mean=g.slice(2,9).reduce((a,b)=>a+b)/7,amt=C.tMatch.val();
     matchG=g.map(x=>Math.max(-9,Math.min(9,(x-mean)*amt)));A.meq.forEach((b,i)=>ST(b.gain,matchG[i],.25))},350)}
-  const hs=ctx.createBufferSource();hs.buffer=noiseBuf;hs.loop=true;A.hissG=G(0);hs.connect(BQ('highpass',2500)).connect(A.hissG).connect(A.wetG);hs.start();
+  
   // OUT
   A.out=G(1);A.wetG.connect(A.out);A.cleanD.connect(A.out);A.outG=G(1);A.out.connect(A.outG);A.anOut=ctx.createAnalyser();A.anOut.fftSize=1024;A.outG.connect(A.anOut);
   A.safe=ctx.createDynamicsCompressor();A.safe.threshold.value=-2;A.safe.ratio.value=20;A.safe.attack.value=.002;A.safe.release.value=.12;A.outG.connect(A.safe).connect(ctx.destination);
@@ -515,7 +514,7 @@ addEventListener('resize',fit);fit();if(PLUG)$('#pname').textContent='CHOOSE PRE
 <script type="module">
 if (window.__JUCE__) {
   const Juce = await import("./juce/index.js");
-  const KNOBS = ["inG","mix","outG","bk","phRA","phRB","phDepth","phFb","phMix","eSend","time","eInt","eAge","eSpr","eRet","sSend","sDrive","sDecay","sTone","sRet","srPitch","srRate","srDepth","srWave","tDrive","tWow","tHiss","tMatch"];
+  const KNOBS = ["inG","mix","outG","bk","phRA","phRB","phDepth","phFb","phMix","eSend","time","eInt","eAge","eSpr","eRet","sSend","sDrive","sDecay","sTone","sRet","srPitch","srRate","srDepth","srWave","tDrive","tWow","tMatch"];
   const TOG = ["phOn","phSq","sync","aux","byp","cut","mono"], PADS = { thE:"#pTE", thS:"#pTS", warp:"#pWarp", siren:"#pSir", kick:"#pKick" };
   const S = {}, T = {}, P = {};
   const fromHost = (fn) => { hostSet = true; try { fn(); } finally { hostSet = false; } };

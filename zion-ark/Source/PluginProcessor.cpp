@@ -6,7 +6,7 @@ using APVTS = juce::AudioProcessorValueTreeState;
 const juce::StringArray& ZionArkProcessor::knobIds()
 {
     static const juce::StringArray ids { "inG","mix","outG","bk","phRA","phRB","phDepth","phFb","phMix","eSend","time","eInt","eAge","eSpr","eRet",
-                                         "sSend","sDrive","sDecay","sTone","sRet","srPitch","srRate","srDepth","srWave","tDrive","tWow","tHiss","tMatch" };
+                                         "sSend","sDrive","sDecay","sTone","sRet","srPitch","srRate","srDepth","srWave","tDrive","tWow","tMatch" };
     return ids;
 }
 const juce::StringArray& ZionArkProcessor::toggleIds()
@@ -25,7 +25,7 @@ APVTS::ParameterLayout ZionArkProcessor::layout()
         { "eSend", { "Echo send", .15f } }, { "time", { "Echo time", .5f } }, { "eInt", { "Echo repeat", .45f } }, { "eAge", { "Tape age", .55f } }, { "eSpr", { "Echo to spring", .2f } }, { "eRet", { "Echo return", .7f } },
         { "sSend", { "Spring send", .25f } }, { "sDrive", { "Spring drive", .45f } }, { "sDecay", { "Spring decay", .45f } }, { "sTone", { "Spring tone", .55f } }, { "sRet", { "Spring return", .6f } },
         { "srPitch", { "Siren pitch", .5f } }, { "srRate", { "Siren rate", .45f } }, { "srDepth", { "Siren depth", .5f } }, { "srWave", { "Siren shape", 2.0f / 3.0f } },
-        { "tDrive", { "Tape drive", .35f } }, { "tWow", { "Tape wow", .2f } }, { "tHiss", { "Tape hiss", .1f } }, { "tMatch", { "Match amount", .85f } } };
+        { "tDrive", { "Tape drive", .35f } }, { "tWow", { "Tape wow", .2f } }, { "tMatch", { "Match amount", .85f } } };
     const std::map<juce::String, std::pair<juce::String, bool>> T {
         { "phOn", { "Phase on", true } }, { "phSq", { "Phase square sweep", false } }, { "sync", { "Echo host sync", true } }, { "aux", { "AUX 100% wet", false } },
         { "byp", { "Bypass", false } }, { "cut", { "Dry cut", false } }, { "mono", { "Mono", true } },
@@ -100,7 +100,7 @@ void ZionArkProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::Mid
     p.mode = (int) r ("mode"); p.sync = r ("sync") > .5f;
     p.sSend = r ("sSend"); p.sDrive = r ("sDrive"); p.sDecay = r ("sDecay"); p.sTone = r ("sTone"); p.sRet = r ("sRet");
     p.srPitch = r ("srPitch"); p.srRate = r ("srRate"); p.srDepth = r ("srDepth"); p.srWave = r ("srWave");
-    p.tDrive = r ("tDrive"); p.tWow = r ("tWow"); p.tHiss = r ("tHiss"); p.tMatch = r ("tMatch"); p.match = (int) r ("match"); p.mono = r ("mono") > .5f;
+    p.tDrive = r ("tDrive"); p.tWow = r ("tWow"); p.tMatch = r ("tMatch"); p.match = (int) r ("match"); p.mono = r ("mono") > .5f;
     p.aux = r ("aux") > .5f; p.byp = r ("byp") > .5f; p.cut = r ("cut") > .5f;
     p.thE = r ("thE") > .5f; p.thS = r ("thS") > .5f; p.warp = r ("warp") > .5f; p.siren = r ("siren") > .5f; p.kick = r ("kick") > .5f;
     if (auto* ph = getPlayHead())

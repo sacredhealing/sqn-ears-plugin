@@ -65,7 +65,7 @@ struct Params
     float eSend = .15f, time = .5f, eInt = .45f, eAge = .55f, eSpr = .2f, eRet = .7f; int mode = 0; bool sync = true;
     float sSend = .25f, sDrive = .45f, sDecay = .45f, sTone = .55f, sRet = .6f;
     float srPitch = .5f, srRate = .45f, srDepth = .5f, srWave = 2.0f / 3.0f;
-    float tDrive = .35f, tWow = .2f, tHiss = .1f, tMatch = .85f; int match = 1; bool mono = true;
+    float tDrive = .35f, tWow = .2f, tMatch = .85f; int match = 1; bool mono = true;
     bool aux = false, byp = false, cut = false, thE = false, thS = false, warp = false, siren = false, kick = false;
     double hostBpm = 0;
 };
@@ -272,7 +272,7 @@ public:
         const auto& p = P;
         const float sTone = ex (1500, 9000, p.sTone), sRet = lin (0, 1.5f, p.sRet);
         if (std::fabs (sTone - lastSt) > 1) { lastSt = sTone; sLp.set (Biquad::LP, sTone, 0.6f, 0, sr); }
-        const float k = lin (.6f, 5, p.tDrive), wow = p.tWow * 0.0012f, flut = p.tWow * 0.00006f, hiss = lin (0, .02f, p.tHiss);
+        const float k = lin (.6f, 5, p.tDrive), wow = p.tWow * 0.0012f, flut = p.tWow * 0.00006f;
         const int mt = std::clamp (p.match, 0, 4); const bool mOn = mt > 0 && ! p.byp;
         const float eraF = mOn ? ERA[mt] : 20000.0f;
         if (std::fabs (eraF - lastEra) > 1) { lastEra = eraF; era1.set (Biquad::LP, eraF, 0.6f, 0, sr); era2.set (Biquad::LP, eraF, 0.9f, 0, sr); }
@@ -303,13 +303,12 @@ public:
                 s[c] = v;
             }
             ww = (ww + 1) % wowLen;
-            const float hn = hissHp.proc (noise.next(), 0) * sHiss.next (hiss);
             const float mx = sMix.next (mixT), cl = 1.0f - mx, og = sOut.next (outG);
             for (int c = 0; c < 2; ++c)
             {
                 float v = s[c];
                 for (int b = 0; b < 10; ++b) v = mq[b].proc (v, c);
-                v = era2.proc (era1.proc (v, c), c) + hn;
+                v = era2.proc (era1.proc (v, c), c);
                 const float o = (v * mx + cleanS[(size_t) (2 * i + c)] * cl) * og;
                 outAcc += 0.5 * (double) o * o;
                 (c ? R : L)[i] = std::isfinite (o) ? o : 0.0f;
