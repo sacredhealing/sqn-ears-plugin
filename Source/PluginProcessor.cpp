@@ -17,6 +17,8 @@ APVTS::ParameterLayout SqnEarsProcessor::layout()
     l.add (std::make_unique<juce::AudioParameterFloat> (juce::ParameterID { "harsh", 1 }, "Harshness tamer", juce::NormalisableRange<float> (0, 100, 0.1f), 50.0f, pct));
     l.add (std::make_unique<juce::AudioParameterFloat> (juce::ParameterID { "glue", 1 }, "Glue", juce::NormalisableRange<float> (0, 100, 0.1f), 50.0f, pct));
     l.add (std::make_unique<juce::AudioParameterBool> (juce::ParameterID { "limiter", 1 }, "Loud (peak limiter)", true));
+    l.add (std::make_unique<juce::AudioParameterFloat> (juce::ParameterID { "loudOff", 1 }, "Loudness +/-", juce::NormalisableRange<float> (-4, 4, 0.5f), 0.0f,
+        juce::AudioParameterFloatAttributes().withLabel ("dB")));
     l.add (std::make_unique<juce::AudioParameterBool> (juce::ParameterID { "binaural", 1 }, "Binaural beats", false));
     l.add (std::make_unique<juce::AudioParameterChoice> (juce::ParameterID { "binState", 1 }, "Binaural state",
         juce::StringArray { "Auto", "Epsilon 0.5 Hz", "Delta 2 Hz", "Theta 6 Hz", "Schumann 7.83 Hz", "Alpha 10 Hz", "Beta 14 Hz", "Gamma 40 Hz" }, 0));
@@ -36,6 +38,7 @@ SqnEarsProcessor::SqnEarsProcessor()
     pSound = state.getRawParameterValue ("sound"); pAmount = state.getRawParameterValue ("amount");
     pConsole = state.getRawParameterValue ("console"); pHarsh = state.getRawParameterValue ("harsh");
     pGlue = state.getRawParameterValue ("glue"); pLimiter = state.getRawParameterValue ("limiter");
+    pLoud = state.getRawParameterValue ("loudOff");
     pBin = state.getRawParameterValue ("binaural"); pBinState = state.getRawParameterValue ("binState");
     pBinCar = state.getRawParameterValue ("binCarrier"); pBinVol = state.getRawParameterValue ("binVol");
 }
@@ -60,6 +63,7 @@ void SqnEarsProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::Mid
     p.listen = pListen->load() > 0.5f; p.fix = pFix->load() > 0.5f; p.limiter = pLimiter->load() > 0.5f;
     p.sound = (int) pSound->load(); p.amount = pAmount->load(); p.console = pConsole->load();
     p.harsh = pHarsh->load(); p.glue = pGlue->load();
+    p.loudOff = pLoud->load();
     p.binaural = pBin->load() > 0.5f; p.binState = (int) pBinState->load(); p.binCarrier = (int) pBinCar->load(); p.binVol = pBinVol->load();
     if (auto* ph = getPlayHead())
         if (auto pos = ph->getPosition())
@@ -84,6 +88,8 @@ void SqnEarsProcessor::getStateInformation (juce::MemoryBlock& dest)
         a.setProperty ("mhb", an.mhb, nullptr); a.setProperty ("mhba", an.mhba, nullptr);
         a.setProperty ("corr", an.corr, nullptr); a.setProperty ("lcorr", an.lcorr, nullptr);
         a.setProperty ("I", an.I, nullptr); a.setProperty ("tp", an.tp, nullptr);
+        for (int i = 0; i < 9; ++i) { a.setProperty ("mw" + juce::String (i), an.mw[i], nullptr); a.setProperty ("weq" + juce::String (i), f.weq[i], nullptr); a.setProperty ("eq" + juce::String (i), f.eq[i], nullptr); }
+        a.setProperty ("haveW", an.haveW, nullptr); a.setProperty ("useW", f.useW, nullptr);
         a.setProperty ("key", an.key, nullptr); a.setProperty ("minor", an.minor, nullptr); a.setProperty ("aRef", an.aRef, nullptr); a.setProperty ("bpm", an.bpm, nullptr);
         a.setProperty ("ready", f.ready, nullptr); a.setProperty ("style", f.style, nullptr);
         a.setProperty ("gain", f.gain, nullptr); a.setProperty ("trim", f.trim, nullptr); a.setProperty ("cal", f.cal, nullptr);
@@ -115,6 +121,8 @@ void SqnEarsProcessor::setStateInformation (const void* data, int size)
     for (int i = 0; i < 6; ++i) an.mm[i] = (float) a.getProperty ("mm" + juce::String (i), 0.0f);
     an.mhb = fl ("mhb", 0.12f); an.mhba = fl ("mhba", 1e-6f); an.corr = fl ("corr", 1); an.lcorr = fl ("lcorr", 1);
     an.I = fl ("I", -70); an.tp = fl ("tp", -70);
+    for (int i = 0; i < 9; ++i) { an.mw[i] = (float) a.getProperty ("mw" + juce::String (i), 0.0f); f.weq[i] = (float) a.getProperty ("weq" + juce::String (i), 0.0f); f.eq[i] = (float) a.getProperty ("eq" + juce::String (i), 0.0f); }
+    an.haveW = a.getProperty ("haveW", false); f.useW = a.getProperty ("useW", false);
     an.key = a.getProperty ("key", -1); an.minor = a.getProperty ("minor", false); an.aRef = fl ("aRef", 440); an.bpm = fl ("bpm", 0);
     f.ready = a.getProperty ("ready", false); f.style = a.getProperty ("style", 0);
     f.gain = fl ("gain", 0); f.trim = fl ("trim", 0); f.cal = a.getProperty ("cal", false); f.caln = a.getProperty ("caln", 0);

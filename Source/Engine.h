@@ -159,30 +159,30 @@ static const double kSacred[11] = { 108, 174, 285, 396, 417, 432, 528, 639, 741,
 static const double kStates[8] = { 0, 0.5, 2, 6, 7.83, 10, 14, 40 };   // Auto, Epsilon, Delta, Theta, Schumann, Alpha, Beta, Gamma
 
 //============================================================================== the sounds
-struct Style { const char* name; float lufs; float off[9]; float vc, glue, harsh, wid; float corrT = 0; };  // corrT: measured L/R similarity of the reference (0 = use wid)
+struct Style { const char* name; float lufs; float off[9]; float vc, glue, harsh, wid; float corrT = 0; float wT[9] {}; float wConf = 0; };  // wT: measured side-vs-mid per octave (dB), wConf 0 = not measured  // corrT: measured L/R similarity of the reference (0 = use wid)
 inline const std::array<Style, 12>& styles()
 {
     // Sounds marked MEASURED come from real reference records analysed with this engine (tone per octave, width, loudness).
     static const std::array<Style, 12> s { {
         { "Sovereign",       -11.0f, { 0, 0, 0, 0, 0, 0, 0, 0, 0 },                      0.00f, 0.5f, 1.0f,  0.0f },
         // MEASURED: Midnite (4 reference songs) - mono bass, open top, light glue (they recorded live, little compression)
-        { "Zion Roots",      -12.5f, { 1.0f, -2.2f, -1.1f, 0.2f, 0.0f, -0.1f, -0.2f, 1.3f, 1.2f }, 0.30f, 0.3f, 1.0f, 0.0f, 0.97f },
+        { "Zion Roots",      -12.5f, { 1.0f, -2.2f, -1.1f, 0.2f, 0.0f, -0.1f, -0.2f, 1.3f, 1.2f }, 0.30f, 0.3f, 1.0f, 0.0f, 0.97f, { -30.1f, -22.6f, -17.8f, -15.8f, -14.6f, -14.6f, -14.9f, -17.7f, -19.4f }, 0.75f },
         // MEASURED (1 song, blended 60/40 with design): early-70s Upsetter-era roots - mono, big low end
-        { "Kingston 1973",   -13.0f, { 3.4f, 0.7f, -1.3f, -0.5f, 0.7f, -0.6f, -1.9f, 0.1f, -2.7f }, 0.70f, 0.6f, 1.3f, 0.0f, 0.97f },
+        { "Kingston 1973",   -13.0f, { 3.4f, 0.7f, -1.3f, -0.5f, 0.7f, -0.6f, -1.9f, 0.1f, -2.7f }, 0.70f, 0.6f, 1.3f, 0.0f, 0.97f, { -30.4f, -30.5f, -30.9f, -31.0f, -30.9f, -31.5f, -33.0f, -33.6f, -34.1f }, 0.5f },
         // MEASURED (1 song, blended 60/40 with design): late-70s Island-era roots - forward mids, open stereo
-        { "Island '77",      -14.0f, { -1.2f, -2.0f, -0.5f, 0.5f, 1.4f, 1.4f, 0.4f, 0.7f, -1.1f }, 0.50f, 0.5f, 1.1f, 0.0f, 0.85f },
+        { "Island '77",      -14.0f, { -1.2f, -2.0f, -0.5f, 0.5f, 1.4f, 1.4f, 0.4f, 0.7f, -1.1f }, 0.50f, 0.5f, 1.1f, 0.0f, 0.85f, { -20.9f, -16.0f, -12.1f, -9.6f, -8.9f, -5.9f, -4.5f, -5.4f, -6.1f }, 0.5f },
         { "Dub Chamber",     -12.0f, { 2.5f, 2, 0, -0.5f, -0.5f, -1, -1.5f, -2, -3 },     0.50f, 0.5f, 1.2f,  1.0f },
         // MEASURED: 1992-93 West Coast (4 reference songs)
-        { "West Coast '92",  -10.2f, { 0.1f, -2.6f, -1.7f, -0.6f, -1.4f, -0.1f, 2.3f, 3.1f, 1.0f }, 0.25f, 0.8f, 0.8f, 0.0f, 0.87f },
+        { "West Coast '92",  -10.2f, { 0.1f, -2.6f, -1.7f, -0.6f, -1.4f, -0.1f, 2.3f, 3.1f, 1.0f }, 0.25f, 0.8f, 0.8f, 0.0f, 0.87f, { -22.0f, -18.8f, -14.5f, -13.0f, -9.4f, -8.3f, -8.4f, -8.6f, -7.7f }, 0.75f },
         // MEASURED: 1996 G-funk (4 reference songs)
-        { "G-Funk '96",      -10.4f, { 0.0f, -0.3f, -0.5f, -0.2f, -1.4f, 0.3f, 1.9f, 1.7f, -1.6f },  0.25f, 0.8f, 1.0f, 0.0f, 0.97f },
+        { "G-Funk '96",      -10.4f, { 0.0f, -0.3f, -0.5f, -0.2f, -1.4f, 0.3f, 1.9f, 1.7f, -1.6f },  0.25f, 0.8f, 1.0f, 0.0f, 0.97f, { -26.3f, -24.3f, -17.6f, -13.7f, -13.6f, -14.9f, -16.1f, -14.6f, -14.4f }, 0.75f },
         // MEASURED: 1999 West Coast (2 reference songs)
-        { "West Coast '99",   -9.0f, { 0.5f, -1.0f, 0.0f, 1.0f, 0.5f, -0.3f, 0.1f, 1.0f, -1.8f },   0.10f, 0.7f, 1.0f, 0.0f, 0.93f },
+        { "West Coast '99",   -9.0f, { 0.5f, -1.0f, 0.0f, 1.0f, 0.5f, -0.3f, 0.1f, 1.0f, -1.8f },   0.10f, 0.7f, 1.0f, 0.0f, 0.93f, { -23.4f, -18.5f, -15.4f, -14.8f, -14.4f, -13.8f, -11.9f, -8.6f, -6.0f }, 0.75f },
         // MEASURED: 1993-95 New York (4 reference songs)
-        { "Golden Era '94",  -12.0f, { 0.2f, 0.2f, -0.5f, -0.6f, -1.3f, -0.3f, 2.1f, 1.2f, -1.0f }, 0.30f, 0.7f, 0.9f, 0.0f, 0.92f },
+        { "Golden Era '94",  -12.0f, { 0.2f, 0.2f, -0.5f, -0.6f, -1.3f, -0.3f, 2.1f, 1.2f, -1.0f }, 0.30f, 0.7f, 0.9f, 0.0f, 0.92f, { -17.4f, -18.2f, -18.2f, -17.8f, -17.9f, -18.1f, -16.6f, -13.9f, -11.4f }, 0.75f },
         { "808 Modern",       -9.0f, { 2.5f, 1.5f, -1, -0.5f, 0, 0, 0.5f, 1.5f, 2 },      0.00f, 0.6f, 1.0f,  1.0f },
         // MEASURED: early-80s pop (1 reference song) - clean, bright top, wide, very dynamic
-        { "Crystal Pop '82", -13.5f, { -1.3f, -2.3f, -2.4f, -1.1f, -0.1f, 0.3f, 1.4f, 2.7f, 2.8f }, 0.10f, 0.4f, 1.0f, 0.0f, 0.82f },
+        { "Crystal Pop '82", -13.5f, { -1.3f, -2.3f, -2.4f, -1.1f, -0.1f, 0.3f, 1.4f, 2.7f, 2.8f }, 0.10f, 0.4f, 1.0f, 0.0f, 0.82f, { -17.6f, -13.7f, -8.2f, -6.8f, -6.6f, -6.6f, -8.2f, -9.3f, -9.3f }, 0.5f },
         { "Mantra Temple",   -16.0f, { -1, -1, -0.5f, 0, 0, 0, 0, 0.5f, 1 },              0.20f, 0.2f, 1.2f,  1.5f },
     } };
     return s;
@@ -223,20 +223,20 @@ struct KWeight
 };
 
 //============================================================================== what Listen heard (saved with the session)
-struct Analysis { bool have = false; float mb[9] {}, mm[6] {}, mhb = 0.12f, mhba = 1e-6f, corr = 1, lcorr = 1, I = -70, tp = -70; int key = -1; bool minor = false; float aRef = 440, bpm = 0; };
+struct Analysis { bool have = false; float mb[9] {}, mm[6] {}, mhb = 0.12f, mhba = 1e-6f, corr = 1, lcorr = 1, I = -70, tp = -70; int key = -1; bool minor = false; float aRef = 440, bpm = 0; float mw[9] {}; bool haveW = false; };
 struct Plan
 {
     bool ready = false, monobass = false, cal = false; int style = 0, caln = 0;
-    float eq[9] {}; float gain = 0, trim = 0, ls = 0, lm = 0, pr = 0, hs = 0, mudf = 250, mudg = 0, width = 0, hbase = 0.12f, hbabs = 1e-6f;
+    float eq[9] {}, weq[9] {}; bool useW = false; float gain = 0, trim = 0, ls = 0, lm = 0, pr = 0, hs = 0, mudf = 250, mudg = 0, width = 0, hbase = 0.12f, hbabs = 1e-6f;
 };
-struct Params { bool listen = false, fix = false, limiter = true, binaural = false; int sound = 0, binState = 0, binCarrier = 0; float amount = 100, console = 0, harsh = 50, glue = 50, binVol = -22; double hostBpm = 0; };
+struct Params { bool listen = false, fix = false, limiter = true, binaural = false; int sound = 0, binState = 0, binCarrier = 0; float amount = 100, console = 0, harsh = 50, glue = 50, binVol = -22, loudOff = 0; double hostBpm = 0; };
 
 struct Readout
 {
     std::atomic<float> lufsIn { -70 }, tpIn { -70 }, corr { 0 }, gain { 0 }, secs { 0 }, lufsOut { -70 }, peakOut { -70 },
         turnDown { 0 }, harsh { 0 }, glue { 0 }, lim { 0 }, ls { 0 }, lm { 0 }, pr { 0 }, hs { 0 }, mudf { 250 }, mudg { 0 }, width { 0 };
     std::atomic<int> state { 0 }, style { 0 }, key { -1 }, bpmSrc { 0 }, carrierIdx { -1 }; std::atomic<bool> cal { false }, minor { false }, binOn { false };
-    std::atomic<float> bpm { 0 }, aRef { 440 }, carrierHz { 0 }, carrierPlayed { 0 }, beatHz { 0 };
+    std::atomic<float> target { -13 }, bpm { 0 }, aRef { 440 }, carrierHz { 0 }, carrierPlayed { 0 }, beatHz { 0 };
     std::array<std::atomic<float>, 32> spec {}; std::array<std::atomic<float>, 9> eq {};
 };
 
@@ -256,7 +256,7 @@ public:
         kin[0].prepare (sr); kin[1].prepare (sr); kout[0].prepare (sr); kout[1].prepare (sr);
         min_.sublen = mout.sublen = (int) std::floor (sr * 0.1);
         for (int c = 0; c < 2; ++c) { lp[c].set (Bq::LowPass, 120, 0.7071, 0, sr); lp[c].reset(); }
-        for (int b = 0; b < 9; ++b) { band[b].set (Bq::BandPass0dB, centers[b], 1.41, 0, sr); band[b].reset(); }
+        for (int b = 0; b < 9; ++b) { band[b].set (Bq::BandPass0dB, centers[b], 1.41, 0, sr); band[b].reset(); sband[b].set (Bq::BandPass0dB, centers[b], 1.41, 0, sr); sband[b].reset(); }
         for (int b = 0; b < 6; ++b) { mudb[b].set (Bq::BandPass0dB, mudf[b], 4.3, 0, sr); mudb[b].reset(); }
         hbM.set (Bq::BandPass0dB, 4500, 0.8, 0, sr);
         for (int c = 0; c < 2; ++c)
@@ -294,6 +294,7 @@ public:
     void process (float* L, float* R, int n, const Params& p)
     {
         const int style = clampv (p.sound, 0, (int) styles().size() - 1), limI = p.limiter ? 1 : 0;
+        loudOff = clampv (p.loudOff, -4.0f, 4.0f);
         // LANDR-style: press Master (fix) and play. It learns while it plays, masters after ~8 s,
         // refines every 4 s, and locks when playback stops (2 s of silence after 30 s heard).
         // "Listen" = learn this song again from the start.
@@ -308,9 +309,9 @@ public:
             if (totN >= sr * 8 && (totN - planAt >= sr * 4 || lock) && silent == 0) { lastAmount = p.amount; if (snapshot()) computeFix (style, p.amount, p.limiter); planAt = totN; }
             if (lock && totN >= sr * 8) { learning = false; if (snapshot()) computeFix (style, p.amount, p.limiter); }
         }
-        else if (an.have && lastStyle >= 0 && (style != lastStyle || std::abs (p.amount - lastAmount) > 0.5f || limI != lastLim))
+        else if (an.have && lastStyle >= 0 && (style != lastStyle || std::abs (p.amount - lastAmount) > 0.5f || limI != lastLim || std::abs (p.loudOff - lastOff) > 0.01f))
         { lastAmount = p.amount; computeFix (style, p.amount, p.limiter); }
-        lastListen = p.listen; lastFixP = p.fix; lastStyle = style; lastAmount = p.amount; lastLim = limI;
+        lastListen = p.listen; lastFixP = p.fix; lastOff = p.loudOff; lastStyle = style; lastAmount = p.amount; lastLim = limI;
 
         // manual Vintage Console 1973 (works with or without Fix)
         const float vc = p.console / 100.0f;
@@ -344,7 +345,7 @@ public:
         const double gth = an.I + 3 - 6 * std::min (ge, 1.0), gratio = 2 + ge;
         const double gt = std::pow (10.0, (fx.gain + fx.trim) / 20.0) * std::pow (10.0, 1.5 * std::min (ge, 1.0) / 20.0);
         const double wg = std::pow (10.0, fx.width / 20.0) - 1.0, mb = fx.monobass ? 1.0 : 0.0;
-        const bool dow = wg != 0 || fx.monobass;
+        const bool useW = fx.useW; const bool dow = useW || wg != 0 || fx.monobass;
         const double vs = st.vc * a;
         const double ceil = std::pow (10.0, -1.5 / 20.0), step = 1.0 / std::max (1.0, sr * 0.05);
         const bool dlim = active && p.limiter;
@@ -388,7 +389,12 @@ public:
                 hg += 0.1 * (hgt - hg); gc += 0.05 * (gtg - gc); gs += gsk * (gt - gs);
                 const double k = hg - 1;
                 l += k * bl; r += k * br;
-                if (dow) { const double mm = (l + r) * 0.5, ss = (l - r) * 0.5 + wg * sh - mb * sl; l = mm + ss; r = mm - ss; }
+                if (dow)
+                {
+                    const double mm = (l + r) * 0.5; double ss = (l - r) * 0.5;
+                    if (useW) { for (auto& f : sideEq) ss = f.run (ss); } else ss += wg * sh - mb * sl;
+                    l = mm + ss; r = mm - ss;
+                }
                 const double g = gc * gs; l *= g; r *= g;
                 if (vs > 0.001) { l = console (cf[0].slo, cf[0].shi, cf[0].sdc, l, vs); r = console (cf[1].slo, cf[1].shi, cf[1].sdc, r, vs); }
                 hmax = std::min (hmax, hg); gmax = std::min (gmax, gc);
@@ -428,7 +434,7 @@ public:
             }
             if (! learning && ! fx.cal && mout.blocks >= 120)
             {
-                const double want = st.lufs + (1 - a) * (an.I - st.lufs);
+                const double tg = st.lufs + loudOff, want = tg + (1 - a) * (an.I - tg);
                 const double t = clampv (want - mout.integrated(), -3.0, 3.0);
                 const double capg = (p.limiter ? (-1.5 - an.tp + 8) : std::max (0.0, -1.0 - an.tp - 0.3)) - fx.gain;
                 if (std::abs (t) > 0.3) fx.trim = (float) clampv (std::min (fx.trim + t, capg), -6.0, 6.0);
@@ -448,6 +454,7 @@ public:
         ro.lufsOut = (float) Io; ro.peakOut = target == 1 ? (float) dB20 (std::max (opk, 1e-9)) : -70.0f;
         ro.turnDown = Io > -70 ? (float) std::max (0.0, Io + 14) : 0.0f;
         ro.harsh = (float) -dB20 (hmax); ro.glue = (float) -dB20 (gmax); ro.lim = (float) -dB20 (lmax);
+        ro.target = styles()[(size_t) clampv (target == 1 ? fx.style : style, 0, (int) styles().size() - 1)].lufs + loudOff;
         for (int b = 0; b < 9; ++b) ro.eq[(size_t) b] = fx.eq[b]; ro.ls = fx.ls; ro.lm = fx.lm; ro.pr = fx.pr; ro.hs = fx.hs; ro.mudf = fx.mudf; ro.mudg = fx.mudg; ro.width = fx.width;
         // 0 idle, 1 learning (not mastering yet), 2 mastered + locked, 3 ready (Master off), 4 mastering while still learning
         ro.state = learning ? (target == 1 ? 4 : 1) : (target == 1 ? 2 : (fx.ready ? 3 : 0));
@@ -462,16 +469,17 @@ private:
     static constexpr double baseT[9] = { -6, -6, -9, -10.5, -11.5, -13.5, -16.5, -20, -28 };
     static constexpr double mudf[6] = { 160, 200, 250, 315, 400, 500 };
     double sr = 44100; int LA = 66;
-    KWeight kin[2], kout[2]; Meter min_, mout; Biquad lp[2], band[9], mudb[6], hbM, sideHP, sideLP, scHP, specBp[32];
+    KWeight kin[2], kout[2]; Meter min_, mout; Biquad lp[2], band[9], sband[9], sideEq[9], mudb[6], hbM, sideHP, sideLP, scHP, specBp[32];
     Ch cf[2];
     double specE[32] {}; double octResp[9][9] {};
-    double sLL = 0, sRR = 0, sLR = 0, lLL = 0, lRR = 0, lLR = 0, nsamp = 0, bandE[9] {}, mudE[6] {}, totE = 0, totN = 0, hbE = 0, tp = 0, opk = 0;
+    double sLL = 0, sRR = 0, sLR = 0, lLL = 0, lRR = 0, lLR = 0, nsamp = 0, bandE[9] {}, sideE[9] {}, mudE[6] {}, totE = 0, totN = 0, hbE = 0, tp = 0, opk = 0;
     double hist[2][16] {}; int hpos = 0; double tpc[3][16] {};
     double ha = 0, hr = 0, ga = 0, grl = 0, gsk = 0, rc = 0, specRel = 0;
     double hb = 0, hx = 0, hg = 1, hgt = 1, ge2 = 0, gc = 1, gtg = 1, gs = 1; unsigned tick = 0;
     std::vector<double> dqv, box; std::vector<long long> dqi; long long dh = 0, dt = 0, lt = 0; int cap = 70; double rel = 1, bsum = 0;
     std::vector<float> dDL, dDR, dWL, dWR; int dp = 0;
     MusicSense sense; Binaural bin;
+    float loudOff = 0, lastOff = 0;
     bool learning = false, lastFixP = false; double planAt = 0, silent = 0;
     double mixv = 0; bool lastListen = false; int lastStyle = -1, lastLim = -1, lastFix = 0; float lastAmount = 100, lastVc = -1; bool coeffDirty = true;
 
@@ -485,7 +493,7 @@ private:
     void resetMeas()
     {
         min_.reset(); sLL = sRR = sLR = lLL = lRR = lLR = nsamp = 0;
-        for (auto& e : bandE) e = 0; for (auto& e : mudE) e = 0; totE = totN = hbE = tp = 0;
+        for (auto& e : bandE) e = 0; for (auto& e : sideE) e = 0; for (auto& e : mudE) e = 0; totE = totN = hbE = tp = 0;
         for (auto& h : hist) for (auto& v : h) v = 0;
         sense.reset();
     }
@@ -493,7 +501,7 @@ private:
 
     void listen (const float* L, const float* R, int n)
     {
-        double bE = 0, tE[9] {}, tM[6] {}, tH = 0;
+        double bE = 0, tE[9] {}, tS[9] {}, tM[6] {}, tH = 0;
         for (int i = 0; i < n; ++i)
         {
             const double l = L[i], r = R[i];
@@ -514,12 +522,13 @@ private:
                         tp = std::max (tp, std::abs (y));
                     }
             const double v = (l + r) * 0.5; bE += v * v; sense.feed (v);
-            for (int k = 0; k < 9; ++k) { const double y = band[k].run (v); tE[k] += y * y; }
+            const double sv = (l - r) * 0.5;
+            for (int k = 0; k < 9; ++k) { const double y = band[k].run (v); tE[k] += y * y; const double z = sband[k].run (sv); tS[k] += z * z; }
             for (int k = 0; k < 6; ++k) { const double y = mudb[k].run (v); tM[k] += y * y; }
             const double y = hbM.run (v); tH += y * y;
         }
         nsamp += n;
-        if (bE / n > 1e-7) { totE += bE; totN += n; for (int k = 0; k < 9; ++k) bandE[k] += tE[k]; for (int k = 0; k < 6; ++k) mudE[k] += tM[k]; hbE += tH; }
+        if (bE / n > 1e-7) { totE += bE; totN += n; for (int k = 0; k < 9; ++k) { bandE[k] += tE[k]; sideE[k] += tS[k]; } for (int k = 0; k < 6; ++k) mudE[k] += tM[k]; hbE += tH; }
     }
 
     bool snapshot()
@@ -527,6 +536,8 @@ private:
         if (totN < sr * 5) return false;   // never plan from silence
         for (int b = 0; b < 9; ++b) an.mb[b] = (float) dB10 (bandE[b] / std::max (totE, 1e-20));
         for (int b = 0; b < 6; ++b) an.mm[b] = (float) dB10 (mudE[b]);
+        for (int b = 0; b < 9; ++b) an.mw[b] = (float) std::max (-40.0, dB10 (sideE[b] / std::max (bandE[b], 1e-20)));
+        an.haveW = true;
         an.mhb = (float) (hbE / std::max (totE, 1e-20)); an.mhba = (float) (hbE / std::max (totN, 1.0));
         an.corr = (float) (sLR / std::sqrt (std::max (sLL * sRR, 1e-30)));
         an.lcorr = (float) (lLR / std::sqrt (std::max (lLL * lRR, 1e-30)));
@@ -568,7 +579,27 @@ private:
             fx.width = (float) (clampv (10.0 * std::log10 (((1 - ct) / (1 + ct)) / ((1 - c) / (1 + c))), -3.0, 3.0) * a);
         }
         fx.monobass = (an.lcorr < 0.9f || st.wid > 0) && a > 0;
-        double g = clampv ((double) st.lufs - an.I, -12.0, 9.0);
+        // width per octave: move the song's side-vs-mid balance toward the records, band by band
+        fx.useW = st.wConf > 0 && an.haveW;
+        if (fx.useW)
+        {
+            double t9[9], g9[9];
+            for (int b = 0; b < 9; ++b)
+            {
+                const double d = st.wConf * (st.wT[b] - an.mw[b]);
+                t9[b] = (b < 2 ? clampv (d, -9.0, 0.0) : clampv (d, -6.0, 4.0)) * a;   // bass may only get narrower
+                g9[b] = t9[b];
+            }
+            for (int it = 0; it < 8; ++it)
+            {
+                double got[9];
+                for (int i = 0; i < 9; ++i) { got[i] = 0; for (int j = 0; j < 9; ++j) got[i] += octResp[i][j] * g9[j]; }
+                for (int b = 0; b < 9; ++b) g9[b] = clampv (g9[b] + 0.8 * (t9[b] - got[b]), -10.0, 5.0);
+            }
+            double avg = 0; for (int b = 0; b < 9; ++b) { fx.weq[b] = (float) g9[b]; if (b >= 3) avg += g9[b] / 6; }
+            fx.width = (float) avg; fx.monobass = false;
+        }
+        double g = clampv ((double) st.lufs + loudOff - an.I, -12.0, 9.0);
         if (limon) g = std::min (g, -1.5 - an.tp + 6); else if (g > 0) g = std::min (g, std::max (0.0, -1.0 - an.tp - 0.3));
         fx.gain = (float) (g * a); fx.trim = 0; fx.cal = false; fx.caln = 0; fx.style = style; fx.ready = true;
         coeffDirty = true; mout.reset(); opk = 0;
@@ -627,7 +658,7 @@ private:
         }
         bin.fc = play; bin.beat = beat;
         // level: under the mix by binVol dB (sine at the song's loudness)
-        const double ref = fx.ready ? styles()[(size_t) clampv (fx.style, 0, (int) styles().size() - 1)].lufs : (an.I > -60 ? an.I : -14.0);
+        const double ref = fx.ready ? styles()[(size_t) clampv (fx.style, 0, (int) styles().size() - 1)].lufs + loudOff : (an.I > -60 ? an.I : -14.0);
         bin.ampT = p.binaural ? std::pow (10.0, (ref + p.binVol + 0.7) / 20.0) : 0.0;
         ro.binOn = p.binaural; ro.carrierHz = (float) fc; ro.carrierPlayed = (float) play; ro.beatHz = (float) beat; ro.carrierIdx = idx;
     }
@@ -637,6 +668,7 @@ private:
         for (auto& f : cf)
         {
             for (int b = 0; b < 9; ++b) f.oct[b].set (Bq::Peaking, centers[b], 1.41, fx.eq[b], sr);
+            for (int b = 0; b < 9; ++b) sideEq[b].set (Bq::Peaking, centers[b], 1.41, fx.weq[b], sr);
             f.mud.set (Bq::Peaking, fx.mudf, 4.3, fx.mudg, sr);
             f.slo.set (Bq::LowShelf, 70, 0.7071, 0.8 * st.vc * a, sr); f.shi.set (Bq::HighShelf, 14000, 0.7071, -1.5 * st.vc * a, sr);
         }

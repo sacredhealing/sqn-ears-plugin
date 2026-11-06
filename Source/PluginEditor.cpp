@@ -16,15 +16,16 @@ SqnEarsEditor::SqnEarsEditor (SqnEarsProcessor& p)
       consoleA (fparam (p, "console"), consoleR, nullptr),
       harshA (fparam (p, "harsh"), harshR, nullptr),
       glueA (fparam (p, "glue"), glueR, nullptr),
-      binVolA (fparam (p, "binVol"), binVolR, nullptr)
+      binVolA (fparam (p, "binVol"), binVolR, nullptr),
+      loudA (fparam (p, "loudOff"), loudR, nullptr)
 {
     proc.engine.uiOpen = true;
     addAndMakeVisible (web);
     web.goToURL (juce::WebBrowserComponent::getResourceProviderRoot());
     setResizable (true, true);
-    setResizeLimits (720, 480, 1600, 1080);
+    setResizeLimits (640, 477, 1960, 1460);
     if (auto* c = getConstrainer()) c->setFixedAspectRatio (980.0 / 730.0);
-    setSize (900, 670);
+    setSize (980, 730);
     startTimerHz (30);
 }
 
@@ -48,6 +49,7 @@ void SqnEarsEditor::timerCallback()
     juce::Array<juce::var> eq;
     for (auto& v : r.eq) eq.add (v.load());
     o->setProperty ("eq", eq);
+    o->setProperty ("target", r.target.load());
     o->setProperty ("bpm", r.bpm.load()); o->setProperty ("bpmSrc", r.bpmSrc.load()); o->setProperty ("key", r.key.load());
     o->setProperty ("minor", r.minor.load()); o->setProperty ("aRef", r.aRef.load()); o->setProperty ("binOn", r.binOn.load());
     o->setProperty ("carrierHz", r.carrierHz.load()); o->setProperty ("carrierPlayed", r.carrierPlayed.load());
