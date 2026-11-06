@@ -1,0 +1,55 @@
+name: Build Zion Ark installer
+on:
+  push:
+    branches: [zion-ark]
+    paths: ['zion-ark/**', '.github/workflows/build-zion-ark.yml']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  mac:
+    runs-on: macos-15-intel
+    defaults:
+      run:
+        working-directory: zion-ark
+    steps:
+      - uses: actions/checkout@v4
+      - name: Get JUCE 8
+        run: git clone --depth 1 --branch 8.0.4 https://github.com/juce-framework/JUCE.git JUCE
+      - name: Build AU + VST3 (Apple Silicon + Intel)
+        run: |
+          cmake -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_OSX_ARCHITECTURES="arm64;x86_64" -DCMAKE_OSX_DEPLOYMENT_TARGET=11.0
+          cmake --build build --config Release -j 4
+      - name: Sign (ad-hoc) and validate the Audio Unit
+        run: |
+          A="build/ZionArk_artefacts/Release"
+          codesign --force --deep -s - "$A/AU/Zion Ark.component"
+          codesign --force --deep -s - "$A/VST3/Zion Ark.vst3"
+          mkdir -p ~/Library/Audio/Plug-Ins/Components
+          cp -R "$A/AU/Zion Ark.component" ~/Library/Audio/Plug-Ins/Components/
+          killall -9 AudioComponentRegistrar || true
+          sleep 3
+          auval -v aufx ZnAk SqnM
+      - name: Make installer
+        run: |
+          A="build/ZionArk_artefacts/Release"
+          mkdir -p pkg/au pkg/vst3
+          cp -R "$A/AU/Zion Ark.component" pkg/au/
+          cp -R "$A/VST3/Zion Ark.vst3" pkg/vst3/
+          pkgbuild --root pkg/au --identifier com.siddhaquantumnexus.zionark.au --version 0.1.0 --install-location "/Library/Audio/Plug-Ins/Components" au.pkg
+          pkgbuild --root pkg/vst3 --identifier com.siddhaquantumnexus.zionark.vst3 --version 0.1.0 --install-location "/Library/Audio/Plug-Ins/VST3" vst3.pkg
+          productbuild --package au.pkg --package vst3.pkg "Zion_Ark_Installer.pkg"
+          ls -la Zion_Ark_Installer.pkg
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Zion_Ark_Installer
+          path: zion-ark/Zion_Ark_Installer.pkg
+      - name: Publish download link (Releases > zion-ark-latest)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release delete zion-ark-latest -y --cleanup-tag || true
+          ditto -c -k --keepParent Zion_Ark_Installer.pkg Zion_Ark_Installer.zip
+          gh release create zion-ark-latest Zion_Ark_Installer.zip Zion_Ark_Installer.pkg --target "$GITHUB_SHA" --title "Zion Ark - latest" --notes "Double-click Zion_Ark_Installer.pkg to install Zion Ark (AU + VST3), then restart Mixbus. Put it on any track or bus; use AUX for a send bus."
