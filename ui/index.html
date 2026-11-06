@@ -15,7 +15,8 @@ html,body{margin:0;height:100%;background:#030303;overflow:hidden;font-family:"P
 .ver{font-size:9px;letter-spacing:.2em;color:var(--faint);font-weight:800;margin-left:8px;vertical-align:top;-webkit-text-fill-color:var(--faint)}
 .brand b{display:block;font-weight:900;letter-spacing:-.05em;font-size:30px;line-height:1;margin-top:6px}
 .brand b em{font-style:normal;background:linear-gradient(180deg,#FFF1BE,#D4AF37 55%,#8C6A12);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 0 12px rgba(212,175,55,.45))}
-.pills{display:flex;gap:8px;flex-wrap:nowrap}
+.pills{display:flex;gap:8px;flex-wrap:nowrap;min-width:0;justify-content:flex-end;overflow:hidden}
+.top{min-width:0}.pills .pill{flex:0 1 auto;min-width:0}.pills .pill span{overflow:hidden;text-overflow:ellipsis}#status{max-width:250px}#music{max-width:300px}
 .pill{white-space:nowrap;border:1px solid rgba(212,175,55,.45);border-radius:999px;padding:8px 11px;font-weight:800;font-size:7.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--gold2);display:flex;align-items:center;gap:9px;background:rgba(212,175,55,.06);box-shadow:inset 0 1px 0 rgba(255,255,255,.08)}
 .pill i{width:8px;height:8px;border-radius:50%;background:var(--faint)}
 .pill.live i{background:var(--gold);box-shadow:0 0 14px var(--gold);animation:blink 1.6s ease-in-out infinite}
