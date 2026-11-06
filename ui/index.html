@@ -56,6 +56,9 @@ html,body{margin:0;height:100%;background:#030303;overflow:hidden;font-family:"P
 .knobs{display:grid;grid-template-columns:1fr 1fr;gap:8px 4px}
 .k{text-align:center}
 .kn{position:relative;width:62px;height:62px;margin:auto;cursor:ns-resize;touch-action:none}
+.kn::before{content:"";position:absolute;inset:-34%;border-radius:50%;background:radial-gradient(circle,rgba(246,222,141,calc(.18 + .4*var(--n,.5))) 0%,rgba(212,175,55,calc(.1 + .25*var(--n,.5))) 38%,rgba(212,175,55,0) 68%);filter:blur(4px);animation:halo 3.2s ease-in-out infinite;pointer-events:none}
+.kn::after{content:"";position:absolute;inset:-9%;border-radius:50%;border:1px solid rgba(246,222,141,.35);box-shadow:0 0 18px rgba(212,175,55,.55),inset 0 0 12px rgba(212,175,55,.35);animation:halo 3.2s ease-in-out infinite reverse;pointer-events:none}
+@keyframes halo{50%{transform:scale(1.07);opacity:.7}}
 .kn .ring{position:absolute;inset:0;border-radius:50%;background:conic-gradient(from 225deg,var(--c) 0 var(--p),rgba(255,255,255,.07) var(--p) 75%,transparent 75%);-webkit-mask:radial-gradient(circle,transparent 60%,#000 61%);mask:radial-gradient(circle,transparent 60%,#000 61%);filter:drop-shadow(0 0 5px var(--c))}
 .kn .cap{position:absolute;inset:16%;border-radius:50%;background:conic-gradient(from 20deg,#2a2418,#6b5420,#1b160c,#5a4719,#2a2418,#8c6c22,#2a2418);box-shadow:inset 0 2px 2px rgba(255,240,190,.35),inset 0 -4px 8px rgba(0,0,0,.7),0 8px 16px rgba(0,0,0,.8)}
 .kn .cap::before{content:"";position:absolute;inset:14%;border-radius:50%;background:radial-gradient(circle at 40% 30%,#3a3222,#0d0b07 70%)}
@@ -161,7 +164,7 @@ KN.forEach(([id, label, col, def]) => {
   k.innerHTML = `<div class="kn" style="--c:${col}"><div class="ring"></div><div class="cap"></div><div class="tick"></div><b></b></div><div class="t">${label}</div>`;
   $("knobs").appendChild(k);
   const kn = k.querySelector(".kn"), val = k.querySelector("b");
-  const paint = () => { const n = st.getNormalisedValue(); kn.style.setProperty("--p", (n * 75) + "%"); kn.style.setProperty("--a", (-135 + 270 * n) + "deg"); val.textContent = Math.round(st.getScaledValue()); };
+  const paint = () => { const n = st.getNormalisedValue(); kn.style.setProperty("--p", (n * 75) + "%"); kn.style.setProperty("--n", n); kn.style.setProperty("--a", (-135 + 270 * n) + "deg"); val.textContent = Math.round(st.getScaledValue()); };
   st.valueChangedEvent.addListener(paint); st.propertiesChangedEvent.addListener(paint);
   let y0 = 0, n0 = 0;
   kn.addEventListener("pointerdown", e => { kn.setPointerCapture(e.pointerId); y0 = e.clientY; n0 = st.getNormalisedValue(); st.sliderDragStarted(); });
