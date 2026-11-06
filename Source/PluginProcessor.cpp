@@ -126,7 +126,7 @@ void SqnEarsProcessor::setStateInformation (const void* data, int size)
     an.mhb = fl ("mhb", 0.12f); an.mhba = fl ("mhba", 1e-6f); an.corr = fl ("corr", 1); an.lcorr = fl ("lcorr", 1);
     an.I = fl ("I", -70); an.tp = fl ("tp", -70);
     for (int i = 0; i < 9; ++i) { an.mw[i] = (float) a.getProperty ("mw" + juce::String (i), 0.0f); f.weq[i] = (float) a.getProperty ("weq" + juce::String (i), 0.0f); f.eq[i] = (float) a.getProperty ("eq" + juce::String (i), 0.0f); }
-    an.haveW = a.getProperty ("haveW", false); engine.songEnd = (double) a.getProperty ("songEnd", 0.0); f.useW = a.getProperty ("useW", false);
+    an.haveW = a.getProperty ("haveW", false); engine.songEnd = engine.frontier = (double) a.getProperty ("songEnd", 0.0); f.useW = a.getProperty ("useW", false);
     an.key = a.getProperty ("key", -1); an.minor = a.getProperty ("minor", false); an.aRef = fl ("aRef", 440); an.bpm = fl ("bpm", 0);
     f.ready = a.getProperty ("ready", false); f.style = a.getProperty ("style", 0);
     f.gain = fl ("gain", 0); f.trim = fl ("trim", 0); f.cal = a.getProperty ("cal", false); f.caln = a.getProperty ("caln", 0);

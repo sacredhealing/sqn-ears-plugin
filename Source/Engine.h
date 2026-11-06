@@ -302,11 +302,15 @@ public:
         { double pk = 0; for (int i = 0; i < n; ++i) pk = std::max (pk, (double) std::max (std::abs (L[i]), std::abs (R[i])));
           musicHold = pk > 1e-3 ? sr * 1.5 : std::max (0.0, musicHold - n);
           // learn where the song ends on the timeline: the last moment music sounds (above -50 dBFS)
-          if (p.playing && p.posSec >= 0 && pk > 0.003) songEnd = std::max (songEnd, p.posSec + n / sr); }
+          if (p.playing && p.posSec >= 0)
+          {
+              if (pk > 0.003) { frontier = std::max (frontier, p.posSec + n / sr); if (frontier > songEnd + 0.5 && songEnd > 0) songEnd = 0; }   // song got longer: learn again
+              else if (frontier > 20 && p.posSec > frontier + 2.0) songEnd = frontier;   // music really ended while playing: that is the end
+          } }
         // LANDR-style: press Master (fix) and play. It learns while it plays, masters after ~8 s,
         // refines every 4 s, and locks when playback stops (2 s of silence after 30 s heard).
         // "Listen" = learn this song again from the start.
-        if ((p.fix && ! lastFixP && ! an.have) || (p.listen && ! lastListen)) { learning = true; resetMeas(); planAt = 0; silent = 0; if (p.listen) songEnd = 0; }
+        if ((p.fix && ! lastFixP && ! an.have) || (p.listen && ! lastListen)) { learning = true; resetMeas(); planAt = 0; silent = 0; if (p.listen) songEnd = frontier = 0; }
         if (! p.fix && ! p.listen) learning = false;
         if (learning)
         {
@@ -489,7 +493,7 @@ private:
     MusicSense sense; Binaural bin;
     float loudOff = 0, lastOff = 0; double musicHold = 0;
 public:
-    double songEnd = 0;   // seconds on the timeline where the music ends (saved with the session)
+    double songEnd = 0, frontier = 0;   // confirmed end of the music on the timeline (saved), furthest point heard so far
 private:
     bool learning = false, lastFixP = false; double planAt = 0, silent = 0;
     double mixv = 0; bool lastListen = false; int lastStyle = -1, lastLim = -1, lastFix = 0; float lastAmount = 100, lastVc = -1; bool coeffDirty = true;
@@ -674,7 +678,7 @@ private:
         const double ref = fx.ready ? styles()[(size_t) clampv (fx.style, 0, (int) styles().size() - 1)].lufs + loudOff : (an.I > -60 ? an.I : -14.0);
         bin.ampT = p.binaural ? std::pow (10.0, (ref + p.binVol + 0.7) / 20.0) : 0.0;
         // silent while stopped or quiet; fully faded out 5 s before the learned end of the song (3 s fade)
-        const bool nearEnd = songEnd > 20 && p.posSec >= 0 && p.posSec > songEnd - 8.0;
+        const bool nearEnd = songEnd > 20 && p.posSec >= 0 && p.posSec > songEnd - 8.0 && p.posSec < songEnd + 30.0;
         bin.gateT = (p.playing && musicHold > 0 && ! nearEnd) ? 1.0 : 0.0;
         ro.songEnd = (float) songEnd;
         ro.binLive = (float) bin.gate;
