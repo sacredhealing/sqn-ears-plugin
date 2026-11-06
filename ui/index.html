@@ -11,10 +11,11 @@ html,body{margin:0;height:100%;background:#030303;overflow:hidden;font-family:"P
 .lbl{font-weight:800;font-size:8px;letter-spacing:.5em;text-transform:uppercase;color:var(--gold)}
 .lbl.d{color:var(--faint)}
 .top{grid-column:1/-1;display:flex;justify-content:space-between;align-items:center;gap:12px}
+.brand .lbl{white-space:nowrap;letter-spacing:.42em}
 .brand b{display:block;font-weight:900;letter-spacing:-.05em;font-size:30px;line-height:1;margin-top:6px}
 .brand b em{font-style:normal;background:linear-gradient(180deg,#FFF1BE,#D4AF37 55%,#8C6A12);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 0 12px rgba(212,175,55,.45))}
-.pills{display:flex;gap:10px}
-.pill{border:1px solid rgba(212,175,55,.45);border-radius:999px;padding:9px 15px;font-weight:800;font-size:8px;letter-spacing:.35em;text-transform:uppercase;color:var(--gold2);display:flex;align-items:center;gap:9px;background:rgba(212,175,55,.06);box-shadow:inset 0 1px 0 rgba(255,255,255,.08)}
+.pills{display:flex;gap:8px;flex-wrap:nowrap}
+.pill{white-space:nowrap;border:1px solid rgba(212,175,55,.45);border-radius:999px;padding:9px 13px;font-weight:800;font-size:8px;letter-spacing:.22em;text-transform:uppercase;color:var(--gold2);display:flex;align-items:center;gap:9px;background:rgba(212,175,55,.06);box-shadow:inset 0 1px 0 rgba(255,255,255,.08)}
 .pill i{width:8px;height:8px;border-radius:50%;background:var(--faint)}
 .pill.live i{background:var(--gold);box-shadow:0 0 14px var(--gold);animation:blink 1.6s ease-in-out infinite}
 .pill.listen i{background:var(--cyan);box-shadow:0 0 14px var(--cyan);animation:blink .8s ease-in-out infinite}
@@ -66,7 +67,20 @@ html,body{margin:0;height:100%;background:#030303;overflow:hidden;font-family:"P
 .kn .tick{position:absolute;left:50%;top:18%;width:3px;height:14%;margin-left:-1.5px;border-radius:2px;background:var(--gold2);box-shadow:0 0 8px var(--gold2);transform-origin:50% 230%;transform:rotate(var(--a))}
 .kn b{position:absolute;inset:0;display:grid;place-items:center;font-weight:900;font-size:12px;z-index:2;pointer-events:none}
 .k .t{font-weight:800;font-size:7px;letter-spacing:.3em;text-transform:uppercase;color:var(--faint);margin-top:5px}
-.bottom{grid-column:1/-1;display:grid;grid-template-columns:1fr 27%;gap:1.8vw}
+.bottom{grid-column:1/-1;display:grid;grid-template-columns:1fr 1.25fr 24%;gap:1.4vw}
+.binhead{display:flex;justify-content:space-between;align-items:center}
+.tog{border:1px solid rgba(212,175,55,.45);border-radius:999px;padding:5px 12px;font-weight:800;font-size:8px;letter-spacing:.35em;color:var(--muted);cursor:pointer}
+.tog.on{color:#1a1205;background:linear-gradient(180deg,#FFF0B8,#D4AF37 55%,#9C7414);box-shadow:0 0 18px rgba(212,175,55,.55)}
+.binbig{font-weight:900;font-size:19px;letter-spacing:-.03em;margin-top:6px}.binbig em{font-style:normal;color:var(--cyan);text-shadow:0 0 12px rgba(34,211,238,.5)}
+.binwhy{font-size:10px;color:var(--muted);margin-top:2px;min-height:14px}
+.minis{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px}
+.mini{border:1px solid rgba(255,255,255,.08);border-radius:999px;padding:3px 7px;font-size:9px;color:var(--muted);cursor:pointer;background:rgba(255,255,255,.02)}
+.mini.on{border-color:var(--cyan);color:#cffafe;background:rgba(34,211,238,.12);box-shadow:0 0 10px rgba(34,211,238,.3)}
+.mini.g.on{border-color:var(--gold);color:var(--gold2);background:rgba(212,175,55,.12);box-shadow:0 0 10px rgba(212,175,55,.3)}
+.vol{display:flex;align-items:center;gap:8px;margin-top:7px;font-size:9px;color:var(--faint)}
+.vol input{flex:1;-webkit-appearance:none;appearance:none;height:4px;border-radius:4px;background:linear-gradient(90deg,#0e7490,#D4AF37);outline:none}
+.vol input::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;border-radius:50%;background:radial-gradient(circle at 40% 30%,#FFF0B8,#D4AF37 60%,#7a5a10);box-shadow:0 0 10px rgba(212,175,55,.8);cursor:pointer}
+#curve{height:46px}
 #curve{width:100%;height:58px;display:block}
 .moves{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:11px;color:var(--muted)}.moves b{color:#F4F1E8;font-family:"SF Mono",Menlo,monospace;font-weight:500}
 .dyn{display:grid;grid-template-columns:auto 1fr auto;gap:5px 8px;align-items:center;font-size:10px;color:var(--muted);margin-top:6px}
@@ -79,7 +93,7 @@ html,body{margin:0;height:100%;background:#030303;overflow:hidden;font-family:"P
 <div class="ui">
  <div class="top">
   <div class="brand"><div class="lbl">Siddha Quantum Nexus · Master Intelligence</div><b>SQN <em>Ears</em></b></div>
-  <div class="pills"><div class="pill btn" id="limBtn" title="Peak limiter: lets the loud sounds reach their target safely"><i></i>Loud</div><div class="pill" id="status"><i></i><span>Press Master</span></div></div>
+  <div class="pills"><div class="pill" id="music" title="Tempo · key · tuning, heard from your song"><i style="background:var(--cyan);box-shadow:0 0 10px var(--cyan)"></i><span>— BPM · — KEY</span></div><div class="pill btn" id="limBtn" title="Peak limiter: lets the loud sounds reach their target safely"><i></i>Loud</div><div class="pill" id="status"><i></i><span>Press Master</span></div></div>
  </div>
  <div class="col">
   <div class="card"><div class="lbl d">Loudness</div><div class="v" id="lu">— <small>LUFS</small></div><div class="s" id="luS">target — · heard —</div><div class="meter"><i id="luM" style="width:0;background:linear-gradient(90deg,#8C6A12,#F6DE8D);box-shadow:0 0 12px #D4AF37"></i></div></div>
@@ -100,6 +114,10 @@ html,body{margin:0;height:100%;background:#030303;overflow:hidden;font-family:"P
  </div>
  <div class="bottom">
   <div class="card"><div class="lbl d">Tone · what Ears changed</div><canvas id="curve"></canvas><div class="moves" id="moves"><span>Press Master and play the song: Ears learns and masters while it plays</span></div></div>
+  <div class="card" id="binCard"><div class="binhead"><div class="lbl">Binaural · headphones</div><div class="tog" id="binTog">OFF</div></div>
+   <div class="binbig" id="binBig">— Hz · <em>— Hz</em></div><div class="binwhy" id="binWhy">Turn on: Ears tunes the tone to your song's key and tempo</div>
+   <div class="minis" id="binStates"></div><div class="minis" id="binCars"></div>
+   <div class="vol"><span>Volume</span><input type="range" id="binVol" min="0" max="1000" value="529"><span id="binVolV">-22 dB</span></div></div>
   <div class="card"><div class="lbl d">Working now</div>
    <div class="dyn"><span>Harsh</span><div class="meter"><i id="dH" style="width:0;background:#22D3EE;box-shadow:0 0 10px #22D3EE"></i></div><em id="dHv">0.0</em>
    <span>Glue</span><div class="meter"><i id="dG" style="width:0;background:#D4AF37;box-shadow:0 0 10px #D4AF37"></i></div><em id="dGv">0.0</em>
@@ -110,21 +128,23 @@ html,body{margin:0;height:100%;background:#030303;overflow:hidden;font-family:"P
 <script>
 // demo backend when opened outside the plugin (design preview)
 if (!window.__JUCE__) {
-  const L = {}, demo = { listen:false, fix:true, limiter:true };
+  const L = {}, demo = { listen:false, fix:true, limiter:true, binaural:true };
   window.__SQN_DEMO__ = true;
-  window.__JUCE__ = { initialisationData:{ __juce__sliders:["amount","console","harsh","glue"], __juce__toggles:["listen","fix","limiter"], __juce__comboBoxes:["sound"], __juce__functions:[] },
+  window.__JUCE__ = { initialisationData:{ __juce__sliders:["amount","console","harsh","glue","binVol"], __juce__toggles:["listen","fix","limiter","binaural"], __juce__comboBoxes:["sound","binState","binCarrier"], __juce__functions:[] },
     backend:{ addEventListener(id,fn){ (L[id]=L[id]||[]).push(fn); return [id,fn]; }, removeEventListener(){},
       emitEvent(id,ev){ const fire=(e)=>setTimeout(()=>(L[id]||[]).forEach(f=>f(e)));
-        const vals={amount:100,console:60,harsh:50,glue:50};
+        const vals={amount:100,console:60,harsh:50,glue:50,binVol:-22};
         if(ev.eventType==="requestInitialUpdate"){
-          if(id.startsWith("__juce__slider")){const n=id.slice(14);fire({eventType:"propertiesChanged",start:0,end:100,skew:1,name:n,label:"%",numSteps:1001,interval:0.1,parameterIndex:0});fire({eventType:"valueChanged",value:vals[n]});}
+          if(id.startsWith("__juce__slider")){const n=id.slice(14);fire({eventType:"propertiesChanged",start:n==="binVol"?-40:0,end:n==="binVol"?-6:100,skew:1,name:n,label:"%",numSteps:1001,interval:0.1,parameterIndex:0});fire({eventType:"valueChanged",value:vals[n]});}
           if(id.startsWith("__juce__toggle")){const n=id.slice(14);fire({eventType:"valueChanged",value:demo[n]});}
+          if(id==="__juce__comboBoxbinState"){fire({eventType:"propertiesChanged",name:"s",parameterIndex:0,choices:["Auto","Epsilon","Delta","Theta","Schumann","Alpha","Beta","Gamma"]});fire({eventType:"valueChanged",value:0});return;}
+          if(id==="__juce__comboBoxbinCarrier"){fire({eventType:"propertiesChanged",name:"c",parameterIndex:0,choices:["Auto","108","174","285","396","417","432","528","639","741","852","963"]});fire({eventType:"valueChanged",value:0});return;}
           if(id.startsWith("__juce__comboBox")){fire({eventType:"propertiesChanged",name:"Sound",parameterIndex:0,choices:["Sovereign","Zion Roots","Kingston 1973","Island '77","Dub Chamber","West Coast '92","G-Funk '96","West Coast '99","Golden Era '94","808 Modern","Crystal Pop '82","Mantra Temple"]});fire({eventType:"valueChanged",value:5/11});}
         } else if(ev.eventType==="valueChanged"){fire({eventType:"valueChanged",value:ev.value});}
       } } };
   let t=0; setInterval(()=>{t+=.033;const spec=[];for(let k=0;k<32;k++)spec.push(-38+14*Math.sin(k*.45+t*2.1)*Math.cos(k*.13-t)-k*.5+6*Math.random());
     (L.meters||[]).forEach(f=>f({state:4,style:5,cal:false,lufsIn:-15.4,tpIn:-0.6,corr:.93,gain:2.4,secs:47,lufsOut:-13.1+.15*Math.sin(t),peakOut:-1.6,turnDown:0,
-      harsh:Math.max(0,2.2*Math.sin(t*1.3)),glue:1.4+.6*Math.sin(t*2.2),lim:Math.max(0,1.5*Math.sin(t*.9)),ls:-1.4,lm:-1.6,pr:2.6,hs:2.4,eq:[-1.2,-1.6,-1.6,-1.1,-0.8,0.6,3.4,3.1,1.7],mudf:315,mudg:-1,width:1.5,latencyMs:1.5,spec}));},33);
+      harsh:Math.max(0,2.2*Math.sin(t*1.3)),glue:1.4+.6*Math.sin(t*2.2),lim:Math.max(0,1.5*Math.sin(t*.9)),ls:-1.4,lm:-1.6,pr:2.6,hs:2.4,eq:[-1.2,-1.6,-1.6,-1.1,-0.8,0.6,3.4,3.1,1.7],mudf:315,mudg:-1,width:1.5,latencyMs:1.5,spec,bpm:80,bpmSrc:1,key:9,minor:false,aRef:440,binOn:true,carrierHz:741,carrierPlayed:370.5,beatHz:5.33,carrierIdx:8}));},33);
 }
 </script>
 <script type="module">
@@ -174,6 +194,26 @@ KN.forEach(([id, label, col, def]) => {
   kn.addEventListener("wheel", e => { e.preventDefault(); st.setNormalisedValue(Math.min(1, Math.max(0, st.getNormalisedValue() - Math.sign(e.deltaY) * .02))); paint(); }, { passive:false });
 });
 
+// binaural
+const binT = Juce.getToggleState("binaural"), binS = Juce.getComboBoxState("binState"), binC = Juce.getComboBoxState("binCarrier"), binV = Juce.getSliderState("binVol");
+const SN = ["Auto","ε 0.5","δ 2","θ 6","7.83","α 10","β 14","γ 40"], CN = ["Auto","108","174","285","396","417","432","528","639","741","852","963"];
+SN.forEach((n, i) => { const c = document.createElement("div"); c.className = "mini"; c.textContent = n; c.title = ["Auto: the sound's vibe, locked to the tempo","Epsilon: transcendental","Delta: deep sleep, restore","Theta: deep meditation","Schumann: Earth resonance","Alpha: relaxed, open","Beta: focus","Gamma: insight"][i]; c.onclick = () => binS.setChoiceIndex(i); $("binStates").appendChild(c); });
+CN.forEach((n, i) => { const c = document.createElement("div"); c.className = "mini g"; c.textContent = n; c.title = i ? n + " Hz" : "Auto: the sacred frequency in tune with your song"; c.onclick = () => binC.setChoiceIndex(i); $("binCars").appendChild(c); });
+const paintBin = () => {
+  $("binTog").classList.toggle("on", binT.getValue()); $("binTog").textContent = binT.getValue() ? "ON" : "OFF";
+  [...$("binStates").children].forEach((c, k) => c.classList.toggle("on", k === binS.getChoiceIndex()));
+  [...$("binCars").children].forEach((c, k) => c.classList.toggle("on", k === binC.getChoiceIndex()));
+  $("binVol").value = Math.round(binV.getNormalisedValue() * 1000); $("binVolV").textContent = Math.round(binV.getScaledValue()) + " dB";
+  $("binCard").style.opacity = binT.getValue() ? 1 : .72;
+};
+$("binTog").onclick = () => binT.setValue(!binT.getValue());
+$("binVol").addEventListener("pointerdown", () => binV.sliderDragStarted());
+$("binVol").addEventListener("input", e => { binV.setNormalisedValue(e.target.value / 1000); $("binVolV").textContent = Math.round(binV.getScaledValue()) + " dB"; });
+$("binVol").addEventListener("change", () => binV.sliderDragEnded());
+[binT, binS, binC, binV].forEach(x => { x.valueChangedEvent.addListener(paintBin); if (x.propertiesChangedEvent) x.propertiesChangedEvent.addListener(paintBin); });
+const KEYS = ["C","C#","D","Eb","E","F","F#","G","Ab","A","Bb","B"];
+const band = (b) => b < 1 ? "ε" : b < 4 ? "δ" : Math.abs(b - 7.83) < .01 ? "Schumann" : b < 8 ? "θ" : b < 13 ? "α" : b < 30 ? "β" : "γ";
+
 // meters from the plugin
 const f1 = (v) => (v > -69 ? v.toFixed(1) : "—");
 const sg = (v) => (v >= 0 ? "+" : "") + v.toFixed(1);
@@ -202,6 +242,19 @@ window.__JUCE__.backend.addEventListener("meters", (d) => {
   const bar = (id, v) => { $(id).style.width = Math.min(100, v / 6 * 100) + "%"; $(id + "v").textContent = v.toFixed(1); };
   bar("dH", fixed ? d.harsh : 0); bar("dG", fixed ? d.glue : 0); bar("dL", fixed ? d.lim : 0);
   $("stream").textContent = fixed && d.lufsOut > -69 ? (d.turnDown > 0.2 ? `Spotify / YouTube turn it down ${d.turnDown.toFixed(1)} dB` : "Spotify / YouTube: no turn-down") : `Latency ${d.latencyMs.toFixed(1)} ms · Fix off = undo`;
+  // tempo, key, tuning
+  const keyTxt = d.key >= 0 ? (d.minor ? `${KEYS[d.key]} MINOR / ${KEYS[(d.key + 3) % 12]} MAJOR` : `${KEYS[d.key]} MAJOR / ${KEYS[(d.key + 9) % 12]} MINOR`) : "— KEY";
+  $("music").querySelector("span").textContent = `${d.bpm > 0 ? Math.round(d.bpm * 10) / 10 : "—"} BPM · ${keyTxt}${d.key >= 0 ? " · A=" + Math.round(d.aRef) : ""}`;
+  $("music").title = d.bpmSrc === 1 ? "Tempo from your Mixbus session" : d.bpmSrc === 2 ? "Tempo heard in the audio" : "Play the song with Master on to hear tempo and key";
+  // binaural readout
+  const ch = d.carrierIdx >= 0 ? `${Math.round(d.carrierHz)} Hz` : (d.carrierPlayed > 0 ? `Key root ${d.carrierPlayed.toFixed(1)} Hz` : "—");
+  $("binBig").innerHTML = `${ch} · <em>${d.beatHz ? d.beatHz.toFixed(2) : "—"} Hz ${band(d.beatHz || 0)}</em>`;
+  const locked = d.bpm > 0 && [ -2,-1,0,1,2,3,4,5,6 ].some(n => Math.abs(d.bpm / 60 * 2 ** n - d.beatHz) < .01);
+  const why = [];
+  if (binC.getChoiceIndex() === 0 && d.key >= 0) why.push(`in tune with ${KEYS[d.key]} ${d.minor ? "minor" : "major"}`);
+  if (d.carrierIdx >= 0 && Math.abs(d.carrierPlayed - d.carrierHz) > .5) why.push(`played at ${d.carrierPlayed.toFixed(1)} Hz`);
+  if (locked) why.push(`locked to ${Math.round(d.bpm)} BPM`);
+  $("binWhy").textContent = why.length ? why.join(" · ") : (d.key >= 0 ? "" : "Press Master and play: Ears hears key and tempo");
   if (d.state >= 2) $("moves").innerHTML = `<span>Bass <b>${sg(d.ls)}</b></span><span>Low-mid <b>${sg(d.lm)}</b></span>${d.mudg < -0.05 ? `<span>Mud ${Math.round(d.mudf)} Hz <b>${sg(d.mudg)}</b></span>` : ""}<span>Presence <b>${sg(d.pr)}</b></span><span>Air <b>${sg(d.hs)}</b></span><span>Gain <b>${sg(d.gain)}</b></span>`;
 });
 
@@ -256,5 +309,5 @@ let t = 0, specS = new Array(32).fill(-60);
   const sx = (t * .25 % 1) * CW; cg.fillStyle = "rgba(34,211,238,.25)"; cg.fillRect(sx, 0, 2, CH);
   requestAnimationFrame(frame);
 })();
-paintButtons();
+paintButtons(); paintBin();
 </script></body></html>

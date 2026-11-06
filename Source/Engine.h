@@ -54,7 +54,111 @@ struct Biquad
     }
 };
 
-//============================================================================== the 11 sounds
+
+//============================================================================== key + tuning + tempo (learned while it plays)
+static const char* const kKeyNames[12] = { "C", "C#", "D", "Eb", "E", "F", "F#", "G", "Ab", "A", "Bb", "B" };
+struct MusicSense
+{
+    double sr = 44100;
+    Biquad ch[2][48]; double ceF[2][48] {}, C[2][12] {}, tot[2] {};   // 48 semitone filters C3..B6, for A=440 and A=432
+    Biquad lowB, hiB; int fLen = 441, cLen = 4410, fN = 0, cN = 0; double eLo = 0, eHi = 0, pLo = 0, pHi = 0; std::vector<float> onset;
+    void prepare (double rate)
+    {
+        sr = rate; fLen = (int) std::round (sr / 100.0); cLen = fLen * 10;
+        for (int t = 0; t < 2; ++t)
+            for (int k = 0; k < 48; ++k)
+                ch[t][k].set (Bq::BandPass0dB, (t == 0 ? 440.0 : 432.0) * std::pow (2.0, (48 + k - 69) / 12.0), 25.0, 0, sr);
+        lowB.set (Bq::LowPass, 150, 0.7071, 0, sr); hiB.set (Bq::HighPass, 2000, 0.7071, 0, sr);
+        onset.reserve (9000); reset();
+    }
+    void reset()
+    {
+        for (int t = 0; t < 2; ++t) { tot[t] = 0; for (auto& v : C[t]) v = 0; for (auto& v : ceF[t]) v = 0; for (auto& b : ch[t]) b.reset(); }
+        fN = cN = 0; eLo = eHi = pLo = pHi = 0; onset.clear(); lowB.reset(); hiB.reset();
+    }
+    inline void feed (double m)
+    {
+        for (int t = 0; t < 2; ++t) for (int k = 0; k < 48; ++k) { const double y = ch[t][k].run (m); ceF[t][k] += y * y; }
+        const double lo = lowB.run (m), hi = hiB.run (m); eLo += lo * lo; eHi += hi * hi;
+        if (++fN >= fLen)                    // 10 ms onset frame: kick band + hat/snare band
+        {
+            const double l1 = std::log10 (eLo / fN + 1e-10), h1 = std::log10 (eHi / fN + 1e-10);
+            const double d = std::max (0.0, l1 - pLo) + std::max (0.0, h1 - pHi); pLo = l1; pHi = h1; eLo = eHi = 0; fN = 0;
+            if (onset.size() >= 9000) onset.erase (onset.begin(), onset.begin() + 1000);
+            onset.push_back ((float) d);
+        }
+        if (++cN >= cLen)                    // 100 ms chroma frame, normalised so loud hits don't dominate
+        {
+            for (int t = 0; t < 2; ++t)
+            {
+                double c[12] {}, mx = 1e-20, sum = 0;
+                for (int k = 0; k < 48; ++k) { c[(48 + k) % 12] += std::sqrt (ceF[t][k]); sum += ceF[t][k]; ceF[t][k] = 0; }
+                for (double v : c) mx = std::max (mx, v);
+                if (sum > 1e-9) { for (int i = 0; i < 12; ++i) C[t][i] += c[i] / mx; tot[t] += sum; }
+            }
+            cN = 0;
+        }
+    }
+    int key = -1; bool minor = false; double aRef = 440, bpm = 0, keyConf = 0;
+    void analyse()
+    {
+        const int t = tot[1] > tot[0] * 1.12 ? 1 : 0; aRef = t ? 432 : 440;
+        const double* c = C[t];
+        static const double maj[12] = { 6.35, 2.23, 3.48, 2.33, 4.38, 4.09, 2.52, 5.19, 2.39, 3.66, 2.29, 2.88 };
+        static const double mnr[12] = { 6.33, 2.68, 3.52, 5.38, 2.60, 3.53, 2.54, 4.75, 3.98, 2.69, 3.34, 3.17 };
+        auto corr = [&] (const double* prof, int root)
+        {
+            double mx = 0, my = 0; for (int i = 0; i < 12; ++i) { mx += c[i]; my += prof[i]; } mx /= 12; my /= 12;
+            double sxy = 0, sxx = 0, syy = 0;
+            for (int i = 0; i < 12; ++i) { const double x = c[(root + i) % 12] - mx, y = prof[i] - my; sxy += x * y; sxx += x * x; syy += y * y; }
+            return sxy / std::sqrt (std::max (sxx * syy, 1e-20));
+        };
+        double best = -2, second = -2; key = 0; minor = false;
+        for (int r = 0; r < 12; ++r) for (int m = 0; m < 2; ++m)
+        {
+            const double v = corr (m ? mnr : maj, r);
+            if (v > best) { second = best; best = v; key = r; minor = m == 1; } else if (v > second) second = v;
+        }
+        keyConf = best - second;
+        // tempo: autocorrelation of the onset curve with its double (harmonic check), prior around 70-140 BPM
+        const int N = (int) onset.size(); bpm = 0;
+        if (N > 800)
+        {
+            double mean = 0; for (auto v : onset) mean += v; mean /= N;
+            std::vector<double> o ((size_t) N); for (int i = 0; i < N; ++i) o[(size_t) i] = onset[(size_t) i] - mean;
+            static double r[241]; for (auto& v : r) v = 0;
+            for (int L = 20; L <= 240; ++L) { double acc = 0; for (int i = 0; i + L < N; ++i) acc += o[(size_t) i] * o[(size_t) (i + L)]; r[L] = acc; }
+            int bestL = 0; double bestV = -1e30;
+            for (int L = 33; L <= 100; ++L)      // 60..180 BPM
+            {
+                const double b = 6000.0 / L, w = std::exp (-0.5 * std::pow (std::log2 (b / 95.0) / 0.55, 2));
+                const double v = (r[L] + 0.5 * r[std::min (240, 2 * L)] + 0.25 * r[std::min (240, 4 * L)]) * w;
+                if (v > bestV) { bestV = v; bestL = L; }
+            }
+            double Lf = bestL;
+            { const double a = r[bestL - 1], b = r[bestL], cc = r[bestL + 1], den = a - 2 * b + cc; if (std::abs (den) > 1e-12) Lf += clampv (0.5 * (a - cc) / den, -0.5, 0.5); }
+            bpm = 6000.0 / Lf;
+        }
+    }
+};
+
+//============================================================================== binaural generator (L and R carriers differ by the beat)
+struct Binaural
+{
+    double phL = 0, phR = 0, amp = 0, ampT = 0, fc = 216, beat = 6, k = 0.0001;
+    inline void tick (double sr, double& l, double& r)
+    {
+        amp += (ampT - amp) * k;
+        if (amp < 1e-7 && ampT == 0) return;
+        phL += 2 * kPi * (fc - beat * 0.5) / sr; phR += 2 * kPi * (fc + beat * 0.5) / sr;
+        if (phL > 2 * kPi) phL -= 2 * kPi; if (phR > 2 * kPi) phR -= 2 * kPi;
+        l += amp * std::sin (phL); r += amp * std::sin (phR);
+    }
+};
+static const double kSacred[11] = { 108, 174, 285, 396, 417, 432, 528, 639, 741, 852, 963 };
+static const double kStates[8] = { 0, 0.5, 2, 6, 7.83, 10, 14, 40 };   // Auto, Epsilon, Delta, Theta, Schumann, Alpha, Beta, Gamma
+
+//============================================================================== the sounds
 struct Style { const char* name; float lufs; float off[9]; float vc, glue, harsh, wid; float corrT = 0; };  // corrT: measured L/R similarity of the reference (0 = use wid)
 inline const std::array<Style, 12>& styles()
 {
@@ -119,19 +223,20 @@ struct KWeight
 };
 
 //============================================================================== what Listen heard (saved with the session)
-struct Analysis { bool have = false; float mb[9] {}, mm[6] {}, mhb = 0.12f, mhba = 1e-6f, corr = 1, lcorr = 1, I = -70, tp = -70; };
+struct Analysis { bool have = false; float mb[9] {}, mm[6] {}, mhb = 0.12f, mhba = 1e-6f, corr = 1, lcorr = 1, I = -70, tp = -70; int key = -1; bool minor = false; float aRef = 440, bpm = 0; };
 struct Plan
 {
     bool ready = false, monobass = false, cal = false; int style = 0, caln = 0;
     float eq[9] {}; float gain = 0, trim = 0, ls = 0, lm = 0, pr = 0, hs = 0, mudf = 250, mudg = 0, width = 0, hbase = 0.12f, hbabs = 1e-6f;
 };
-struct Params { bool listen = false, fix = false, limiter = true; int sound = 0; float amount = 100, console = 0, harsh = 50, glue = 50; };
+struct Params { bool listen = false, fix = false, limiter = true, binaural = false; int sound = 0, binState = 0, binCarrier = 0; float amount = 100, console = 0, harsh = 50, glue = 50, binVol = -22; double hostBpm = 0; };
 
 struct Readout
 {
     std::atomic<float> lufsIn { -70 }, tpIn { -70 }, corr { 0 }, gain { 0 }, secs { 0 }, lufsOut { -70 }, peakOut { -70 },
         turnDown { 0 }, harsh { 0 }, glue { 0 }, lim { 0 }, ls { 0 }, lm { 0 }, pr { 0 }, hs { 0 }, mudf { 250 }, mudg { 0 }, width { 0 };
-    std::atomic<int> state { 0 }, style { 0 }; std::atomic<bool> cal { false };
+    std::atomic<int> state { 0 }, style { 0 }, key { -1 }, bpmSrc { 0 }, carrierIdx { -1 }; std::atomic<bool> cal { false }, minor { false }, binOn { false };
+    std::atomic<float> bpm { 0 }, aRef { 440 }, carrierHz { 0 }, carrierPlayed { 0 }, beatHz { 0 };
     std::array<std::atomic<float>, 32> spec {}; std::array<std::atomic<float>, 9> eq {};
 };
 
@@ -168,6 +273,7 @@ public:
             Biquad t; t.set (Bq::Peaking, centers[j], 1.41, 1.0, sr);
             for (int i = 0; i < 9; ++i) octResp[i][j] = t.magDb (std::min (centers[i], sr * 0.45), sr);
         }
+        sense.prepare (sr); bin.k = coef (1.0);
         ha = coef (0.005); hr = coef (0.08); ga = coef (0.02); grl = coef (0.2); gsk = coef (0.2); rc = coef (0.08); specRel = coef (0.25);
         for (int p = 1; p <= 3; ++p)
         {
@@ -243,14 +349,16 @@ public:
         const double ceil = std::pow (10.0, -1.5 / 20.0), step = 1.0 / std::max (1.0, sr * 0.05);
         const bool dlim = active && p.limiter;
         const int W = LA, D = LA - 1;
+        setupBinaural (p, style);
 
         for (int i = 0; i < n; ++i)
         {
-            const double xl = L[i], xr = R[i];
+            double tl = 0, tr = 0; bin.tick (sr, tl, tr);              // binaural tone, added after the mastering stages
+            const double xl = L[i] + tl, xr = R[i] + tr;
             double wl = xl, wr = xr;
             if (active)
             {
-                double l = xl, r = xr;
+                double l = L[i], r = R[i];
                 for (int c = 0; c < 2; ++c)
                 {
                     auto& f = cf[c]; double& v = c == 0 ? l : r;
@@ -284,7 +392,7 @@ public:
                 const double g = gc * gs; l *= g; r *= g;
                 if (vs > 0.001) { l = console (cf[0].slo, cf[0].shi, cf[0].sdc, l, vs); r = console (cf[1].slo, cf[1].shi, cf[1].sdc, r, vs); }
                 hmax = std::min (hmax, hg); gmax = std::min (gmax, gc);
-                wl = l; wr = r;
+                wl = l + tl; wr = r + tr;
             }
             // look-ahead limiter (hold-min + box smoothing: never exceeds the ceiling)
             double b = 1;
@@ -363,6 +471,7 @@ private:
     double hb = 0, hx = 0, hg = 1, hgt = 1, ge2 = 0, gc = 1, gtg = 1, gs = 1; unsigned tick = 0;
     std::vector<double> dqv, box; std::vector<long long> dqi; long long dh = 0, dt = 0, lt = 0; int cap = 70; double rel = 1, bsum = 0;
     std::vector<float> dDL, dDR, dWL, dWR; int dp = 0;
+    MusicSense sense; Binaural bin;
     bool learning = false, lastFixP = false; double planAt = 0, silent = 0;
     double mixv = 0; bool lastListen = false; int lastStyle = -1, lastLim = -1, lastFix = 0; float lastAmount = 100, lastVc = -1; bool coeffDirty = true;
 
@@ -378,6 +487,7 @@ private:
         min_.reset(); sLL = sRR = sLR = lLL = lRR = lLR = nsamp = 0;
         for (auto& e : bandE) e = 0; for (auto& e : mudE) e = 0; totE = totN = hbE = tp = 0;
         for (auto& h : hist) for (auto& v : h) v = 0;
+        sense.reset();
     }
     void limReset() { std::fill (dqv.begin(), dqv.end(), 1.0); std::fill (dqi.begin(), dqi.end(), 0); std::fill (box.begin(), box.end(), 1.0); dh = dt = lt = 0; rel = 1; bsum = LA; }
 
@@ -403,7 +513,7 @@ private:
                         for (int m = 0; m < 16; ++m) y += tpc[ph][m] * hist[c][(hpos + m) & 15];
                         tp = std::max (tp, std::abs (y));
                     }
-            const double v = (l + r) * 0.5; bE += v * v;
+            const double v = (l + r) * 0.5; bE += v * v; sense.feed (v);
             for (int k = 0; k < 9; ++k) { const double y = band[k].run (v); tE[k] += y * y; }
             for (int k = 0; k < 6; ++k) { const double y = mudb[k].run (v); tM[k] += y * y; }
             const double y = hbM.run (v); tH += y * y;
@@ -421,6 +531,7 @@ private:
         an.corr = (float) (sLR / std::sqrt (std::max (sLL * sRR, 1e-30)));
         an.lcorr = (float) (lLR / std::sqrt (std::max (lLL * lRR, 1e-30)));
         an.I = (float) min_.integrated(); an.tp = (float) dB20 (std::max (tp, 1e-9)); an.have = true;
+        sense.analyse(); an.key = sense.key; an.minor = sense.minor; an.aRef = (float) sense.aRef; an.bpm = (float) sense.bpm;
         return true;
     }
 
@@ -461,6 +572,64 @@ private:
         if (limon) g = std::min (g, -1.5 - an.tp + 6); else if (g > 0) g = std::min (g, std::max (0.0, -1.0 - an.tp - 0.3));
         fx.gain = (float) (g * a); fx.trim = 0; fx.cal = false; fx.caln = 0; fx.style = style; fx.ready = true;
         coeffDirty = true; mout.reset(); opk = 0;
+    }
+
+    // the song's tempo: Mixbus tempo when it agrees with what we hear, otherwise what we hear
+    double songBpm (double host, int& src) const
+    {
+        src = 0;
+        const double heard = an.bpm;
+        if (host > 0 && std::abs (host - 120.0) > 0.01) { src = 1; return host; }   // the session tempo was set: trust it
+        if (host > 0 && heard > 0)
+            for (double m : { 0.5, 1.0, 2.0 })
+                if (std::abs (host * m / heard - 1.0) < 0.03) { src = 1; return host; }
+        if (heard > 0) { src = 2; return heard; }
+        if (host > 0) { src = 1; return host; }
+        return 0;
+    }
+    void setupBinaural (const Params& p, int style)
+    {
+        int src = 0; const double bpm = songBpm (p.hostBpm, src);
+        ro.bpm = (float) bpm; ro.bpmSrc = src; ro.key = an.key; ro.minor = an.minor; ro.aRef = an.aRef;
+        // beat: chosen state, or Auto = the sound's vibe, locked to the groove (BPM/60 x 2^n) when close
+        double beat = kStates[clampv (p.binState, 0, 7)];
+        if (p.binState == 0)
+        {
+            const double tgt = style == 11 ? 6.0 : (style >= 1 && style <= 4 ? 7.83 : 10.0);
+            beat = tgt;
+            if (bpm > 0 && style != 1 && style != 2 && style != 3 && style != 4)
+            {
+                double bestB = 0, bestD = 1e9;
+                for (int n = -2; n <= 6; ++n) { const double b = bpm / 60.0 * std::pow (2.0, n), d = std::abs (std::log2 (b / tgt)); if (d < bestD) { bestD = d; bestB = b; } }
+                if (bestD < 0.27) beat = bestB;
+            }
+        }
+        // carrier: chosen frequency, or Auto = the sacred frequency that sits in tune with the song's key
+        double fc = 216, play = 216; int idx = -1;
+        if (p.binCarrier > 0) { idx = clampv (p.binCarrier - 1, 0, 10); fc = play = kSacred[idx]; }
+        else if (an.key >= 0)
+        {
+            static const int majS[7] = { 0, 2, 4, 5, 7, 9, 11 }, minS[7] = { 0, 2, 3, 5, 7, 8, 10 };
+            const int* sc = an.minor ? minS : majS; double bestScore = 1e9;
+            for (int s = 0; s < 11; ++s)
+                for (int o = 0; o > -4; --o)
+                {
+                    const double f = kSacred[s] * std::pow (2.0, o);
+                    if (f < 90 || f > 500) continue;
+                    const double midi = 69 + 12 * std::log2 (f / an.aRef), cents = (midi - std::round (midi)) * 100;
+                    const int pc = (((int) std::round (midi) % 12) + 12) % 12, deg = ((pc - an.key) % 12 + 12) % 12;
+                    double w = 0; for (int d = 0; d < 7; ++d) if (sc[d] == deg) w = (d == 0 || d == 2 || d == 4) ? 1.0 : 0.6;
+                    if (w == 0 || std::abs (cents) > 20) continue;
+                    const double score = std::abs (cents) / w + std::abs (std::log2 (f / 220.0)) * 4;
+                    if (score < bestScore) { bestScore = score; idx = s; fc = kSacred[s]; play = f; }
+                }
+            if (idx < 0) { fc = 0; play = an.aRef * std::pow (2.0, (an.key - 9) / 12.0) / 2; while (play < 110) play *= 2; while (play > 220) play /= 2; }
+        }
+        bin.fc = play; bin.beat = beat;
+        // level: under the mix by binVol dB (sine at the song's loudness)
+        const double ref = fx.ready ? styles()[(size_t) clampv (fx.style, 0, (int) styles().size() - 1)].lufs : (an.I > -60 ? an.I : -14.0);
+        bin.ampT = p.binaural ? std::pow (10.0, (ref + p.binVol + 0.7) / 20.0) : 0.0;
+        ro.binOn = p.binaural; ro.carrierHz = (float) fc; ro.carrierPlayed = (float) play; ro.beatHz = (float) beat; ro.carrierIdx = idx;
     }
 
     void updateCoeffs (const Style& st, double a)
