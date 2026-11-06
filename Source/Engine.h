@@ -229,6 +229,7 @@ struct Plan
     bool ready = false, monobass = false, cal = false; int style = 0, caln = 0;
     float eq[9] {}, weq[9] {}; bool useW = false; float gain = 0, trim = 0, ls = 0, lm = 0, pr = 0, hs = 0, mudf = 250, mudg = 0, width = 0, hbase = 0.12f, hbabs = 1e-6f;
 };
+constexpr double kLearnSecs = 30.0;   // seconds of music SQN Ears listens to before it locks
 struct Params { bool listen = false, fix = false, limiter = true, binaural = false; int sound = 0, binState = 0, binCarrier = 0; float amount = 100, console = 0, harsh = 50, glue = 50, binVol = -22, loudOff = 0; double hostBpm = 0; };
 
 struct Readout
@@ -305,7 +306,7 @@ public:
             listen (L, R, n);
             double pk = 0; for (int i = 0; i < n; ++i) pk = std::max (pk, (double) std::max (std::abs (L[i]), std::abs (R[i])));
             silent = pk < 1e-3 ? silent + n : 0;
-            const bool lock = (totN >= sr * 30 && silent >= sr * 2) || (! p.listen && lastListen && ! p.fix);
+            const bool lock = totN >= sr * kLearnSecs || (! p.listen && lastListen && ! p.fix);   // 30 s of music, then it stops by itself
             if (totN >= sr * 8 && (totN - planAt >= sr * 4 || lock) && silent == 0) { lastAmount = p.amount; if (snapshot()) computeFix (style, p.amount, p.limiter); planAt = totN; }
             if (lock && totN >= sr * 8) { learning = false; if (snapshot()) computeFix (style, p.amount, p.limiter); }
         }
