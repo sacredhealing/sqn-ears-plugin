@@ -70,6 +70,7 @@ void SqnEarsProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::Mid
         {
             if (auto bpm = pos->getBpm()) p.hostBpm = *bpm;
             p.playing = pos->getIsPlaying();
+            if (auto ts = pos->getTimeInSeconds()) p.posSec = *ts;
         }
     const juce::SpinLock::ScopedLockType sl (lock);
     engine.process (buffer.getWritePointer (0), buffer.getWritePointer (1), buffer.getNumSamples(), p);
@@ -92,7 +93,7 @@ void SqnEarsProcessor::getStateInformation (juce::MemoryBlock& dest)
         a.setProperty ("corr", an.corr, nullptr); a.setProperty ("lcorr", an.lcorr, nullptr);
         a.setProperty ("I", an.I, nullptr); a.setProperty ("tp", an.tp, nullptr);
         for (int i = 0; i < 9; ++i) { a.setProperty ("mw" + juce::String (i), an.mw[i], nullptr); a.setProperty ("weq" + juce::String (i), f.weq[i], nullptr); a.setProperty ("eq" + juce::String (i), f.eq[i], nullptr); }
-        a.setProperty ("haveW", an.haveW, nullptr); a.setProperty ("useW", f.useW, nullptr);
+        a.setProperty ("haveW", an.haveW, nullptr); a.setProperty ("songEnd", engine.songEnd, nullptr); a.setProperty ("useW", f.useW, nullptr);
         a.setProperty ("key", an.key, nullptr); a.setProperty ("minor", an.minor, nullptr); a.setProperty ("aRef", an.aRef, nullptr); a.setProperty ("bpm", an.bpm, nullptr);
         a.setProperty ("ready", f.ready, nullptr); a.setProperty ("style", f.style, nullptr);
         a.setProperty ("gain", f.gain, nullptr); a.setProperty ("trim", f.trim, nullptr); a.setProperty ("cal", f.cal, nullptr);
@@ -125,7 +126,7 @@ void SqnEarsProcessor::setStateInformation (const void* data, int size)
     an.mhb = fl ("mhb", 0.12f); an.mhba = fl ("mhba", 1e-6f); an.corr = fl ("corr", 1); an.lcorr = fl ("lcorr", 1);
     an.I = fl ("I", -70); an.tp = fl ("tp", -70);
     for (int i = 0; i < 9; ++i) { an.mw[i] = (float) a.getProperty ("mw" + juce::String (i), 0.0f); f.weq[i] = (float) a.getProperty ("weq" + juce::String (i), 0.0f); f.eq[i] = (float) a.getProperty ("eq" + juce::String (i), 0.0f); }
-    an.haveW = a.getProperty ("haveW", false); f.useW = a.getProperty ("useW", false);
+    an.haveW = a.getProperty ("haveW", false); engine.songEnd = (double) a.getProperty ("songEnd", 0.0); f.useW = a.getProperty ("useW", false);
     an.key = a.getProperty ("key", -1); an.minor = a.getProperty ("minor", false); an.aRef = fl ("aRef", 440); an.bpm = fl ("bpm", 0);
     f.ready = a.getProperty ("ready", false); f.style = a.getProperty ("style", 0);
     f.gain = fl ("gain", 0); f.trim = fl ("trim", 0); f.cal = a.getProperty ("cal", false); f.caln = a.getProperty ("caln", 0);

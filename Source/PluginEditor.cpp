@@ -49,7 +49,7 @@ void SqnEarsEditor::timerCallback()
     juce::Array<juce::var> eq;
     for (auto& v : r.eq) eq.add (v.load());
     o->setProperty ("eq", eq);
-    o->setProperty ("target", r.target.load()); o->setProperty ("capped", r.capped.load()); o->setProperty ("binLive", r.binLive.load());
+    o->setProperty ("target", r.target.load()); o->setProperty ("capped", r.capped.load()); o->setProperty ("binLive", r.binLive.load()); o->setProperty ("songEnd", r.songEnd.load());
     o->setProperty ("bpm", r.bpm.load()); o->setProperty ("bpmSrc", r.bpmSrc.load()); o->setProperty ("key", r.key.load());
     o->setProperty ("minor", r.minor.load()); o->setProperty ("aRef", r.aRef.load()); o->setProperty ("binOn", r.binOn.load());
     o->setProperty ("carrierHz", r.carrierHz.load()); o->setProperty ("carrierPlayed", r.carrierPlayed.load());

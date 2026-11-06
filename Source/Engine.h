@@ -233,14 +233,14 @@ struct Plan
     float eq[9] {}, weq[9] {}; bool useW = false, capped = false; float gain = 0, trim = 0, ls = 0, lm = 0, pr = 0, hs = 0, mudf = 250, mudg = 0, width = 0, hbase = 0.12f, hbabs = 1e-6f;
 };
 constexpr double kLearnSecs = 30.0;   // seconds of music SQN Ears listens to before it locks
-struct Params { bool listen = false, fix = false, limiter = true, binaural = false; int sound = 0, binState = 0, binCarrier = 0; float amount = 100, console = 0, harsh = 50, glue = 50, binVol = -22, loudOff = 0; double hostBpm = 0; bool playing = true; };
+struct Params { bool listen = false, fix = false, limiter = true, binaural = false; int sound = 0, binState = 0, binCarrier = 0; float amount = 100, console = 0, harsh = 50, glue = 50, binVol = -22, loudOff = 0; double hostBpm = 0, posSec = -1; bool playing = true; };
 
 struct Readout
 {
     std::atomic<float> lufsIn { -70 }, tpIn { -70 }, corr { 0 }, gain { 0 }, secs { 0 }, lufsOut { -70 }, peakOut { -70 },
         turnDown { 0 }, harsh { 0 }, glue { 0 }, lim { 0 }, ls { 0 }, lm { 0 }, pr { 0 }, hs { 0 }, mudf { 250 }, mudg { 0 }, width { 0 };
     std::atomic<int> state { 0 }, style { 0 }, key { -1 }, bpmSrc { 0 }, carrierIdx { -1 }; std::atomic<bool> cal { false }, minor { false }, binOn { false }, capped { false };
-    std::atomic<float> binLive { 0 }, target { -13 }, bpm { 0 }, aRef { 440 }, carrierHz { 0 }, carrierPlayed { 0 }, beatHz { 0 };
+    std::atomic<float> songEnd { 0 }, binLive { 0 }, target { -13 }, bpm { 0 }, aRef { 440 }, carrierHz { 0 }, carrierPlayed { 0 }, beatHz { 0 };
     std::array<std::atomic<float>, 32> spec {}; std::array<std::atomic<float>, 9> eq {};
 };
 
@@ -300,11 +300,13 @@ public:
         const int style = clampv (p.sound, 0, (int) styles().size() - 1), limI = p.limiter ? 1 : 0;
         loudOff = clampv (p.loudOff, -4.0f, 4.0f);
         { double pk = 0; for (int i = 0; i < n; ++i) pk = std::max (pk, (double) std::max (std::abs (L[i]), std::abs (R[i])));
-          musicHold = pk > 1e-3 ? sr * 1.5 : std::max (0.0, musicHold - n); }
+          musicHold = pk > 1e-3 ? sr * 1.5 : std::max (0.0, musicHold - n);
+          // learn where the song ends on the timeline: the last moment music sounds (above -50 dBFS)
+          if (p.playing && p.posSec >= 0 && pk > 0.003) songEnd = std::max (songEnd, p.posSec + n / sr); }
         // LANDR-style: press Master (fix) and play. It learns while it plays, masters after ~8 s,
         // refines every 4 s, and locks when playback stops (2 s of silence after 30 s heard).
         // "Listen" = learn this song again from the start.
-        if ((p.fix && ! lastFixP && ! an.have) || (p.listen && ! lastListen)) { learning = true; resetMeas(); planAt = 0; silent = 0; }
+        if ((p.fix && ! lastFixP && ! an.have) || (p.listen && ! lastListen)) { learning = true; resetMeas(); planAt = 0; silent = 0; if (p.listen) songEnd = 0; }
         if (! p.fix && ! p.listen) learning = false;
         if (learning)
         {
@@ -486,6 +488,9 @@ private:
     std::vector<float> dDL, dDR, dWL, dWR; int dp = 0;
     MusicSense sense; Binaural bin;
     float loudOff = 0, lastOff = 0; double musicHold = 0;
+public:
+    double songEnd = 0;   // seconds on the timeline where the music ends (saved with the session)
+private:
     bool learning = false, lastFixP = false; double planAt = 0, silent = 0;
     double mixv = 0; bool lastListen = false; int lastStyle = -1, lastLim = -1, lastFix = 0; float lastAmount = 100, lastVc = -1; bool coeffDirty = true;
 
@@ -668,7 +673,10 @@ private:
         // level: under the mix by binVol dB (sine at the song's loudness)
         const double ref = fx.ready ? styles()[(size_t) clampv (fx.style, 0, (int) styles().size() - 1)].lufs + loudOff : (an.I > -60 ? an.I : -14.0);
         bin.ampT = p.binaural ? std::pow (10.0, (ref + p.binVol + 0.7) / 20.0) : 0.0;
-        bin.gateT = (p.playing && musicHold > 0) ? 1.0 : 0.0;
+        // silent while stopped or quiet; fully faded out 5 s before the learned end of the song (3 s fade)
+        const bool nearEnd = songEnd > 20 && p.posSec >= 0 && p.posSec > songEnd - 8.0;
+        bin.gateT = (p.playing && musicHold > 0 && ! nearEnd) ? 1.0 : 0.0;
+        ro.songEnd = (float) songEnd;
         ro.binLive = (float) bin.gate;
         ro.binOn = p.binaural; ro.capped = fx.capped; ro.carrierHz = (float) fc; ro.carrierPlayed = (float) play; ro.beatHz = (float) beat; ro.carrierIdx = idx;
     }

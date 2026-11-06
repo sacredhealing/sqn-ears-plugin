@@ -114,7 +114,7 @@ html,body{margin:0;height:100%;background:#030303;overflow:hidden;font-family:"P
 <canvas id="stars"></canvas>
 <div class="ui">
  <div class="top">
-  <div class="brand"><div class="lbl">Siddha Quantum Nexus · Master Intelligence</div><b>SQN <em>Ears</em><sup class="ver">v2.6</sup></b></div>
+  <div class="brand"><div class="lbl">Siddha Quantum Nexus · Master Intelligence</div><b>SQN <em>Ears</em><sup class="ver">v2.7</sup></b></div>
   <div class="pills"><div class="pill" id="music" title="Tempo · key · tuning, heard from your song"><i style="background:var(--cyan);box-shadow:0 0 10px var(--cyan)"></i><span>— BPM · — KEY</span></div><div class="pill btn" id="limBtn" title="SQN Ears' own peak limiter: catches every peak at -1.5 dB so the master can reach its loudness safely"><i></i><span>Limiter on</span></div><div class="pill" id="status"><i></i><span>Press Master</span></div></div>
  </div>
  <div class="col">
@@ -173,7 +173,7 @@ if (!window.__JUCE__) {
       } } };
   let t=0; setInterval(()=>{t+=.033;const spec=[];for(let k=0;k<32;k++)spec.push(-38+14*Math.sin(k*.45+t*2.1)*Math.cos(k*.13-t)-k*.5+6*Math.random());
     (L.meters||[]).forEach(f=>f({state:4,style:5,cal:false,lufsIn:-15.4,tpIn:-0.6,corr:.93,gain:2.4,secs:18,lufsOut:-13.1+.15*Math.sin(t),peakOut:-1.6,turnDown:0,
-      harsh:Math.max(0,2.2*Math.sin(t*1.3)),glue:1.4+.6*Math.sin(t*2.2),lim:Math.max(0,1.5*Math.sin(t*.9)),ls:-1.4,lm:-1.6,pr:2.6,hs:2.4,eq:[-1.2,-1.6,-1.6,-1.1,-0.8,0.6,3.4,3.1,1.7],mudf:315,mudg:-1,width:1.5,latencyMs:1.5,spec,target:-11.5,bpm:80,bpmSrc:1,key:9,minor:false,aRef:440,binOn:true,carrierHz:741,carrierPlayed:370.5,beatHz:5.33,carrierIdx:8,binLive:1,capped:false}));},33);
+      harsh:Math.max(0,2.2*Math.sin(t*1.3)),glue:1.4+.6*Math.sin(t*2.2),lim:Math.max(0,1.5*Math.sin(t*.9)),ls:-1.4,lm:-1.6,pr:2.6,hs:2.4,eq:[-1.2,-1.6,-1.6,-1.1,-0.8,0.6,3.4,3.1,1.7],mudf:315,mudg:-1,width:1.5,latencyMs:1.5,spec,target:-11.5,bpm:80,bpmSrc:1,key:9,minor:false,aRef:440,binOn:true,carrierHz:741,carrierPlayed:370.5,beatHz:5.33,carrierIdx:8,binLive:1,capped:false,songEnd:222}));},33);
 }
 </script>
 <script type="module">
@@ -270,8 +270,8 @@ window.__JUCE__.backend.addEventListener("meters", (d) => {
   $("tpS").textContent = fixed ? "peaks held under -1.5 dB" : (pk > -1 ? "too hot: Fix will hold it" : "safe for every platform");
   $("tpM").style.width = Math.max(0, Math.min(100, (pk + 12) / 12 * 100)) + "%";
   const c = d.corr || 0, word = !c ? "—" : c > .97 ? "Narrow" : c > .85 ? "Natural" : c > .6 ? "Wide" : "Very wide";
-  $("wd").innerHTML = c ? `${word} <small>${Math.round(c * 100)}% centred</small>` : "—";
-  $("wdS").textContent = fixed ? `details opened ${sg(d.width)} dB · bass kept mono` : "100% = mono · lower = wider sound";
+  $("wd").innerHTML = c ? `${word} <small>your mix · ${Math.round(c * 100)}% centred</small>` : "—";
+  $("wdS").textContent = fixed ? (d.width >= 0 ? `Ears opened the details ${sg(d.width)} dB · bass kept mono` : `Ears narrowed it ${sg(d.width)} dB · bass kept mono`) : "your mix · 100% = mono, lower = wider";
   $("wdM").style.width = Math.max(0, Math.min(100, (1 - Math.max(0, d.corr)) * 200 + 20)) + "%";
   $("big").textContent = shown > -69 ? shown.toFixed(1) : "—";
   const LS = 30, lt = Math.min(LS, Math.floor(d.secs));
@@ -301,7 +301,8 @@ window.__JUCE__.backend.addEventListener("meters", (d) => {
   const why = d.binOn && d.beatHz ? [`pulse ${d.beatHz.toFixed(2)} Hz`] : [];
   if (binC.getChoiceIndex() === 0 && d.key >= 0) why.push(`in tune with ${KEYS[d.key]} ${d.minor ? "minor" : "major"}`);
   if (locked) why.push(`pulsing with ${Math.round(d.bpm)} BPM`);
-  if (d.binOn && (d.binLive || 0) < .05) why.push("silent until the music plays");
+  const mmss = (x) => Math.floor(x / 60) + ":" + String(Math.floor(x % 60)).padStart(2, "0");
+  if (d.binOn) why.push(d.songEnd > 20 ? `fades out by ${mmss(d.songEnd - 5)} (5 s before the end)` : "play to the end once to learn the ending");
   $("binWhy").textContent = why.join(" · ");
   if (d.state >= 2) $("moves").innerHTML = `<span>Bass <b>${sg(d.ls)}</b></span><span>Low-mid <b>${sg(d.lm)}</b></span>${d.mudg < -0.05 ? `<span>Mud ${Math.round(d.mudf)} Hz <b>${sg(d.mudg)}</b></span>` : ""}<span>Presence <b>${sg(d.pr)}</b></span><span>Air <b>${sg(d.hs)}</b></span><span>Gain <b>${sg(d.gain)}</b></span>`;
 });
