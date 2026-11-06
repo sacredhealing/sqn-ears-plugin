@@ -277,7 +277,7 @@ public:
             Biquad t; t.set (Bq::Peaking, centers[j], 1.41, 1.0, sr);
             for (int i = 0; i < 9; ++i) octResp[i][j] = t.magDb (std::min (centers[i], sr * 0.45), sr);
         }
-        sense.prepare (sr); bin.k = coef (1.0); bin.gIn = coef (2.5 / 4.6); bin.gOut = coef (3.0 / 4.6);
+        sense.prepare (sr); bin.k = coef (0.25); bin.gIn = coef (2.5 / 4.6); bin.gOut = coef (3.0 / 4.6);
         ha = coef (0.005); hr = coef (0.08); ga = coef (0.02); grl = coef (0.2); gsk = coef (0.2); rc = coef (0.08); specRel = coef (0.25);
         for (int p = 1; p <= 3; ++p)
         {
@@ -301,6 +301,12 @@ public:
         loudOff = clampv (p.loudOff, -4.0f, 4.0f);
         { double pk = 0; for (int i = 0; i < n; ++i) pk = std::max (pk, (double) std::max (std::abs (L[i]), std::abs (R[i])));
           musicHold = pk > 1e-3 ? sr * 1.5 : std::max (0.0, musicHold - n);
+          { double ms = 0; for (int i = 0; i < n; ++i) ms += 0.5 * ((double) L[i] * L[i] + (double) R[i] * R[i]); ms /= std::max (1, n);
+            const double ks = 1.0 - std::exp (-n / (0.6 * sr)), kl = 1.0 - std::exp (-n / (40.0 * sr));
+            eShort += (ms - eShort) * ks;
+            eLong = ms > eLong ? eLong + (ms - eLong) * kl * 4.0 : eLong + (ms - eLong) * kl * 0.25;   // long memory of how loud the song is
+            const double rr = eLong > 1e-9 ? eShort / eLong : 0.0;           // power ratio now vs the song
+            follow = rr < 1e-3 ? 0.0 : clampv (std::pow (rr, 0.9), 0.0, 1.0); }   // fades ~1.8x faster than the music, gone at -30 dB
           // learn where the song ends on the timeline: the last moment music sounds (above -50 dBFS)
           if (p.playing && p.posSec >= 0)
           {
@@ -491,7 +497,7 @@ private:
     std::vector<double> dqv, box; std::vector<long long> dqi; long long dh = 0, dt = 0, lt = 0; int cap = 70; double rel = 1, bsum = 0;
     std::vector<float> dDL, dDR, dWL, dWR; int dp = 0;
     MusicSense sense; Binaural bin;
-    float loudOff = 0, lastOff = 0; double musicHold = 0;
+    float loudOff = 0, lastOff = 0; double musicHold = 0, eShort = 0, eLong = 0, follow = 0;
 public:
     double songEnd = 0, frontier = 0;   // confirmed end of the music on the timeline (saved), furthest point heard so far
 private:
@@ -676,7 +682,7 @@ private:
         bin.fc = play; bin.beat = beat;
         // level: under the mix by binVol dB (sine at the song's loudness)
         const double ref = fx.ready ? styles()[(size_t) clampv (fx.style, 0, (int) styles().size() - 1)].lufs + loudOff : (an.I > -60 ? an.I : -14.0);
-        bin.ampT = p.binaural ? std::pow (10.0, (ref + p.binVol + 0.7) / 20.0) : 0.0;
+        bin.ampT = p.binaural ? std::pow (10.0, (ref + p.binVol + 0.7) / 20.0) * follow : 0.0;   // stays the same distance under the music, fades when the song fades
         // silent while stopped or quiet; fully faded out 5 s before the learned end of the song (3 s fade)
         const bool nearEnd = songEnd > 20 && p.posSec >= 0 && p.posSec > songEnd - 8.0 && p.posSec < songEnd + 30.0;
         bin.gateT = (p.playing && musicHold > 0 && ! nearEnd) ? 1.0 : 0.0;
