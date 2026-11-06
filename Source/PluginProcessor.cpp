@@ -67,7 +67,10 @@ void SqnEarsProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::Mid
     p.binaural = pBin->load() > 0.5f; p.binState = (int) pBinState->load(); p.binCarrier = (int) pBinCar->load(); p.binVol = pBinVol->load();
     if (auto* ph = getPlayHead())
         if (auto pos = ph->getPosition())
+        {
             if (auto bpm = pos->getBpm()) p.hostBpm = *bpm;
+            p.playing = pos->getIsPlaying();
+        }
     const juce::SpinLock::ScopedLockType sl (lock);
     engine.process (buffer.getWritePointer (0), buffer.getWritePointer (1), buffer.getNumSamples(), p);
 }

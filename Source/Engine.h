@@ -146,13 +146,16 @@ struct MusicSense
 struct Binaural
 {
     double phL = 0, phR = 0, amp = 0, ampT = 0, fc = 216, beat = 6, k = 0.0001;
+    double gate = 0, gateT = 0, gIn = 0.00001, gOut = 0.00001;    // follows the music: fade in with the song, fade out when it ends
     inline void tick (double sr, double& l, double& r)
     {
         amp += (ampT - amp) * k;
-        if (amp < 1e-7 && ampT == 0) return;
+        gate += (gateT - gate) * (gateT > gate ? gIn : gOut);
+        if ((amp < 1e-7 && ampT == 0) || (gate < 1e-5 && gateT == 0)) return;
         phL += 2 * kPi * (fc - beat * 0.5) / sr; phR += 2 * kPi * (fc + beat * 0.5) / sr;
         if (phL > 2 * kPi) phL -= 2 * kPi; if (phR > 2 * kPi) phR -= 2 * kPi;
-        l += amp * std::sin (phL); r += amp * std::sin (phR);
+        const double a = amp * gate * gate;   // smooth (squared) fade curve
+        l += a * std::sin (phL); r += a * std::sin (phR);
     }
 };
 static const double kSacred[11] = { 108, 174, 285, 396, 417, 432, 528, 639, 741, 852, 963 };
@@ -227,17 +230,17 @@ struct Analysis { bool have = false; float mb[9] {}, mm[6] {}, mhb = 0.12f, mhba
 struct Plan
 {
     bool ready = false, monobass = false, cal = false; int style = 0, caln = 0;
-    float eq[9] {}, weq[9] {}; bool useW = false; float gain = 0, trim = 0, ls = 0, lm = 0, pr = 0, hs = 0, mudf = 250, mudg = 0, width = 0, hbase = 0.12f, hbabs = 1e-6f;
+    float eq[9] {}, weq[9] {}; bool useW = false, capped = false; float gain = 0, trim = 0, ls = 0, lm = 0, pr = 0, hs = 0, mudf = 250, mudg = 0, width = 0, hbase = 0.12f, hbabs = 1e-6f;
 };
 constexpr double kLearnSecs = 30.0;   // seconds of music SQN Ears listens to before it locks
-struct Params { bool listen = false, fix = false, limiter = true, binaural = false; int sound = 0, binState = 0, binCarrier = 0; float amount = 100, console = 0, harsh = 50, glue = 50, binVol = -22, loudOff = 0; double hostBpm = 0; };
+struct Params { bool listen = false, fix = false, limiter = true, binaural = false; int sound = 0, binState = 0, binCarrier = 0; float amount = 100, console = 0, harsh = 50, glue = 50, binVol = -22, loudOff = 0; double hostBpm = 0; bool playing = true; };
 
 struct Readout
 {
     std::atomic<float> lufsIn { -70 }, tpIn { -70 }, corr { 0 }, gain { 0 }, secs { 0 }, lufsOut { -70 }, peakOut { -70 },
         turnDown { 0 }, harsh { 0 }, glue { 0 }, lim { 0 }, ls { 0 }, lm { 0 }, pr { 0 }, hs { 0 }, mudf { 250 }, mudg { 0 }, width { 0 };
-    std::atomic<int> state { 0 }, style { 0 }, key { -1 }, bpmSrc { 0 }, carrierIdx { -1 }; std::atomic<bool> cal { false }, minor { false }, binOn { false };
-    std::atomic<float> target { -13 }, bpm { 0 }, aRef { 440 }, carrierHz { 0 }, carrierPlayed { 0 }, beatHz { 0 };
+    std::atomic<int> state { 0 }, style { 0 }, key { -1 }, bpmSrc { 0 }, carrierIdx { -1 }; std::atomic<bool> cal { false }, minor { false }, binOn { false }, capped { false };
+    std::atomic<float> binLive { 0 }, target { -13 }, bpm { 0 }, aRef { 440 }, carrierHz { 0 }, carrierPlayed { 0 }, beatHz { 0 };
     std::array<std::atomic<float>, 32> spec {}; std::array<std::atomic<float>, 9> eq {};
 };
 
@@ -274,7 +277,7 @@ public:
             Biquad t; t.set (Bq::Peaking, centers[j], 1.41, 1.0, sr);
             for (int i = 0; i < 9; ++i) octResp[i][j] = t.magDb (std::min (centers[i], sr * 0.45), sr);
         }
-        sense.prepare (sr); bin.k = coef (1.0);
+        sense.prepare (sr); bin.k = coef (1.0); bin.gIn = coef (2.5 / 4.6); bin.gOut = coef (3.0 / 4.6);
         ha = coef (0.005); hr = coef (0.08); ga = coef (0.02); grl = coef (0.2); gsk = coef (0.2); rc = coef (0.08); specRel = coef (0.25);
         for (int p = 1; p <= 3; ++p)
         {
@@ -296,6 +299,8 @@ public:
     {
         const int style = clampv (p.sound, 0, (int) styles().size() - 1), limI = p.limiter ? 1 : 0;
         loudOff = clampv (p.loudOff, -4.0f, 4.0f);
+        { double pk = 0; for (int i = 0; i < n; ++i) pk = std::max (pk, (double) std::max (std::abs (L[i]), std::abs (R[i])));
+          musicHold = pk > 1e-3 ? sr * 1.5 : std::max (0.0, musicHold - n); }
         // LANDR-style: press Master (fix) and play. It learns while it plays, masters after ~8 s,
         // refines every 4 s, and locks when playback stops (2 s of silence after 30 s heard).
         // "Listen" = learn this song again from the start.
@@ -480,7 +485,7 @@ private:
     std::vector<double> dqv, box; std::vector<long long> dqi; long long dh = 0, dt = 0, lt = 0; int cap = 70; double rel = 1, bsum = 0;
     std::vector<float> dDL, dDR, dWL, dWR; int dp = 0;
     MusicSense sense; Binaural bin;
-    float loudOff = 0, lastOff = 0;
+    float loudOff = 0, lastOff = 0; double musicHold = 0;
     bool learning = false, lastFixP = false; double planAt = 0, silent = 0;
     double mixv = 0; bool lastListen = false; int lastStyle = -1, lastLim = -1, lastFix = 0; float lastAmount = 100, lastVc = -1; bool coeffDirty = true;
 
@@ -601,7 +606,9 @@ private:
             fx.width = (float) avg; fx.monobass = false;
         }
         double g = clampv ((double) st.lufs + loudOff - an.I, -12.0, 9.0);
+        const double gWant = g;
         if (limon) g = std::min (g, -1.5 - an.tp + 6); else if (g > 0) g = std::min (g, std::max (0.0, -1.0 - an.tp - 0.3));
+        fx.capped = g < gWant - 0.3;
         fx.gain = (float) (g * a); fx.trim = 0; fx.cal = false; fx.caln = 0; fx.style = style; fx.ready = true;
         coeffDirty = true; mout.reset(); opk = 0;
     }
@@ -661,7 +668,9 @@ private:
         // level: under the mix by binVol dB (sine at the song's loudness)
         const double ref = fx.ready ? styles()[(size_t) clampv (fx.style, 0, (int) styles().size() - 1)].lufs + loudOff : (an.I > -60 ? an.I : -14.0);
         bin.ampT = p.binaural ? std::pow (10.0, (ref + p.binVol + 0.7) / 20.0) : 0.0;
-        ro.binOn = p.binaural; ro.carrierHz = (float) fc; ro.carrierPlayed = (float) play; ro.beatHz = (float) beat; ro.carrierIdx = idx;
+        bin.gateT = (p.playing && musicHold > 0) ? 1.0 : 0.0;
+        ro.binLive = (float) bin.gate;
+        ro.binOn = p.binaural; ro.capped = fx.capped; ro.carrierHz = (float) fc; ro.carrierPlayed = (float) play; ro.beatHz = (float) beat; ro.carrierIdx = idx;
     }
 
     void updateCoeffs (const Style& st, double a)

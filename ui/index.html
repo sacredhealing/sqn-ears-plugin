@@ -12,10 +12,11 @@ html,body{margin:0;height:100%;background:#030303;overflow:hidden;font-family:"P
 .lbl.d{color:var(--faint)}
 .top{grid-column:1/-1;display:flex;justify-content:space-between;align-items:center;gap:12px}
 .brand .lbl{white-space:nowrap;letter-spacing:.42em}
+.ver{font-size:9px;letter-spacing:.2em;color:var(--faint);font-weight:800;margin-left:8px;vertical-align:top;-webkit-text-fill-color:var(--faint)}
 .brand b{display:block;font-weight:900;letter-spacing:-.05em;font-size:30px;line-height:1;margin-top:6px}
 .brand b em{font-style:normal;background:linear-gradient(180deg,#FFF1BE,#D4AF37 55%,#8C6A12);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 0 12px rgba(212,175,55,.45))}
 .pills{display:flex;gap:8px;flex-wrap:nowrap}
-.pill{white-space:nowrap;border:1px solid rgba(212,175,55,.45);border-radius:999px;padding:9px 13px;font-weight:800;font-size:8px;letter-spacing:.22em;text-transform:uppercase;color:var(--gold2);display:flex;align-items:center;gap:9px;background:rgba(212,175,55,.06);box-shadow:inset 0 1px 0 rgba(255,255,255,.08)}
+.pill{white-space:nowrap;border:1px solid rgba(212,175,55,.45);border-radius:999px;padding:8px 11px;font-weight:800;font-size:7.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--gold2);display:flex;align-items:center;gap:9px;background:rgba(212,175,55,.06);box-shadow:inset 0 1px 0 rgba(255,255,255,.08)}
 .pill i{width:8px;height:8px;border-radius:50%;background:var(--faint)}
 .pill.live i{background:var(--gold);box-shadow:0 0 14px var(--gold);animation:blink 1.6s ease-in-out infinite}
 .pill.listen i{background:var(--cyan);box-shadow:0 0 14px var(--cyan);animation:blink .8s ease-in-out infinite}
@@ -79,14 +80,25 @@ html,body{margin:0;height:100%;background:#030303;overflow:hidden;font-family:"P
 .binhead{display:flex;justify-content:space-between;align-items:center}
 .tog{border:1px solid rgba(212,175,55,.45);border-radius:999px;padding:5px 12px;font-weight:800;font-size:8px;letter-spacing:.35em;color:var(--muted);cursor:pointer}
 .tog.on{color:#1a1205;background:linear-gradient(180deg,#FFF0B8,#D4AF37 55%,#9C7414);box-shadow:0 0 18px rgba(212,175,55,.55)}
-.binbig{font-weight:900;font-size:18px;letter-spacing:-.03em;margin-top:4px}.binbig em{font-style:normal;color:var(--cyan);text-shadow:0 0 12px rgba(34,211,238,.5)}
-.binwhy{font-size:10px;color:var(--muted);margin-top:2px;min-height:14px}
-.minis{display:flex;flex-wrap:wrap;gap:4px;margin-top:5px}
-.binmean{font-size:10px;line-height:1.45;color:var(--gold2);margin-top:3px;min-height:29px}.binmean b{color:#cffafe;font-weight:700}
-.mini{border:1px solid rgba(255,255,255,.08);border-radius:999px;padding:3px 7px;font-size:9px;color:var(--muted);cursor:pointer;background:rgba(255,255,255,.02)}
-.mini.on{border-color:var(--cyan);color:#cffafe;background:rgba(34,211,238,.12);box-shadow:0 0 10px rgba(34,211,238,.3)}
-.mini.g.on{border-color:var(--gold);color:var(--gold2);background:rgba(212,175,55,.12);box-shadow:0 0 10px rgba(212,175,55,.3)}
-.vol{display:flex;align-items:center;gap:8px;margin-top:7px;font-size:9px;color:var(--faint)}
+.bincard{--sc:#38bdf8;transition:box-shadow .6s,border-color .6s;background:radial-gradient(120% 90% at 15% 30%,color-mix(in srgb,var(--sc) 16%,transparent),transparent 60%),linear-gradient(160deg,rgba(255,255,255,.07),rgba(255,255,255,.015) 40%,rgba(255,255,255,.01))}
+.bincard.live{border-color:color-mix(in srgb,var(--sc) 45%,transparent);box-shadow:inset 0 1px 0 rgba(255,255,255,.12),0 0 34px color-mix(in srgb,var(--sc) 30%,transparent),0 18px 40px rgba(0,0,0,.55)}
+.binrow{display:flex;align-items:center;gap:10px;margin-top:4px}
+#binWave{width:96px;height:46px;flex:none;border-radius:14px;background:rgba(0,0,0,.35);box-shadow:inset 0 0 18px color-mix(in srgb,var(--sc) 25%,transparent)}
+.binname{display:flex;flex-direction:column;min-width:0}
+.binname b{font-weight:900;font-size:19px;letter-spacing:.06em;color:var(--sc);text-shadow:0 0 18px color-mix(in srgb,var(--sc) 70%,transparent);line-height:1.05}
+.binname span{font-size:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#F4F1E8;opacity:.85;margin-top:2px}
+.binname em{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-style:normal;font-size:9.5px;color:var(--gold2);margin-top:3px;font-family:"SF Mono",Menlo,monospace}
+.binwhy{font-size:9px;color:var(--muted);margin-top:3px;min-height:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.orbs{display:flex;justify-content:space-between;margin-top:4px}
+.orb2{display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;width:40px}
+.orb2 i{width:12px;height:12px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff8,var(--c) 45%,#0008);box-shadow:0 0 6px var(--c);opacity:.55;transition:all .25s}
+.orb2 span{font-size:7px;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);font-weight:800}
+.orb2.on i{opacity:1;transform:scale(1.35);box-shadow:0 0 14px var(--c),0 0 26px var(--c)}.orb2.on span{color:#F4F1E8}
+.gems{display:flex;flex-wrap:nowrap;justify-content:space-between;gap:2px;margin-top:5px}
+.gem{display:flex;align-items:center;gap:3px;border-radius:999px;padding:2px 5px 2px 3px;font-size:8.5px;color:var(--muted);cursor:pointer;border:1px solid rgba(255,255,255,.07);background:rgba(255,255,255,.02)}
+.gem i{width:6px;height:6px;border-radius:50%;background:var(--c);box-shadow:0 0 6px var(--c)}
+.gem.on{color:#fff;border-color:var(--c);background:color-mix(in srgb,var(--c) 22%,transparent);box-shadow:0 0 12px color-mix(in srgb,var(--c) 55%,transparent)}
+.vol{display:flex;align-items:center;gap:8px;margin-top:5px;font-size:9px;color:var(--faint)}
 .vol input{flex:1;-webkit-appearance:none;appearance:none;height:4px;border-radius:4px;background:linear-gradient(90deg,#0e7490,#D4AF37);outline:none}
 .vol input::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;border-radius:50%;background:radial-gradient(circle at 40% 30%,#FFF0B8,#D4AF37 60%,#7a5a10);box-shadow:0 0 10px rgba(212,175,55,.8);cursor:pointer}
 #curve{height:46px}
@@ -101,13 +113,13 @@ html,body{margin:0;height:100%;background:#030303;overflow:hidden;font-family:"P
 <canvas id="stars"></canvas>
 <div class="ui">
  <div class="top">
-  <div class="brand"><div class="lbl">Siddha Quantum Nexus · Master Intelligence</div><b>SQN <em>Ears</em></b></div>
+  <div class="brand"><div class="lbl">Siddha Quantum Nexus · Master Intelligence</div><b>SQN <em>Ears</em><sup class="ver">v2.6</sup></b></div>
   <div class="pills"><div class="pill" id="music" title="Tempo · key · tuning, heard from your song"><i style="background:var(--cyan);box-shadow:0 0 10px var(--cyan)"></i><span>— BPM · — KEY</span></div><div class="pill btn" id="limBtn" title="SQN Ears' own peak limiter: catches every peak at -1.5 dB so the master can reach its loudness safely"><i></i><span>Limiter on</span></div><div class="pill" id="status"><i></i><span>Press Master</span></div></div>
  </div>
  <div class="col">
   <div class="card"><div class="lbl d">Loudness</div><div class="v" id="lu">— <small>LUFS</small></div><div class="s" id="luS">target — · heard —</div><div class="lo"><span class="lb" id="loMinus">−</span><span id="loV">sound's own</span><span class="lb" id="loPlus">+</span></div><div class="meter"><i id="luM" style="width:0;background:linear-gradient(90deg,#8C6A12,#F6DE8D);box-shadow:0 0 12px #D4AF37"></i></div></div>
   <div class="card"><div class="lbl d">Peak</div><div class="v" id="tp">— <small>dB</small></div><div class="s" id="tpS">safe ceiling -1.5 dB</div><div class="meter"><i id="tpM" style="width:0;background:linear-gradient(90deg,#1f8a4c,#7cf2a9);box-shadow:0 0 12px #4ADE80"></i></div></div>
-  <div class="card"><div class="lbl d">Stereo field</div><div class="v" id="wd">—</div><div class="s" id="wdS">bass kept mono</div><div class="meter"><i id="wdM" style="width:0;background:linear-gradient(90deg,#0e7490,#7deaf7);box-shadow:0 0 12px #22D3EE"></i></div></div>
+  <div class="card"><div class="lbl d">Stereo width</div><div class="v" id="wd">—</div><div class="s" id="wdS">bass kept mono</div><div class="meter"><i id="wdM" style="width:0;background:linear-gradient(90deg,#0e7490,#7deaf7);box-shadow:0 0 12px #22D3EE"></i></div></div>
  </div>
  <div class="center">
   <div class="orbwrap">
@@ -123,10 +135,17 @@ html,body{margin:0;height:100%;background:#030303;overflow:hidden;font-family:"P
  </div>
  <div class="bottom">
   <div class="card"><div class="lbl d">Tone · what Ears changed</div><canvas id="curve"></canvas><div class="moves" id="moves"><span>Press Master and play the song: Ears learns and masters while it plays</span></div></div>
-  <div class="card" id="binCard"><div class="binhead"><div class="lbl">Binaural · headphones</div><div class="tog" id="binTog">OFF</div></div>
-   <div class="binbig" id="binBig">— Hz · <em>— Hz</em></div><div class="binwhy" id="binWhy">Turn on: Ears tunes the tone to your song's key and tempo</div>
-   <div class="binmean" id="binMean"></div><div class="minis" id="binStates"></div><div class="minis" id="binCars"></div>
-   <div class="vol"><span>Volume</span><input type="range" id="binVol" min="0" max="1000" value="529"><span id="binVolV">-22 dB</span></div></div>
+  <div class="card bincard" id="binCard">
+   <div class="binhead"><div class="lbl">Binaural · headphones</div><div class="tog" id="binTog">OFF</div></div>
+   <div class="binrow">
+    <canvas id="binWave"></canvas>
+    <div class="binname"><b id="binState">—</b><span id="binStateMean">Turn on, then play your song</span><em id="binHz">—</em></div>
+   </div>
+   <div class="binwhy" id="binWhy"></div>
+   <div class="orbs" id="binStates"></div>
+   <div class="gems" id="binCars"></div>
+   <div class="vol"><span>Volume</span><input type="range" id="binVol" min="0" max="1000" value="529"><span id="binVolV">-22 dB</span></div>
+  </div>
   <div class="card"><div class="lbl d">Working now</div>
    <div class="dyn"><span>Harsh</span><div class="meter"><i id="dH" style="width:0;background:#22D3EE;box-shadow:0 0 10px #22D3EE"></i></div><em id="dHv">0.0</em>
    <span>Glue</span><div class="meter"><i id="dG" style="width:0;background:#D4AF37;box-shadow:0 0 10px #D4AF37"></i></div><em id="dGv">0.0</em>
@@ -153,7 +172,7 @@ if (!window.__JUCE__) {
       } } };
   let t=0; setInterval(()=>{t+=.033;const spec=[];for(let k=0;k<32;k++)spec.push(-38+14*Math.sin(k*.45+t*2.1)*Math.cos(k*.13-t)-k*.5+6*Math.random());
     (L.meters||[]).forEach(f=>f({state:4,style:5,cal:false,lufsIn:-15.4,tpIn:-0.6,corr:.93,gain:2.4,secs:18,lufsOut:-13.1+.15*Math.sin(t),peakOut:-1.6,turnDown:0,
-      harsh:Math.max(0,2.2*Math.sin(t*1.3)),glue:1.4+.6*Math.sin(t*2.2),lim:Math.max(0,1.5*Math.sin(t*.9)),ls:-1.4,lm:-1.6,pr:2.6,hs:2.4,eq:[-1.2,-1.6,-1.6,-1.1,-0.8,0.6,3.4,3.1,1.7],mudf:315,mudg:-1,width:1.5,latencyMs:1.5,spec,target:-11.5,bpm:80,bpmSrc:1,key:9,minor:false,aRef:440,binOn:true,carrierHz:741,carrierPlayed:370.5,beatHz:5.33,carrierIdx:8}));},33);
+      harsh:Math.max(0,2.2*Math.sin(t*1.3)),glue:1.4+.6*Math.sin(t*2.2),lim:Math.max(0,1.5*Math.sin(t*.9)),ls:-1.4,lm:-1.6,pr:2.6,hs:2.4,eq:[-1.2,-1.6,-1.6,-1.1,-0.8,0.6,3.4,3.1,1.7],mudf:315,mudg:-1,width:1.5,latencyMs:1.5,spec,target:-11.5,bpm:80,bpmSrc:1,key:9,minor:false,aRef:440,binOn:true,carrierHz:741,carrierPlayed:370.5,beatHz:5.33,carrierIdx:8,binLive:1,capped:false}));},33);
 }
 </script>
 <script type="module">
@@ -203,24 +222,25 @@ KN.forEach(([id, label, col, def]) => {
   kn.addEventListener("wheel", e => { e.preventDefault(); st.setNormalisedValue(Math.min(1, Math.max(0, st.getNormalisedValue() - Math.sign(e.deltaY) * .02))); paint(); }, { passive:false });
 });
 
+const HZ_MEAN_EARLY = { "108": "Prana — life force", "174": "Foundation — grounding, safety", "285": "Restoring the energy field", "396": "Liberation — releasing fear", "417": "Transmutation — making change", "432": "Cosmic harmony — Vedic tuning", "528": "Love & DNA restore", "639": "Heart connection", "741": "Awakening intuition", "852": "Third eye — spiritual order", "963": "Crown — unity consciousness" };
 // loudness +/- (on top of the sound's own target)
 const loud = Juce.getSliderState("loudOff");
 const paintLoud = () => { const v = loud.getScaledValue(); $("loV").textContent = Math.abs(v) < .01 ? "sound's own" : v > 0 ? "+" + v.toFixed(1) + " dB louder" : v.toFixed(1) + " dB softer"; };
-const stepLoud = (dir) => { const v = Math.max(-4, Math.min(4, loud.getScaledValue() + dir * 0.5)); loud.sliderDragStarted(); loud.setNormalisedValue((v + 4) / 8); loud.sliderDragEnded(); paintLoud(); };
+const stepLoud = (dir) => { const v = Math.max(-4, Math.min(4, Math.round(loud.getScaledValue() + dir))); loud.sliderDragStarted(); loud.setNormalisedValue((v + 4) / 8); loud.sliderDragEnded(); paintLoud(); };
 $("loMinus").onclick = () => stepLoud(-1); $("loPlus").onclick = () => stepLoud(1);
 loud.valueChangedEvent.addListener(paintLoud); loud.propertiesChangedEvent.addListener(paintLoud);
 
 // binaural
 const binT = Juce.getToggleState("binaural"), binS = Juce.getComboBoxState("binState"), binC = Juce.getComboBoxState("binCarrier"), binV = Juce.getSliderState("binVol");
-const SN = ["Auto","ε 0.5","δ 2","θ 6","7.83","α 10","β 14","γ 40"], CN = ["Auto","108","174","285","396","417","432","528","639","741","852","963"];
-SN.forEach((n, i) => { const c = document.createElement("div"); c.className = "mini"; c.textContent = n; c.title = ["Auto: the sound's vibe, locked to the tempo","Epsilon: transcendental","Delta: deep sleep, restore","Theta: deep meditation","Schumann: Earth resonance","Alpha: relaxed, open","Beta: focus","Gamma: insight"][i]; c.onclick = () => binS.setChoiceIndex(i); $("binStates").appendChild(c); });
-CN.forEach((n, i) => { const c = document.createElement("div"); c.className = "mini g"; c.textContent = n; c.title = i ? n + " Hz" : "Auto: the sacred frequency in tune with your song"; c.onclick = () => binC.setChoiceIndex(i); $("binCars").appendChild(c); });
+const STATES = [ ["Auto","#D4AF37","Chosen from the song's vibe and tempo"], ["Transcend","#a78bfa","Epsilon 0.5 Hz — transcendental stillness, samadhi"], ["Sleep","#6366f1","Delta 2 Hz — deep sleep, restoration, cellular repair"], ["Meditate","#38bdf8","Theta 6 Hz — deep meditation, intuition, inner vision"], ["Earth","#a3e635","Schumann 7.83 Hz — Earth's heartbeat, grounding"], ["Calm","#2dd4bf","Alpha 10 Hz — relaxed awareness, calm open heart"], ["Focus","#fb923c","Beta 14 Hz — awake, alert focus"], ["Insight","#e879f9","Gamma 40 Hz — insight, unity, peak awareness"] ];
+const GEMS = [ ["Auto","#D4AF37"], ["108","#22d3ee"], ["174","#f87171"], ["285","#fb923c"], ["396","#f59e0b"], ["417","#a3e635"], ["432","#fbbf24"], ["528","#34d399"], ["639","#f472b6"], ["741","#818cf8"], ["852","#a78bfa"], ["963","#e9d5ff"] ];
+STATES.forEach(([n, c, t], i) => { const o = document.createElement("div"); o.className = "orb2"; o.style.setProperty("--c", c); o.title = t; o.innerHTML = `<i></i><span>${n}</span>`; o.onclick = () => binS.setChoiceIndex(i); $("binStates").appendChild(o); });
+GEMS.forEach(([n, c], i) => { const g = document.createElement("div"); g.className = "gem"; g.style.setProperty("--c", c); g.title = i ? n + " Hz — " + (HZ_MEAN_EARLY[n] || "") : "Auto: the sacred frequency in tune with your song"; g.innerHTML = `<i></i>${n}`; g.onclick = () => binC.setChoiceIndex(i); $("binCars").appendChild(g); });
 const paintBin = () => {
   $("binTog").classList.toggle("on", binT.getValue()); $("binTog").textContent = binT.getValue() ? "ON" : "OFF";
   [...$("binStates").children].forEach((c, k) => c.classList.toggle("on", k === binS.getChoiceIndex()));
   [...$("binCars").children].forEach((c, k) => c.classList.toggle("on", k === binC.getChoiceIndex()));
   $("binVol").value = Math.round(binV.getNormalisedValue() * 1000); $("binVolV").textContent = Math.round(binV.getScaledValue()) + " dB";
-  $("binCard").style.opacity = binT.getValue() ? 1 : .72;
 };
 $("binTog").onclick = () => binT.setValue(!binT.getValue());
 $("binVol").addEventListener("pointerdown", () => binV.sliderDragStarted());
@@ -241,15 +261,16 @@ window.__JUCE__.backend.addEventListener("meters", (d) => {
   const fixed = d.state === 2 || d.state === 4, tgt = Math.round((d.target ?? TARGET[d.style] ?? -13) * 10) / 10;
   const shown = fixed && d.lufsOut > -69 ? d.lufsOut : d.lufsIn;
   $("lu").innerHTML = `${f1(shown)} <small>LUFS</small>`;
-  $("luS").textContent = `target ${tgt} · heard ${f1(d.lufsIn)}`;
+  $("luS").textContent = d.capped ? `target ${tgt} · safe maximum reached` : `target ${tgt} · heard ${f1(d.lufsIn)}`;
   $("luM").style.width = Math.max(0, Math.min(100, (shown + 24) / 18 * 100)) + "%";
   const pk = fixed ? d.peakOut : d.tpIn;
   $("tp").innerHTML = `${f1(pk)} <small>${fixed ? "dB out" : "dBTP in"}</small>`;
   $("tp").style.color = pk > -1 ? "var(--red)" : "var(--green)";
   $("tpS").textContent = fixed ? "peaks held under -1.5 dB" : (pk > -1 ? "too hot: Fix will hold it" : "safe for every platform");
   $("tpM").style.width = Math.max(0, Math.min(100, (pk + 12) / 12 * 100)) + "%";
-  $("wd").textContent = d.corr ? d.corr.toFixed(2) : "—";
-  $("wdS").textContent = fixed ? `width ${sg(d.width)} dB · bass mono` : "L/R similarity (1 = mono)";
+  const c = d.corr || 0, word = !c ? "—" : c > .97 ? "Narrow" : c > .85 ? "Natural" : c > .6 ? "Wide" : "Very wide";
+  $("wd").innerHTML = c ? `${word} <small>${Math.round(c * 100)}% centred</small>` : "—";
+  $("wdS").textContent = fixed ? `details opened ${sg(d.width)} dB · bass kept mono` : "100% = mono · lower = wider sound";
   $("wdM").style.width = Math.max(0, Math.min(100, (1 - Math.max(0, d.corr)) * 200 + 20)) + "%";
   $("big").textContent = shown > -69 ? shown.toFixed(1) : "—";
   const LS = 30, lt = Math.min(LS, Math.floor(d.secs));
@@ -268,16 +289,19 @@ window.__JUCE__.backend.addEventListener("meters", (d) => {
   $("music").querySelector("span").textContent = `${d.bpm > 0 ? Math.round(d.bpm) + " BPM" : "TEMPO —"} · ${d.key >= 0 ? keyTxt + " · A=" + Math.round(d.aRef) : "KEY: PRESS RE-LEARN"}`;
   $("music").title = d.bpmSrc === 1 ? "Tempo from your Mixbus session" : d.bpmSrc === 2 ? "Tempo heard in the audio" : "Play the song with Master on to hear tempo and key";
   // binaural readout
-  const ch = d.carrierIdx >= 0 ? `${Math.round(d.carrierHz)} Hz` : (d.carrierPlayed > 0 ? `Key root ${d.carrierPlayed.toFixed(1)} Hz` : "—");
-  $("binBig").innerHTML = `${ch} · <em>${d.beatHz ? d.beatHz.toFixed(2) : "—"} Hz ${band(d.beatHz || 0)}</em>`;
+  const st = (() => { const bb = d.beatHz || 0; return bb < 1 ? 1 : bb < 4 ? 2 : Math.abs(bb - 7.83) < .01 ? 4 : bb < 8 ? 3 : bb < 13 ? 5 : bb < 30 ? 6 : 7; })();
+  const [sName, sCol, sMean] = STATES[st];
+  $("binCard").style.setProperty("--sc", sCol); $("binCard").classList.toggle("live", !!d.binOn && (d.binLive || 0) > .05);
+  $("binState").textContent = d.binOn ? sName.toUpperCase() : "OFF";
+  $("binStateMean").textContent = d.binOn ? sMean.split(" — ")[1] : "Turn on, then play your song";
+  const hzTxt = d.carrierIdx >= 0 ? `${Math.round(d.carrierHz)} Hz · ${HZ_MEAN_EARLY[String(Math.round(d.carrierHz))] || ""}` : (d.carrierPlayed > 0 ? `Key note ${d.carrierPlayed.toFixed(0)} Hz · pure harmony with the song` : "");
+  $("binHz").textContent = d.binOn ? hzTxt : "";
   const locked = d.bpm > 0 && [ -2,-1,0,1,2,3,4,5,6 ].some(n => Math.abs(d.bpm / 60 * 2 ** n - d.beatHz) < .01);
-  const why = [];
+  const why = d.binOn && d.beatHz ? [`pulse ${d.beatHz.toFixed(2)} Hz`] : [];
   if (binC.getChoiceIndex() === 0 && d.key >= 0) why.push(`in tune with ${KEYS[d.key]} ${d.minor ? "minor" : "major"}`);
-  if (d.carrierIdx >= 0 && Math.abs(d.carrierPlayed - d.carrierHz) > .5) why.push(`played at ${d.carrierPlayed.toFixed(1)} Hz`);
-  if (locked) why.push(`locked to ${Math.round(d.bpm)} BPM`);
-  const hm = d.carrierIdx >= 0 ? HZ_MEAN[Math.round(d.carrierHz)] : (d.carrierPlayed > 0 ? "The song's own key note — pure harmony with the music" : "");
-  $("binMean").innerHTML = d.beatHz ? `<b>${STATE_MEAN(d.beatHz)}</b>${hm ? "<br>" + Math.round(d.carrierHz || d.carrierPlayed) + " Hz · " + hm : ""}` : "";
-  $("binWhy").textContent = why.length ? why.join(" · ") : (d.key >= 0 ? "" : "Press Master and play: Ears hears key and tempo");
+  if (locked) why.push(`pulsing with ${Math.round(d.bpm)} BPM`);
+  if (d.binOn && (d.binLive || 0) < .05) why.push("silent until the music plays");
+  $("binWhy").textContent = why.join(" · ");
   if (d.state >= 2) $("moves").innerHTML = `<span>Bass <b>${sg(d.ls)}</b></span><span>Low-mid <b>${sg(d.lm)}</b></span>${d.mudg < -0.05 ? `<span>Mud ${Math.round(d.mudf)} Hz <b>${sg(d.mudg)}</b></span>` : ""}<span>Presence <b>${sg(d.pr)}</b></span><span>Air <b>${sg(d.hs)}</b></span><span>Gain <b>${sg(d.gain)}</b></span>`;
 });
 
@@ -300,6 +324,21 @@ function mag(type, f0, Q, g, f, sr = 48000){
   return 10 * Math.log10((nr * nr + ni * ni) / (dr * dr + di * di));
 }
 let t = 0, specS = new Array(32).fill(-60);
+let [bw, BWW, BWH] = fit($("binWave")); addEventListener("resize", () => { [bw, BWW, BWH] = fit($("binWave")); });
+let wavePh = 0;
+function drawWave(){
+  bw.clearRect(0, 0, BWW, BWH);
+  const on = !!M.binOn, live = on ? Math.max(.12, M.binLive || 0) : .08, beat = Math.min(M.beatHz || 6, 12);
+  const col = getComputedStyle($("binCard")).getPropertyValue("--sc").trim() || "#38bdf8";
+  wavePh += .016 * beat;
+  const pulse = .55 + .45 * Math.sin(wavePh * 2 * Math.PI);
+  const g = bw.createRadialGradient(BWW / 2, BWH / 2, 2, BWW / 2, BWH / 2, BWW / 1.6); g.addColorStop(0, col + "55"); g.addColorStop(1, "transparent");
+  bw.globalAlpha = live * pulse; bw.fillStyle = g; bw.fillRect(0, 0, BWW, BWH); bw.globalAlpha = 1;
+  [["#F6DE8D", 0], [col, 1]].forEach(([c, k]) => {
+    bw.strokeStyle = c; bw.lineWidth = 1.8; bw.shadowColor = c; bw.shadowBlur = 8 * live; bw.globalAlpha = .35 + .65 * live; bw.beginPath();
+    for (let x = 0; x <= BWW; x += 2) { const y = BWH / 2 + Math.sin(x * .13 + t * 4 + (k ? wavePh * 2 * Math.PI : 0)) * BWH * .3 * (0.6 + .4 * pulse); x ? bw.lineTo(x, y) : bw.moveTo(x, y); }
+    bw.stroke(); }); bw.globalAlpha = 1; bw.shadowBlur = 0;
+}
 (function frame(){
   t += .016;
   sg2.clearRect(0, 0, SW, SH);
@@ -335,6 +374,7 @@ let t = 0, specS = new Array(32).fill(-60);
   }
   cg.stroke(); cg.shadowBlur = 0;
   const sx = (t * .25 % 1) * CW; cg.fillStyle = "rgba(34,211,238,.25)"; cg.fillRect(sx, 0, 2, CH);
+  drawWave();
   requestAnimationFrame(frame);
 })();
 paintButtons(); paintBin(); paintLoud();
