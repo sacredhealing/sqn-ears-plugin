@@ -41,6 +41,9 @@ void SqnEarsEditor::timerCallback()
     juce::Array<juce::var> spec;
     for (auto& s : r.spec) spec.add (s.load());
     o->setProperty ("spec", spec);
+    juce::Array<juce::var> eq;
+    for (auto& v : r.eq) eq.add (v.load());
+    o->setProperty ("eq", eq);
     web.emitEventIfBrowserIsVisible ("meters", juce::var (o));
 }
 

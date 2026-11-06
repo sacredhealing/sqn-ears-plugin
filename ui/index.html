@@ -52,6 +52,7 @@ html,body{margin:0;height:100%;background:#030303;overflow:hidden;font-family:"P
 .chips{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-top:8px}
 .chip{border:1px solid rgba(255,255,255,.08);border-radius:999px;padding:5px 8px;font-size:10px;color:var(--muted);background:rgba(255,255,255,.02);text-align:center;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;transition:all .15s}
 .chip:hover{color:#fff;border-color:rgba(212,175,55,.4)}
+.chip.m::before{content:"";display:inline-block;width:5px;height:5px;border-radius:50%;background:var(--cyan);box-shadow:0 0 6px var(--cyan);margin-right:6px;vertical-align:middle}
 .chip.on{border-color:var(--gold);color:var(--gold2);background:rgba(212,175,55,.12);box-shadow:0 0 16px rgba(212,175,55,.3),inset 0 1px 0 rgba(255,255,255,.15)}
 .knobs{display:grid;grid-template-columns:1fr 1fr;gap:8px 4px}
 .k{text-align:center}
@@ -118,19 +119,19 @@ if (!window.__JUCE__) {
         if(ev.eventType==="requestInitialUpdate"){
           if(id.startsWith("__juce__slider")){const n=id.slice(14);fire({eventType:"propertiesChanged",start:0,end:100,skew:1,name:n,label:"%",numSteps:1001,interval:0.1,parameterIndex:0});fire({eventType:"valueChanged",value:vals[n]});}
           if(id.startsWith("__juce__toggle")){const n=id.slice(14);fire({eventType:"valueChanged",value:demo[n]});}
-          if(id.startsWith("__juce__comboBox")){fire({eventType:"propertiesChanged",name:"Sound",parameterIndex:0,choices:["Sovereign","Zion Roots","Kingston 1973","Island '77","Dub Chamber","West Coast Gold","G-Funk '96","Golden Era '94","808 Modern","Crystal Pop '82","Mantra Temple"]});fire({eventType:"valueChanged",value:2/10});}
+          if(id.startsWith("__juce__comboBox")){fire({eventType:"propertiesChanged",name:"Sound",parameterIndex:0,choices:["Sovereign","Zion Roots","Kingston 1973","Island '77","Dub Chamber","West Coast '92","G-Funk '96","West Coast '99","Golden Era '94","808 Modern","Crystal Pop '82","Mantra Temple"]});fire({eventType:"valueChanged",value:5/11});}
         } else if(ev.eventType==="valueChanged"){fire({eventType:"valueChanged",value:ev.value});}
       } } };
   let t=0; setInterval(()=>{t+=.033;const spec=[];for(let k=0;k<32;k++)spec.push(-38+14*Math.sin(k*.45+t*2.1)*Math.cos(k*.13-t)-k*.5+6*Math.random());
-    (L.meters||[]).forEach(f=>f({state:4,style:2,cal:false,lufsIn:-15.4,tpIn:-0.6,corr:.93,gain:2.4,secs:47,lufsOut:-13.1+.15*Math.sin(t),peakOut:-1.6,turnDown:0,
-      harsh:Math.max(0,2.2*Math.sin(t*1.3)),glue:1.4+.6*Math.sin(t*2.2),lim:Math.max(0,1.5*Math.sin(t*.9)),ls:1.2,lm:.6,pr:-.8,hs:-1.6,mudf:315,mudg:-1,width:1.5,latencyMs:1.5,spec}));},33);
+    (L.meters||[]).forEach(f=>f({state:4,style:5,cal:false,lufsIn:-15.4,tpIn:-0.6,corr:.93,gain:2.4,secs:47,lufsOut:-13.1+.15*Math.sin(t),peakOut:-1.6,turnDown:0,
+      harsh:Math.max(0,2.2*Math.sin(t*1.3)),glue:1.4+.6*Math.sin(t*2.2),lim:Math.max(0,1.5*Math.sin(t*.9)),ls:-1.4,lm:-1.6,pr:2.6,hs:2.4,eq:[-1.2,-1.6,-1.6,-1.1,-0.8,0.6,3.4,3.1,1.7],mudf:315,mudg:-1,width:1.5,latencyMs:1.5,spec}));},33);
 }
 </script>
 <script type="module">
 import * as Juce from "./juce/index.js";
 const $ = (id) => document.getElementById(id);
-const NAMES = ["Sovereign","Zion Roots","Kingston 1973","Island '77","Dub Chamber","West Coast Gold","G-Funk '96","Golden Era '94","808 Modern","Crystal Pop '82","Mantra Temple"];
-const TARGET = [-11,-13,-13,-12,-12,-10,-10,-10,-9,-11.5,-16];
+const NAMES = ["Sovereign","Zion Roots","Kingston 1973","Island '77","Dub Chamber","West Coast '92","G-Funk '96","West Coast '99","Golden Era '94","808 Modern","Crystal Pop '82","Mantra Temple"];
+const TARGET = [-11,-13,-13,-12,-12,-10,-10.4,-9,-10,-9,-11.5,-16];
 const listen = Juce.getToggleState("listen"), fix = Juce.getToggleState("fix"), lim = Juce.getToggleState("limiter");
 const sound = Juce.getComboBoxState("sound");
 let M = { state:0, spec:[] }, abHeld = false;
@@ -151,7 +152,7 @@ $("abBtn").addEventListener("pointerdown", abDown);
 
 // sounds
 const chips = $("chips");
-NAMES.forEach((n, i) => { const c = document.createElement("div"); c.className = "chip"; c.textContent = n; c.onclick = () => sound.setChoiceIndex(i); chips.appendChild(c); });
+NAMES.forEach((n, i) => { const c = document.createElement("div"); c.className = "chip" + ([5,6,7].includes(i) ? " m" : ""); c.title = [5,6,7].includes(i) ? "Measured from real reference records" : ""; c.textContent = n; c.onclick = () => sound.setChoiceIndex(i); chips.appendChild(c); });
 function paintChips(){ const i = sound.getChoiceIndex(); [...chips.children].forEach((c, k) => c.classList.toggle("on", k === i)); }
 sound.valueChangedEvent.addListener(paintChips); sound.propertiesChangedEvent.addListener(paintChips);
 
@@ -248,7 +249,7 @@ let t = 0, specS = new Array(32).fill(-60);
   cg.strokeStyle = gr; cg.lineWidth = 2.4; cg.shadowColor = "#D4AF37"; cg.shadowBlur = 12; cg.beginPath();
   for (let x = 0; x <= 1.0001; x += .01) {
     const f = fx(x); let db = 0;
-    if (on) { db = mag("ls", 110, .7071, M.ls, f) + mag("pk", 260, 1, M.lm, f) + mag("pk", 3500, .9, M.pr, f) + mag("hs", 9000, .7071, M.hs, f); if (M.mudg < 0) db += mag("pk", M.mudf, 4.3, M.mudg, f); }
+    if (on) { const C = [63,125,250,500,1000,2000,4000,8000,16000]; (M.eq || []).forEach((g, b) => { if (Math.abs(g) > 0.01) db += mag("pk", C[b], 1.41, g, f); }); if (M.mudg < 0) db += mag("pk", M.mudf, 4.3, M.mudg, f); }
     cg.lineTo(x * CW, y0 - db * (CH / 2 - 4) / 4);
   }
   cg.stroke(); cg.shadowBlur = 0;
