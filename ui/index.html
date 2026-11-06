@@ -19,7 +19,7 @@ html,body{margin:0;height:100%;background:#030303;overflow:hidden;font-family:"P
 .pill i{width:8px;height:8px;border-radius:50%;background:var(--faint)}
 .pill.live i{background:var(--gold);box-shadow:0 0 14px var(--gold);animation:blink 1.6s ease-in-out infinite}
 .pill.listen i{background:var(--cyan);box-shadow:0 0 14px var(--cyan);animation:blink .8s ease-in-out infinite}
-.pill.btn{cursor:pointer}.pill.btn.off{opacity:.45;border-color:rgba(255,255,255,.15);color:var(--muted)}
+.pill.btn{cursor:pointer}.pill.btn.lim i{background:var(--gold);box-shadow:0 0 12px var(--gold),0 0 22px rgba(212,175,55,.6)}.pill.btn.lim{box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 0 18px rgba(212,175,55,.3)}.pill.btn.off{opacity:.5;border-color:rgba(255,255,255,.15);color:var(--muted)}
 @keyframes blink{50%{opacity:.35}}
 .card{position:relative;border-radius:26px;padding:14px 16px;background:linear-gradient(160deg,rgba(255,255,255,.07),rgba(255,255,255,.015) 40%,rgba(255,255,255,.01));border:1px solid rgba(255,255,255,.07);box-shadow:inset 0 1px 0 rgba(255,255,255,.12),inset 0 -12px 24px rgba(0,0,0,.35),0 18px 40px rgba(0,0,0,.55);backdrop-filter:blur(40px);-webkit-backdrop-filter:blur(40px)}
 .col{display:flex;flex-direction:column;gap:12px;min-width:0;min-height:0}
@@ -102,7 +102,7 @@ html,body{margin:0;height:100%;background:#030303;overflow:hidden;font-family:"P
 <div class="ui">
  <div class="top">
   <div class="brand"><div class="lbl">Siddha Quantum Nexus · Master Intelligence</div><b>SQN <em>Ears</em></b></div>
-  <div class="pills"><div class="pill" id="music" title="Tempo · key · tuning, heard from your song"><i style="background:var(--cyan);box-shadow:0 0 10px var(--cyan)"></i><span>— BPM · — KEY</span></div><div class="pill btn" id="limBtn" title="Peak limiter: lets the loud sounds reach their target safely"><i></i>Loud</div><div class="pill" id="status"><i></i><span>Press Master</span></div></div>
+  <div class="pills"><div class="pill" id="music" title="Tempo · key · tuning, heard from your song"><i style="background:var(--cyan);box-shadow:0 0 10px var(--cyan)"></i><span>— BPM · — KEY</span></div><div class="pill btn" id="limBtn" title="SQN Ears' own peak limiter: catches every peak at -1.5 dB so the master can reach its loudness safely"><i></i><span>Limiter on</span></div><div class="pill" id="status"><i></i><span>Press Master</span></div></div>
  </div>
  <div class="col">
   <div class="card"><div class="lbl d">Loudness</div><div class="v" id="lu">— <small>LUFS</small></div><div class="s" id="luS">target — · heard —</div><div class="lo"><span class="lb" id="loMinus">−</span><span id="loV">sound's own</span><span class="lb" id="loPlus">+</span></div><div class="meter"><i id="luM" style="width:0;background:linear-gradient(90deg,#8C6A12,#F6DE8D);box-shadow:0 0 12px #D4AF37"></i></div></div>
@@ -168,7 +168,7 @@ let M = { state:0, spec:[] }, abHeld = false;
 // buttons
 function paintButtons(){
   $("fixBtn").classList.toggle("on", fix.getValue());
-  $("limBtn").classList.toggle("off", !lim.getValue());
+  $("limBtn").classList.toggle("off", !lim.getValue()); $("limBtn").classList.toggle("lim", lim.getValue()); $("limBtn").querySelector("span").textContent = lim.getValue() ? "Limiter on" : "Limiter off";
 }
 $("listenBtn").onclick = () => { fix.setValue(true); listen.setValue(true); setTimeout(() => listen.setValue(false), 250); };
 $("fixBtn").onclick = () => fix.setValue(!fix.getValue());
