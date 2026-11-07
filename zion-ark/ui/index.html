@@ -77,9 +77,18 @@ h1{font-size:66px;font-weight:900;letter-spacing:-.05em;line-height:.9;margin:8p
 .tog.on{color:#ffd58a}.tog.on b{background:radial-gradient(circle at 40% 35%,#fff1c4,var(--amb) 50%,#7a3d05);box-shadow:0 0 10px var(--amb)}
 .tog.red.on b{background:radial-gradient(circle,#ffb3bc,var(--rr) 55%,#5a0a14);box-shadow:0 0 10px var(--rr)}.tog.red.on{color:#ff9aa6}
 .pads{display:flex;gap:10px}
-.pad{width:100%;height:46px;border-radius:14px;border:1px solid rgba(212,175,55,.18);background:linear-gradient(180deg,#1a1610,#080706);box-shadow:0 5px 0 #000,0 7px 12px rgba(0,0,0,.7),inset 0 1px 0 rgba(255,230,160,.08);color:rgba(255,255,255,.7);font-size:9px;font-weight:900;letter-spacing:.2em;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;transition:transform .05s}
+.pad{width:100%;height:62px;border-radius:14px;border:1px solid rgba(212,175,55,.18);background:linear-gradient(180deg,#1a1610,#080706);box-shadow:0 5px 0 #000,0 7px 12px rgba(0,0,0,.7),inset 0 1px 0 rgba(255,230,160,.08);color:rgba(255,255,255,.7);font-size:9px;font-weight:900;letter-spacing:.2em;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;transition:transform .05s}
 .chips{display:flex;gap:4px;margin-top:6px}.chip{flex:1;height:20px;border-radius:7px;border:1px solid rgba(255,255,255,.07);background:#070605;color:rgba(255,255,255,.4);font-size:7.5px;font-weight:800;letter-spacing:.08em;padding:0;white-space:nowrap;overflow:hidden}.chip.on{color:#1a0f02;background:linear-gradient(180deg,#ffd58a,var(--amb));border-color:transparent}.padw{flex:1;display:flex;flex-direction:column}
 .pad.auto{border-color:var(--gold);box-shadow:0 5px 0 #000,0 0 26px rgba(212,175,55,.7);background:linear-gradient(180deg,#3a2c0c,#120d04);color:#FFE9A8}
+.pad.armed{border-color:rgba(212,175,55,.75);color:#FFE9A8}.pad.armed small{color:#ffd58a}
+.pop{position:absolute;z-index:20;width:330px;padding:14px;border-radius:20px;background:linear-gradient(180deg,#1e1810,#0a0806);border:1px solid rgba(212,175,55,.55);box-shadow:0 20px 50px rgba(0,0,0,.9),0 0 30px rgba(212,175,55,.2)}
+.pop .t{font-size:13px;font-weight:900;letter-spacing:-.02em;color:#f3dc8a;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center}
+.pop .t button{background:none;border:none;color:rgba(255,255,255,.5);font-size:14px}
+.pop .q{font-size:7.5px;font-weight:800;letter-spacing:.3em;color:rgba(212,175,55,.7);margin:8px 0 6px}
+.pop .opts{display:flex;gap:5px}.pop .opts button{flex:1;height:30px;border-radius:9px;border:1px solid rgba(255,255,255,.08);background:#070605;color:rgba(255,255,255,.6);font-size:8.5px;font-weight:800;letter-spacing:.05em}
+.pop .opts button.on{color:#1a0f02;background:linear-gradient(180deg,#ffd58a,var(--amb));border-color:transparent;box-shadow:0 0 12px rgba(242,169,59,.45)}
+.pop .fire{margin-top:12px;width:100%;height:36px;border-radius:11px;border:1px solid rgba(34,211,238,.4);background:#06181b;color:#c9fbff;font-size:8.5px;font-weight:900;letter-spacing:.25em}
+.pop .fire.hold,.pop .fire.on{background:var(--cy);color:#050505;box-shadow:0 0 20px var(--cy)}
 .pad small{font-size:7px;font-weight:800;letter-spacing:.3em;color:rgba(212,175,55,.6)}
 .pad.hold,.pad:active{transform:translateY(3px);box-shadow:0 2px 0 #000,0 0 22px rgba(34,211,238,.5);background:linear-gradient(180deg,#0f3b42,#06181b);color:#c9fbff;border-color:var(--cy)}
 .pad.on{background:linear-gradient(180deg,#4a0f18,#1a0508);border-color:var(--rr);color:#ffb3bc;box-shadow:0 5px 0 #000,0 0 22px rgba(215,38,61,.45)}
@@ -163,9 +172,9 @@ body.plug{background:#050505;overflow:hidden}body.plug .page{padding:0;max-width
     </div>
 
     <div class="r2">
-      <div class="sec"><div class="plate"><i class="scr"></i><span class="t">Dub Desk</span><span class="lbl">tap / hold = live · chips = auto at the end of every 1, 2, 4 or 8 bars</span><i class="scr"></i></div>
-        <div class="pads"><div class="padw"><button class="pad" id="pCut">DRY CUT<small>mute · tail rings</small></button><div class="chips"><button class="chip ev" data-p="cut">OFF</button><button class="chip ln" data-p="cut">1/4</button></div></div><div class="padw"><button class="pad" id="pTE">THROW<small>echo</small></button><div class="chips"><button class="chip ev" data-p="thE">OFF</button><button class="chip ln" data-p="thE">1/4</button></div></div><div class="padw"><button class="pad" id="pTS">THROW<small>spring</small></button><div class="chips"><button class="chip ev" data-p="thS">OFF</button><button class="chip ln" data-p="thS">1/4</button></div></div><div class="padw"><button class="pad" id="pWarp">WARP<small>tape dive</small></button><div class="chips"><button class="chip ev" data-p="warp">OFF</button><button class="chip ln" data-p="warp">1/4</button></div></div><div class="padw"><button class="pad red" id="pKick">KICK<small>spring crash</small></button><div class="chips"><button class="chip ev" data-p="kick">OFF</button><button class="chip ln" data-p="kick">1/4</button></div></div><div class="padw"><button class="pad red" id="pSir">SIREN<small>sound system</small></button><div class="chips"><button class="chip ev" data-p="siren">OFF</button><button class="chip ln" data-p="siren">1/4</button></div></div></div>
-        <div class="krow" style="margin-top:8px;justify-content:flex-start;gap:18px;align-items:center"><span class="lbl" style="width:70px;line-height:1.8">Siren</span><div data-id="srPitch"></div><div data-id="srRate"></div><div data-id="srDepth"></div><div data-id="srWave"></div><div style="flex:1"></div><span class="lbl" style="color:rgba(212,175,55,.5);text-align:right;line-height:2">EVERY = how many bars<br>LAST = how much of the bar end</span></div></div>
+      <div class="sec"><div class="plate"><i class="scr"></i><span class="t">Dub Desk</span><span class="lbl">tap an effect · choose when it plays · it follows your song</span><i class="scr"></i></div>
+        <div class="pads"><div class="padw"><button class="pad" id="pCut">DRY CUT<small class="sch" data-p="cut">TAP TO SET</small></button></div><div class="padw"><button class="pad" id="pTE">THROW<small class="sch" data-p="thE">TAP TO SET</small></button></div><div class="padw"><button class="pad" id="pTS">THROW<small class="sch" data-p="thS">TAP TO SET</small></button></div><div class="padw"><button class="pad" id="pWarp">WARP<small class="sch" data-p="warp">TAP TO SET</small></button></div><div class="padw"><button class="pad red" id="pKick">KICK<small class="sch" data-p="kick">TAP TO SET</small></button></div><div class="padw"><button class="pad red" id="pSir">SIREN<small class="sch" data-p="siren">TAP TO SET</small></button></div></div>
+        <div class="krow" style="margin-top:8px;justify-content:flex-start;gap:18px;align-items:center"><span class="lbl" style="width:70px;line-height:1.8">Siren</span><div data-id="srPitch"></div><div data-id="srRate"></div><div data-id="srDepth"></div><div data-id="srWave"></div><div style="flex:1"></div><span class="lbl" style="color:rgba(212,175,55,.5);text-align:right;line-height:2">Tap a pad to choose<br>every 1 · 2 · 4 · 8 bars</span></div></div>
       <div class="sec"><div class="plate"><i class="scr"></i><span class="t">Ark Tape 4</span><span class="lbl">quarter-inch · mono · ref match</span><i class="scr"></i></div>
         <div style="display:flex;gap:12px;align-items:center">
           <div style="display:flex;flex-direction:column;gap:6px;align-items:center"><canvas class="vu" id="vuIn"></canvas><span class="lbl">Input</span></div>
@@ -400,7 +409,7 @@ function echoTone(){return 7000*Math.pow(1800/7000,C.eAge.val())*Math.max(.6,Mat
 function applyBounce(v){const g=v*4;ST(A.bLp.frequency,20000*Math.pow(.72,g));ST(A.bPk.gain,.9*g);ST(A.bHp.frequency,22+6*g);A.drive.curve=satCurve(C.tDrive.val()*(1+.22*g))}
 function setHeads(v,tc=.09){if(ctx&&E.tone)ST(E.tone.frequency,echoTone());E.heads.forEach((d,i)=>d.delayTime.setTargetAtTime(v*E.ratios[i],ctx.currentTime,tc))}
 function refreshToggles(){$('#phOn').classList.toggle('on',state.phOn);$('#phWave').classList.toggle('on',state.phWave==='square');$('#phWave').lastChild.textContent=state.phWave==='square'?'SQUARE':'SINE';
-  $('#aux').classList.toggle('on',state.aux);$('#aux span').textContent=state.aux?'AUX 100%':'INSERT';$('#sync').classList.toggle('on',state.sync);$('#byp').classList.toggle('on',state.byp);$('#pCut').classList.toggle('on',state.cut);$$('.chip.ev').forEach(b=>{const v=state.auto[b.dataset.p];b.textContent=v?'EVERY '+EVERY[v]:'AUTO OFF';b.classList.toggle('on',v>0)});$$('.chip.ln').forEach(b=>{b.textContent='LAST '+LEN_L[state.len[b.dataset.p]];b.classList.toggle('on',state.auto[b.dataset.p]>0)});$('#match').classList.toggle('on',state.match>0);$('#match').lastChild.textContent=ML2[state.match];$('#mono').classList.toggle('on',state.mono);
+  $('#aux').classList.toggle('on',state.aux);$('#aux span').textContent=state.aux?'AUX 100%':'INSERT';$('#sync').classList.toggle('on',state.sync);$('#byp').classList.toggle('on',state.byp);$('#pCut').classList.toggle('on',state.cut);$$('.sch').forEach(el=>{const k=el.dataset.p,v=state.auto[k];el.textContent=v?'EVERY '+EVERY[v]+' · '+LEN_L[state.len[k]]:(k==='cut'&&state.cut?'CUT · TAP':'TAP TO SET');el.parentNode.classList.toggle('armed',v>0)});if(window.popRefresh)popRefresh();$('#match').classList.toggle('on',state.match>0);$('#match').lastChild.textContent=ML2[state.match];$('#mono').classList.toggle('on',state.mono);
   applyMode();if(ctx){applyIO();applyPhase();applyTape()}if(onState&&!hostSet)onState()}
 function applyTape(){ST(A.st.gain,state.mono?0:1,.02);ST(A.mo.gain,state.mono?1:0,.02);const on=state.match>0&&!state.byp,ef=on?ERA[state.match]:20000;ST(A.era1.frequency,ef,.05);ST(A.era2.frequency,ef,.05);if(!on){matchG=matchG.map(()=>0);A.meq.forEach(b=>ST(b.gain,0,.2))}}
 function applyIO(){const m=C.mix.val();ST(A.cleanD.gain,state.byp?1:1-m,.02);ST(A.wetG.gain,state.byp?0:m,.02);ST(A.dry.gain,state.aux||state.cut?0:1,.006)}
@@ -410,21 +419,38 @@ $('#phWave').onclick=()=>{state.phWave=state.phWave==='sine'?'square':'sine';ens
 $('#aux').onclick=()=>{state.aux=!state.aux;ensure();refreshToggles()};
 $('#byp').onclick=()=>{state.byp=!state.byp;ensure();refreshToggles()};
 $('#sync').onclick=()=>{const v=C.time.val();state.sync=!state.sync;C.time.steps=state.sync?7:0;if(state.sync){let b=0,bd=9;DIVS.forEach((d,i)=>{const e=Math.abs(Math.log(d[1]*60/state.bpm/v));if(e<bd){bd=e;b=i}});C.time.p=b/6}else{C.time.p=Math.log(v/.05)/Math.log(16)}setP(C.time,C.time.p,true);refreshToggles()};
-$$('.chip.ev').forEach(b=>b.onclick=()=>{const k=b.dataset.p;state.auto=Object.assign({},state.auto,{[k]:(state.auto[k]+1)%5});ensure();refreshToggles()});
-$$('.chip.ln').forEach(b=>b.onclick=()=>{const k=b.dataset.p;state.len=Object.assign({},state.len,{[k]:(state.len[k]+1)%4});ensure();refreshToggles()});
 $('#match').onclick=()=>{state.match=(state.match+1)%5;ensure();refreshToggles()};
 $('#mono').onclick=()=>{state.mono=!state.mono;ensure();refreshToggles()};
-$('#pCut').onclick=()=>{state.cut=!state.cut;ensure();refreshToggles()};
 function hold(el,down,up){let h=false;el.addEventListener('pointerdown',e=>{e.preventDefault();ensure();h=true;el.classList.add('hold');down()});const u=()=>{if(h){h=false;el.classList.remove('hold');up()}};['pointerup','pointercancel','pointerleave'].forEach(t=>el.addEventListener(t,u))}
 const padSet=(id,v)=>{if(PLUG){window.zaPad&&window.zaPad(id,v);return true}return false};
-hold($('#pTE'),()=>padSet('thE',1)||ST(A.eThrow.gain,1.1,.008),()=>padSet('thE',0)||ST(A.eThrow.gain,0,.02));
-hold($('#pTS'),()=>padSet('thS',1)||ST(A.sThrow.gain,1.1,.008),()=>padSet('thS',0)||ST(A.sThrow.gain,0,.02));
-hold($('#pWarp'),()=>padSet('warp',1)||setHeads(C.time.val()*2.3,.35),()=>padSet('warp',0)||setHeads(C.time.val(),.25));
-hold($('#pSir'),()=>padSet('siren',1)||ST(SR.env.gain,.18,.008),()=>padSet('siren',0)||ST(SR.env.gain,0,.03));
+const LIVE={thE:[()=>padSet('thE',1)||ST(A.eThrow.gain,1.1,.008),()=>padSet('thE',0)||ST(A.eThrow.gain,0,.02)],
+  thS:[()=>padSet('thS',1)||ST(A.sThrow.gain,1.1,.008),()=>padSet('thS',0)||ST(A.sThrow.gain,0,.02)],
+  warp:[()=>padSet('warp',1)||setHeads(C.time.val()*2.3,.35),()=>padSet('warp',0)||setHeads(C.time.val(),.25)],
+  siren:[()=>padSet('siren',1)||ST(SR.env.gain,.18,.008),()=>padSet('siren',0)||ST(SR.env.gain,0,.03)]};
+const PNAME={cut:'Dry Cut',thE:'Throw · Echo',thS:'Throw · Spring',warp:'Warp · Tape Dive',kick:'Kick · Spring Crash',siren:'Siren'};
+let popEl=null,popK=null;
+function closePop(){if(popEl){popEl.remove();popEl=null;popK=null}}
+function openPop(k){closePop();ensure();popK=k;const pad=$(PADEL[k]),sec=pad.closest('.sec'),sc=$('#stage').getBoundingClientRect().width/1280,pr=pad.getBoundingClientRect(),sr=sec.getBoundingClientRect();
+  const el=document.createElement('div');el.className='pop';
+  const fireLbl=k==='cut'?'CUT NOW · TAP AGAIN TO RETURN':k==='kick'?'KICK NOW':'HOLD TO PLAY NOW';
+  el.innerHTML=`<div class="t">${PNAME[k]}<button>✕</button></div><div class="q">WHEN · AT THE END OF</div><div class="opts ev">${['OFF','EVERY BAR','EVERY 2','EVERY 4','EVERY 8'].map((t,i)=>`<button data-i="${i}">${t}</button>`).join('')}</div>
+    <div class="q">HOW MUCH OF THAT BAR</div><div class="opts ln">${['LAST 1/8','LAST 1/4','LAST 1/2','WHOLE BAR'].map((t,i)=>`<button data-i="${i}">${t}</button>`).join('')}</div><button class="fire">${fireLbl}</button>`;
+  sec.appendChild(el);const w=330,x=Math.max(8,Math.min((pr.left-sr.left)/sc+(pr.width/sc)/2-w/2,sr.width/sc-w-8));el.style.left=x+'px';el.style.bottom=((sr.bottom-pr.top)/sc+8)+'px';popEl=el;
+  el.querySelector('.t button').onclick=closePop;
+  el.querySelectorAll('.ev button').forEach(b=>b.onclick=()=>{state.auto=Object.assign({},state.auto,{[k]:+b.dataset.i});refreshToggles()});
+  el.querySelectorAll('.ln button').forEach(b=>b.onclick=()=>{state.len=Object.assign({},state.len,{[k]:+b.dataset.i});if(!state.auto[k])state.auto=Object.assign({},state.auto,{[k]:3});refreshToggles()});
+  const f=el.querySelector('.fire');
+  if(k==='cut')f.onclick=()=>{state.cut=!state.cut;refreshToggles()};
+  else if(k==='kick')f.addEventListener('pointerdown',()=>{if(padSet('kick',1)){setTimeout(()=>padSet('kick',0),90);shakeSpring()}else kickSpring();f.classList.add('on');setTimeout(()=>f.classList.remove('on'),150)});
+  else hold(f,LIVE[k][0],LIVE[k][1]);
+  popRefresh()}
+function popRefresh(){if(!popEl)return;const k=popK;popEl.querySelectorAll('.ev button').forEach(b=>b.classList.toggle('on',+b.dataset.i===state.auto[k]));popEl.querySelectorAll('.ln button').forEach(b=>b.classList.toggle('on',+b.dataset.i===state.len[k]&&state.auto[k]>0));if(k==='cut')popEl.querySelector('.fire').classList.toggle('on',state.cut)}
+PADS.forEach(k=>$(PADEL[k]).addEventListener('click',e=>{e.stopPropagation();popK===k?closePop():openPop(k)}));
+document.addEventListener('pointerdown',e=>{if(popEl&&!popEl.contains(e.target)&&!e.target.closest('.pad'))closePop()});
 function shakeSpring(){const sv=$('#springSvg');sv.classList.remove('shake');void sv.offsetWidth;sv.classList.add('shake')}
 function kickSpring(){const t=ctx.currentTime,s=ctx.createBufferSource(),g=ctx.createGain();s.buffer=noiseBuf;g.gain.setValueAtTime(3,t);g.gain.exponentialRampToValueAtTime(.001,t+.06);s.connect(g).connect(S.in);s.start(t,Math.random());s.stop(t+.08);
   const o=ctx.createOscillator(),g2=ctx.createGain();o.frequency.setValueAtTime(90,t);o.frequency.exponentialRampToValueAtTime(30,t+.1);g2.gain.setValueAtTime(2.5,t);g2.gain.exponentialRampToValueAtTime(.001,t+.12);o.connect(g2).connect(S.in);o.start(t);o.stop(t+.13);shakeSpring()}
-$('#pKick').addEventListener('pointerdown',()=>{if(padSet('kick',1)){setTimeout(()=>padSet('kick',0),90);shakeSpring();return}ensure();kickSpring()});
+
 
 /* ================= AUDIO ENGINE (insert-effect signal flow) ================= */
 function ensure(){if(PLUG)return;if(!ctx)initAudio();if(ctx.state!=='running')ctx.resume()}

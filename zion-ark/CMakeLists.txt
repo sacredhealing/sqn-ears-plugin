@@ -1,5 +1,5 @@
 cmake_minimum_required (VERSION 3.22)
-project (ZION_ARK VERSION 0.3.0)
+project (ZION_ARK VERSION 0.3.1)
 set (CMAKE_CXX_STANDARD 17)
 
 set (JUCE_DIR "${CMAKE_SOURCE_DIR}/JUCE" CACHE PATH "JUCE checkout")

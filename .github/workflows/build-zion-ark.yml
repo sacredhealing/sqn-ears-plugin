@@ -38,8 +38,8 @@ jobs:
           mkdir -p pkg/au pkg/vst3
           cp -R "$A/AU/Zion Ark.component" pkg/au/
           cp -R "$A/VST3/Zion Ark.vst3" pkg/vst3/
-          pkgbuild --root pkg/au --identifier com.siddhaquantumnexus.zionark.au --version 0.3.0 --install-location "/Library/Audio/Plug-Ins/Components" au.pkg
-          pkgbuild --root pkg/vst3 --identifier com.siddhaquantumnexus.zionark.vst3 --version 0.3.0 --install-location "/Library/Audio/Plug-Ins/VST3" vst3.pkg
+          pkgbuild --root pkg/au --identifier com.siddhaquantumnexus.zionark.au --version 0.3.1 --install-location "/Library/Audio/Plug-Ins/Components" au.pkg
+          pkgbuild --root pkg/vst3 --identifier com.siddhaquantumnexus.zionark.vst3 --version 0.3.1 --install-location "/Library/Audio/Plug-Ins/VST3" vst3.pkg
           productbuild --package au.pkg --package vst3.pkg "Zion_Ark_Installer.pkg"
           ls -la Zion_Ark_Installer.pkg
       - uses: actions/upload-artifact@v4
